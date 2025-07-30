@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 # Yoga Kailasa
 
 Yoga Kailasa is a Django-based web platform for online yoga courses, breathing techniques, and personalized consultations. It features user authentication, course management, testimonials, newsletter subscriptions, and more, all styled with Tailwind CSS for a modern, responsive UI.
