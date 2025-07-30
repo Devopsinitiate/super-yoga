@@ -1,0 +1,211 @@
+{% extends 'yoga_app/base.html' %}
+{% load static %}
+{% load custom_filters %} {# Ensure this is loaded for add_class filter #}
+
+
+{% block title %}Edit Profile - Yoga Kailasa{% endblock %}
+
+{% block meta_description %}Manage your Yoga Kailasa user profile. Update your email address, change your password, upload a profile picture, or update your bio securely.{% endblock %}
+
+{% block og_title %}Edit Profile - Yoga Kailasa{% endblock %}
+{% block og_description %}Manage your Yoga Kailasa user profile. Update your email address, change your password, upload a profile picture, or update your bio securely.{% endblock %}
+{% block og_image %}{% static 'yoga_app/images/default_profile_og_image.jpg' %}{% endblock %}
+
+
+{% block content %}
+<section class="py-16 bg-gradient-to-r from-amber-100 to-amber-50 min-h-screen flex items-center justify-center">
+    <div class="container mx-auto px-4 max-w-2xl">
+        <div class="bg-white p-8 rounded-xl shadow-lg animate-fade-in-up" style="animation-delay: 0.1s;">
+            <h2 class="text-3xl font-bold text-gray-800 mb-6 text-center">Edit Your Profile</h2>
+            <p class="text-gray-600 text-center mb-8">Update your account details, profile picture, bio, or change your password.</p>
+
+            {# Display Messages (handled by base.html toast system) #}
+            {# The Django messages are captured by JS in base.html and displayed as toasts #}
+            {# This block can remain as a fallback or for server-side redirects without JS #}
+            {% if messages %}
+                <div class="mb-6">
+                    {% for message in messages %}
+                        <div class="p-3 rounded-md mb-2 text-sm {% if message.tags == 'success' %}bg-green-100 text-green-800{% elif message.tags == 'error' %}bg-red-100 text-red-800{% elif message.tags == 'info' %}bg-blue-100 text-blue-800{% endif %}">
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+
+            {# Profile Picture & Bio Update Form #}
+            <div class="mb-8 p-6 border border-gray-200 rounded-lg animate-fade-in-up" style="animation-delay: 0.2s;">
+                <h3 class="text-xl font-semibold text-gray-800 mb-4">Update Profile Details</h3>
+                <form method="post" action="{% url 'profile_edit' %}" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    
+                    {# Current Profile Picture Display #}
+                    <div class="mb-6 text-center">
+                        {% if user_profile.profile_picture %}
+                            <img src="{{ user_profile.profile_picture.url }}" alt="Profile Picture" class="w-32 h-32 rounded-full mx-auto object-cover border-4 border-amber-300 shadow-md">
+                        {% else %}
+                            <div class="w-32 h-32 rounded-full mx-auto bg-gray-200 flex items-center justify-center text-gray-400 text-5xl border-4 border-gray-300 shadow-md">
+                                <i class="fas fa-user-circle"></i>
+                            </div>
+                        {% endif %}
+                        <p class="text-gray-600 text-sm mt-2">Current Profile Picture</p>
+                    </div>
+
+                    {# Profile Picture Field #}
+                    <div class="mb-4">
+                        {{ user_profile_form.profile_picture.label_tag }}
+                        {{ user_profile_form.profile_picture|add_class:'w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100' }}
+                        {% if user_profile_form.profile_picture.errors %}<p class="text-red-500 text-xs italic mt-1">{{ user_profile_form.profile_picture.errors }}</p>{% endif %}
+                    </div>
+
+                    {# Bio Field #}
+                    <div class="mb-4">
+                        {{ user_profile_form.bio.label_tag }}
+                        {{ user_profile_form.bio|add_class:'w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500' }}
+                        {% if user_profile_form.bio.errors %}<p class="text-red-500 text-xs italic mt-1">{{ user_profile_form.bio.errors }}</p>{% endif %}
+                    </div>
+
+                    <button type="submit" name="update_profile" class="w-full bg-amber-500 hover:bg-amber-600 text-white px-6 py-3 rounded-full transition duration-300 mt-4 transform hover:scale-105">
+                        Update Profile <i class="fas fa-save ml-2"></i>
+                    </button>
+                </form>
+            </div>
+
+            {# Account Information Update Form (Username & Email) #}
+            <div class="mb-8 p-6 border border-gray-200 rounded-lg animate-fade-in-up" style="animation-delay: 0.3s;">
+                <h3 class="text-xl font-semibold text-gray-800 mb-4">Update Account Details</h3>
+                <form method="post" action="{% url 'profile_edit' %}">
+                    {% csrf_token %}
+                    {# user_account_form is the renamed UserProfileUpdateForm from forms.py #}
+                    <div class="mb-4">
+                        {{ user_account_form.username.label_tag }}
+                        {{ user_account_form.username|add_class:'w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500' }}
+                        {% if user_account_form.username.errors %}<p class="text-red-500 text-xs italic mt-1">{{ user_account_form.username.errors }}</p>{% endif %}
+                    </div>
+                    <div class="mb-4">
+                        {{ user_account_form.email.label_tag }}
+                        {{ user_account_form.email|add_class:'w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500' }}
+                        {% if user_account_form.email.errors %}<p class="text-red-500 text-xs italic mt-1">{{ user_account_form.email.errors }}</p>{% endif %}
+                    </div>
+                    <button type="submit" name="update_account" class="w-full bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-full transition duration-300 mt-4 transform hover:scale-105">
+                        Update Account <i class="fas fa-user-edit ml-2"></i>
+                    </button>
+                </form>
+            </div>
+
+            {# Password Change Form #}
+            <div class="mb-8 p-6 border border-gray-200 rounded-lg animate-fade-in-up" style="animation-delay: 0.4s;">
+                <h3 class="text-xl font-semibold text-gray-800 mb-4">Change Password</h3>
+                <form method="post" action="{% url 'profile_edit' %}">
+                    {% csrf_token %}
+                    <div class="mb-4">
+                        <label for="{{ password_form.old_password.id_for_label }}" class="block text-gray-700 text-sm font-medium mb-2 text-left">Current Password</label>
+                        {{ password_form.old_password|add_class:'w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500' }}
+                        {% for error in password_form.old_password.errors %}
+                            <p class="text-red-500 text-xs italic text-left">{{ error }}</p>
+                        {% endfor %}
+                    </div>
+                    <div class="mb-4">
+                        <label for="{{ password_form.new_password1.id_for_label }}" class="block text-gray-700 text-sm font-medium mb-2 text-left">New Password</label>
+                        {{ password_form.new_password1|add_class:'w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500' }}
+                        {% if password_form.new_password1.help_text %}
+                            <p class="text-xs text-gray-500 mt-1 text-left">{{ password_form.new_password1.help_text }}</p>
+                        {% endif %}
+                        {% for error in password_form.new_password1.errors %}
+                            <p class="text-red-500 text-xs italic text-left">{{ error }}</p>
+                        {% endfor %}
+                    </div>
+                    <div class="mb-4">
+                        <label for="{{ password_form.new_password2.id_for_label }}" class="block text-gray-700 text-sm font-medium mb-2 text-left">Confirm New Password</label>
+                        {{ password_form.new_password2|add_class:'w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500' }}
+                        {% for error in password_form.new_password2.errors %}
+                            <p class="text-red-500 text-xs italic text-left">{{ error }}</p>
+                        {% endfor %}
+                    </div>
+                    <button type="submit" name="change_password" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-3 rounded-full transition duration-300 mt-4 transform hover:scale-105">
+                        Change Password <i class="fas fa-key ml-2"></i>
+                    </button>
+                </form>
+            </div>
+
+            {# Delete Account Section #}
+            <div class="p-6 border border-red-200 rounded-lg bg-red-50 animate-fade-in-up" style="animation-delay: 0.5s;" id="delete-account-section">
+                <h3 class="text-xl font-semibold text-red-800 mb-4">Delete Account</h3>
+                <p class="text-red-700 mb-6">
+                    Deleting your account is a permanent action and cannot be undone. All your data, including enrolled courses, reviews, and discussion posts, will be removed.
+                </p>
+                {# Button to trigger custom confirmation modal #}
+                <button type="button" id="open-delete-modal" class="w-full bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-full transition duration-300 transform hover:scale-105">
+                    Delete My Account <i class="fas fa-exclamation-triangle ml-2"></i>
+                </button>
+            </div>
+
+            <div class="text-center mt-8 animate-fade-in-up" style="animation-delay: 0.6s;">
+                <a href="{% url 'dashboard' %}" class="text-amber-600 hover:underline">Back to Dashboard</a>
+            </div>
+        </div>
+    </div>
+</section>
+
+{# Custom Delete Confirmation Modal #}
+<div id="delete-confirm-modal" class="fixed inset-0 bg-gray-800 bg-opacity-75 flex items-center justify-center z-[1001] hidden">
+    <div class="bg-white p-8 rounded-lg shadow-xl max-w-md w-full mx-4 transform transition-transform duration-300 scale-95 opacity-0" id="modal-content">
+        <h3 class="text-2xl font-bold text-red-700 mb-4 text-center">Confirm Account Deletion</h3>
+        <p class="text-gray-700 mb-6 text-center">
+            Are you absolutely sure you want to delete your account? This action is irreversible. All your data will be permanently removed.
+        </p>
+        <form method="post" action="{% url 'delete_account' %}" class="flex justify-center space-x-4">
+            {% csrf_token %}
+            <button type="button" id="cancel-delete" class="bg-gray-300 hover:bg-gray-400 text-gray-800 px-6 py-3 rounded-full transition duration-300">
+                Cancel
+            </button>
+            <button type="submit" class="bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-full transition duration-300">
+                Yes, Delete My Account
+            </button>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+{{ block.super }}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        /* Custom Delete Confirmation Modal Logic */
+        const openModalBtn = document.getElementById('open-delete-modal');
+        const deleteModal = document.getElementById('delete-confirm-modal');
+        const modalContent = document.getElementById('modal-content');
+        const cancelDeleteBtn = document.getElementById('cancel-delete');
+
+        if (openModalBtn && deleteModal && modalContent && cancelDeleteBtn) {
+            openModalBtn.addEventListener('click', function() {
+                deleteModal.classList.remove('hidden');
+                setTimeout(() => {
+                    modalContent.classList.remove('scale-95', 'opacity-0');
+                    modalContent.classList.add('scale-100', 'opacity-100');
+                }, 10); // Small delay to ensure hidden is removed before transition
+            });
+
+            cancelDeleteBtn.addEventListener('click', function() {
+                modalContent.classList.remove('scale-100', 'opacity-100');
+                modalContent.classList.add('scale-95', 'opacity-0');
+                modalContent.addEventListener('transitionend', function handler() {
+                    deleteModal.classList.add('hidden');
+                    modalContent.removeEventListener('transitionend', handler);
+                }, { once: true });
+            });
+
+            // Close modal if clicked outside of modal content
+            deleteModal.addEventListener('click', function(event) {
+                if (event.target === deleteModal) {
+                    modalContent.classList.remove('scale-100', 'opacity-100');
+                    modalContent.classList.add('scale-95', 'opacity-0');
+                    modalContent.addEventListener('transitionend', function handler() {
+                        deleteModal.classList.add('hidden');
+                        modalContent.removeEventListener('transitionend', handler);
+                    }, { once: true });
+                }
+            });
+        }
+    });
+</script>
+{% endblock %}

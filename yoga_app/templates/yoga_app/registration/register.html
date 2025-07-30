@@ -1,0 +1,54 @@
+{# yoga_app/templates/yoga_app/registration/register.html #}
+{% extends 'yoga_app/base.html' %}
+{% load static %}
+
+{% block title %}Register - Yoga Kailasa{% endblock %}
+
+{% block content %}
+<section class="py-16 bg-gradient-to-r from-amber-100 to-amber-50 min-h-screen flex items-center justify-center">
+    <div class="bg-white p-8 rounded-lg shadow-xl text-center max-w-md w-full">
+        <h2 class="text-2xl font-bold text-gray-800 mb-6">Create Your Account</h2>
+
+        <form method="post" action="{% url 'register' %}">
+            {% csrf_token %}
+            {% if form.errors %}
+                {# Adjusted error message block to match login.html #}
+                <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4" role="alert">
+                    <p class="font-bold">Error!</p> {# Concise error heading #}
+                    <ul>
+                        {% for field in form %}
+                            {% if field.errors %}
+                                {% for error in field.errors %}<li>{{ field.label }}: {{ error }}</li>{% endfor %}
+                            {% endif %}
+                        {% endfor %}
+                        {% if form.non_field_errors %}
+                            {% for error in form.non_field_errors %}<li>{{ error }}</li>{% endfor %}
+                        {% endif %}
+                    </ul>
+                </div>
+            {% endif %}
+
+            {# This loop will now correctly render all fields with styling from forms.py #}
+            {% for field in form %}
+                <div class="mb-4"> {# Use mb-4 for all fields for consistent spacing #}
+                    <label for="{{ field.id_for_label }}" class="block text-gray-700 text-sm font-medium mb-2 text-left">{{ field.label }}</label>
+                    {{ field }}
+                    {% if field.help_text %}
+                        <p class="text-xs text-gray-500 mt-1 text-left">{{ field.help_text }}</p>
+                    {% endif %}
+                    {% for error in field.errors %}
+                        <p class="text-red-500 text-xs italic text-left">{{ error }}</p>
+                    {% endfor %}
+                </div>
+            {% endfor %}
+
+            <button type="submit" class="w-full bg-amber-500 hover:bg-amber-600 text-white font-medium py-3 px-4 rounded-lg transition duration-300">
+                Register
+            </button>
+        </form>
+
+        <p class="mt-6 text-gray-600 text-sm">Already have an account? <a href="{% url 'login' %}" class="text-amber-500 hover:text-amber-600 font-semibold">Log In here</a></p>
+        <p class="mt-2 text-gray-600 text-sm">Forgot your password? <a href="{% url 'password_reset' %}" class="text-blue-500 hover:text-blue-600 font-semibold">Reset it</a></p>
+    </div>
+</section>
+{% endblock %}

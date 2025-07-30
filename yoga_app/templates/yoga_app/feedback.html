@@ -1,0 +1,210 @@
+{% extends 'yoga_app/base.html' %}
+{% load static %}
+
+{% block title %}Share Your Feedback - Yoga Kailasa{% endblock %}
+
+{% block meta_description %}Provide your valuable feedback and testimonials for Yoga Kailasa. Your insights help us improve our services and courses.{% endblock %}
+
+{% block og_title %}Feedback & Testimonials - Yoga Kailasa{% endblock %}
+{% block og_description %}Provide your valuable feedback and testimonials for Yoga Kailasa. Your insights help us improve our services and courses.{% endblock %}
+{% block og_image %}{% static 'yoga_app/images/default_feedback_og_image.jpg' %}{% endblock %} {# Placeholder for a default feedback OG image #}
+
+{% block extra_css %}
+<style>
+    /* CSS for the fade-in-up animation, specific to feedback.html elements */
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    .animate-fade-in-up {
+        opacity: 0; /* Hidden by default */
+        animation: fadeInUp 0.6s ease-out forwards;
+    }
+    /* Testimonial card styling (re-used from index.html) */
+    .testimonial-card {
+        background-color: #ffffff;
+        border-radius: 0.75rem; /* rounded-xl */
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        padding: 1.5rem;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+    }
+    .testimonial-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+    }
+    .testimonial-card .star-rating {
+        color: #f5b82e; /* amber-500 */
+        margin-bottom: 0.75rem;
+    }
+    .testimonial-card .quote-icon {
+        color: #fbd771; /* amber-300 */
+        font-size: 2.5rem;
+        margin-bottom: 1rem;
+    }
+    .testimonial-card .author {
+        font-weight: 600; /* semibold */
+        color: #4a5568; /* gray-700 */
+        margin-top: 1rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<section class="py-16 bg-gradient-to-r from-amber-100 to-amber-50 min-h-screen">
+    <div class="container mx-auto px-4 max-w-4xl">
+        <div class="bg-white p-8 rounded-xl shadow-lg">
+            <h2 class="text-3xl md:text-4xl font-bold text-gray-800 mb-6 text-center animate-fade-in-up" style="animation-delay: 0.1s;">Share Your Feedback</h2>
+            <p class="text-gray-600 text-center mb-8 animate-fade-in-up" style="animation-delay: 0.2s;">We'd love to hear about your experience with Yoga Kailasa. Your feedback helps us grow and improve!</p>
+
+            <div class="feedback-form-container animate-fade-in-up" style="animation-delay: 0.3s;">
+                <form method="post" action="{% url 'feedback' %}" class="space-y-6" id="feedback-form-page">
+                    {% csrf_token %}
+                    
+                    {# Display non-field errors #}
+                    {% if form.non_field_errors %}
+                        <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
+                            <strong class="font-bold">Error!</strong>
+                            <span class="block sm:inline">{{ form.non_field_errors }}</span>
+                        </div>
+                    {% endif %}
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="form-field-wrapper">
+                            {{ form.author_name.label_tag }}
+                            {{ form.author_name }}
+                            {% if form.author_name.help_text %}<p class="helptext">{{ form.author_name.help_text }}</p>{% endif %}
+                            {% for error in form.author_name.errors %}<p class="errorlist">{{ error }}</p>{% endfor %}
+                        </div>
+                        <div class="form-field-wrapper">
+                            {{ form.email.label_tag }}
+                            {{ form.email }}
+                            {% if form.email.help_text %}<p class="helptext">{{ form.email.help_text }}</p>{% endif %}
+                            {% for error in form.email.errors %}<p class="errorlist">{{ error }}</p>{% endfor %}
+                        </div>
+                    </div>
+
+                    <div class="form-field-wrapper">
+                        <label for="id_rating_testimonial" class="block font-semibold text-gray-700 mb-2">Your Rating</label> {# Corrected ID #}
+                        <div class="flex justify-center space-x-1 text-3xl text-gray-300" id="feedback-star-container"> {# Added container ID #}
+                            <i class="far fa-star rating-star" data-rating="1"></i>
+                            <i class="far fa-star rating-star" data-rating="2"></i>
+                            <i class="far fa-star rating-star" data-rating="3"></i>
+                            <i class="far fa-star rating-star" data-rating="4"></i>
+                            <i class="far fa-star rating-star" data-rating="5"></i>
+                        </div>
+                        {# Hidden input to store the actual rating value - Django's default ID is 'id_rating_testimonial' #}
+                        {{ form.rating }} {# This will render the hidden input with id="id_rating_testimonial" #}
+                        {% if form.rating.errors %}<p class="errorlist">{{ form.rating.errors }}</p>{% endif %}
+                    </div>
+
+                    <div class="form-field-wrapper">
+                        {{ form.feedback_text.label_tag }}
+                        {{ form.feedback_text }}
+                        {% if form.feedback_text.help_text %}<p class="helptext">{{ form.feedback_text.help_text }}</p>{% endif %}
+                        {% for error in form.feedback_text.errors %}<p class="errorlist">{{ error }}</p>{% endfor %}
+                    </div>
+
+                    <button type="submit" class="w-full bg-amber-500 hover:bg-amber-600 text-white font-bold py-3 px-6 rounded-full shadow-lg transition duration-300 transform hover:scale-105 flex items-center justify-center">
+                        Submit Feedback <i class="fas fa-paper-plane ml-2"></i>
+                    </button>
+                </form>
+            </div>
+
+            {% if testimonials %}
+            <div class="mt-12 text-center animate-fade-in-up" style="animation-delay: 0.4s;">
+                <h3 class="text-2xl font-bold text-gray-800 mb-6">What Others Are Saying</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    {% for testimonial in testimonials %}
+                    <div class="testimonial-card">
+                        <div class="star-rating">
+                            {% for i in "12345"|make_list %}
+                                {% if testimonial.rating >= forloop.counter %}
+                                    <i class="fas fa-star"></i>
+                                {% else %}
+                                    <i class="far fa-star"></i>
+                                {% endif %}
+                            {% endfor %}
+                        </div>
+                        <i class="fas fa-quote-right quote-icon"></i>
+                        <p class="text-gray-700 italic mb-4">"{{ testimonial.feedback_text }}"</p>
+                        <p class="author">- {{ testimonial.author_name }}</p>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+{{ block.super }}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Star rating for the feedback form on the dedicated feedback page
+        const feedbackStarContainer = document.getElementById('feedback-star-container');
+        // IMPORTANT: Ensure this ID matches the one set in forms.py for the hidden input
+        const hiddenFeedbackRatingInput = document.getElementById('id_rating_testimonial'); 
+
+        if (feedbackStarContainer && hiddenFeedbackRatingInput) {
+            const feedbackStars = feedbackStarContainer.querySelectorAll('.rating-star');
+            console.log("DEBUG: Feedback page star rating script active.");
+
+            function updateFeedbackStarVisuals(rating) {
+                feedbackStars.forEach(s => {
+                    const starRating = parseInt(s.getAttribute('data-rating'));
+                    if (starRating <= rating) {
+                        s.classList.remove('far');
+                        s.classList.add('fas');
+                        s.classList.add('text-amber-400');
+                    } else {
+                        s.classList.remove('fas');
+                        s.classList.add('far');
+                        s.classList.remove('text-amber-400');
+                    }
+                });
+            }
+
+            // Set initial visual state based on current value (if any)
+            const initialFeedbackRating = hiddenFeedbackRatingInput.value ? parseInt(hiddenFeedbackRatingInput.value) : 0;
+            if (initialFeedbackRating > 0) {
+                updateFeedbackStarVisuals(initialFeedbackRating);
+            }
+
+            feedbackStars.forEach(star => {
+                star.addEventListener('click', function() {
+                    const rating = parseInt(this.getAttribute('data-rating'));
+                    hiddenFeedbackRatingInput.value = rating; // Update hidden input
+                    updateFeedbackStarVisuals(rating); // Update visuals
+                    console.log("DEBUG: Feedback rating set to:", rating);
+                });
+
+                star.addEventListener('mouseover', function() {
+                    const rating = parseInt(this.getAttribute('data-rating'));
+                    updateFeedbackStarVisuals(rating); // Show hover effect
+                });
+
+                star.addEventListener('mouseout', function() {
+                    const currentRating = hiddenFeedbackRatingInput.value ? parseInt(hiddenFeedbackRatingInput.value) : 0;
+                    updateFeedbackStarVisuals(currentRating); // Revert to selected rating or 0
+                });
+            });
+        } else {
+            console.log("DEBUG: Feedback page star rating script NOT active (elements not found or no stars).");
+            if (!feedbackStarContainer) console.log("DEBUG: feedbackStarContainer not found.");
+            if (!hiddenFeedbackRatingInput) console.log("DEBUG: hiddenFeedbackRatingInput (id_rating_testimonial) not found.");
+        }
+    });
+</script>
+{% endblock %}

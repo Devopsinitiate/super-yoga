@@ -1,0 +1,188 @@
+{% extends 'yoga_app/base.html' %}
+{% load static %}
+
+{% block title %}{{ topic.title }} - Discussion - {{ course.title }} - Yoga Kailasa{% endblock %}
+
+{# NEW: Dynamic Meta Description for SEO #}
+{% block meta_description %}Discussion topic: "{{ topic.title }}" in the "{{ course.title }}" course forum. Posted by {{ topic.user.username }}. {{ topic.content|striptags|truncatechars:160 }}{% endblock %}
+
+{# NEW: Dynamic Open Graph Tags for Social Sharing #}
+{% block og_title %}{{ topic.title }} - Discussion - {{ course.title }}{% endblock %}
+{% block og_description %}Discussion topic: "{{ topic.title }}" in the "{{ course.title }}" course forum. Posted by {{ topic.user.username }}. {{ topic.content|striptags|truncatechars:200 }}{% endblock %}
+{% block og_image %}{% if course.image_url %}{{ course.image_url }}{% else %}{% static 'yoga_app/images/default_discussion_og_image.jpg' %}{% endif %}{% endblock %}
+
+
+{% block content %}
+<section class="py-16 bg-gradient-to-r from-amber-100 to-amber-50 min-h-screen">
+    <div class="container mx-auto px-4 max-w-4xl">
+        <div class="bg-white p-8 rounded-xl shadow-lg mb-8">
+            <div class="flex justify-between items-start mb-4">
+                <div>
+                    <h2 class="text-3xl font-bold text-gray-800">{{ topic.title }}</h2>
+                    <p class="text-gray-600 text-sm mt-1">
+                        Posted by <span class="font-semibold">{{ topic.user.username }}</span> on {{ topic.created_at|date:"M d, Y H:i" }}
+                        {% if topic.updated_at and topic.updated_at != topic.created_at %}
+                            (Last updated: {{ topic.updated_at|date:"M d, Y H:i" }})
+                        {% endif %}
+                    </p>
+                    <p class="text-gray-600 text-sm mt-1">
+                        Course: <a href="{% url 'course_detail' course.id %}" class="text-blue-600 hover:underline">{{ course.title }}</a>
+                        {% if topic.lesson %}
+                            <span class="ml-2">| Lesson: <a href="{% url 'course_content' course.id topic.lesson.id %}" class="text-blue-600 hover:underline">{{ topic.lesson.title }}</a></span>
+                        {% endif %}
+                    </p>
+                </div>
+                {# Edit and Delete Buttons for Topic Creator #}
+                {% if request.user == topic.user %}
+                    <div class="flex space-x-2 mt-2 md:mt-0">
+                        <a href="{% url 'edit_discussion_topic' course.id topic.id %}" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-full text-sm transition duration-300">
+                            <i class="fas fa-edit mr-1"></i> Edit Topic
+                        </a>
+                        <form action="{% url 'delete_discussion_topic' course.id topic.id %}" method="post" class="inline" onsubmit="return confirm('Are you sure you want to delete this discussion topic and all its replies? This action cannot be undone.');">
+                            {% csrf_token %}
+                            <button type="submit" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-full text-sm transition duration-300">
+                                <i class="fas fa-trash-alt mr-1"></i> Delete Topic
+                            </button>
+                        </form>
+                    </div>
+                {% endif %}
+            </div>
+
+            <div class="prose max-w-none text-gray-700 leading-relaxed border-t border-gray-200 pt-6">
+                {{ topic.content|safe }}
+            </div>
+        </div>
+
+        {# Discussion Posts (Replies) Section #}
+        <div class="bg-white p-8 rounded-xl shadow-lg">
+            <h3 class="text-2xl font-bold text-gray-800 mb-6 border-b pb-2">{{ posts.count }} Replies</h3>
+
+            {# Display Posts #}
+            <div class="space-y-6 mb-8">
+                {% for post in posts %}
+                    <div class="bg-gray-50 p-6 rounded-lg shadow-sm border border-gray-100">
+                        <div class="flex justify-between items-start mb-3">
+                            <div class="flex items-center">
+                                {# Profile Picture for Post Creator #}
+                                {% if post.user.profile.profile_picture %}
+                                    <img src="{{ post.user.profile.profile_picture.url }}" alt="{{ post.user.username }} Profile" class="w-10 h-10 rounded-full object-cover mr-3 border border-gray-300">
+                                {% else %}
+                                    <div class="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center text-gray-400 text-xl mr-3 border border-gray-300">
+                                        <i class="fas fa-user-circle"></i>
+                                    </div>
+                                {% endif %}
+                                <div>
+                                    <p class="font-semibold text-gray-800">{{ post.user.username }}</p>
+                                    <p class="text-gray-500 text-xs">{{ post.created_at|date:"M d, Y H:i" }}</p>
+                                </div>
+                            </div>
+                            <div class="flex items-center space-x-2">
+                                {# Like Button for Post #}
+                                {% if request.user.is_authenticated %}
+                                    <button 
+                                        class="like-button text-gray-600 hover:text-red-500 transition duration-200 flex items-center space-x-1 text-sm"
+                                        data-type="post"
+                                        data-id="{{ post.id }}"
+                                        data-course-id="{{ course.id }}"
+                                        data-topic-id="{{ topic.id }}"
+                                    >
+                                        <i class="{% if request.user in post.likes.all %}fas text-red-500{% else %}far{% endif %} fa-heart"></i>
+                                        <span class="likes-count">{{ post.likes.count }}</span>
+                                    </button>
+                                {% else %}
+                                    <span class="text-gray-400 flex items-center space-x-1 text-sm">
+                                        <i class="far fa-heart"></i>
+                                        <span>{{ post.likes.count }}</span>
+                                    </span>
+                                {% endif %}
+
+                                {# Edit and Delete Buttons for Post Creator #}
+                                {% if request.user == post.user %}
+                                    <a href="{% url 'edit_discussion_post' course.id topic.id post.id %}" class="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded-full text-xs transition duration-300">
+                                        <i class="fas fa-edit mr-1"></i> Edit
+                                    </a>
+                                    <form action="{% url 'delete_discussion_post' course.id topic.id post.id %}" method="post" class="inline" onsubmit="return confirm('Are you sure you want to delete this reply?');">
+                                        {% csrf_token %}
+                                        <button type="submit" class="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded-full text-xs transition duration-300">
+                                            <i class="fas fa-trash-alt mr-1"></i> Delete
+                                        </button>
+                                    </form>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="prose max-w-none text-gray-700 leading-relaxed">
+                            {{ post.content|safe }}
+                        </div>
+                    </div>
+                {% empty %}
+                    <p class="text-gray-600 text-center">No replies yet. Be the first to respond!</p>
+                {% endfor %}
+            </div>
+
+            {# Reply Form #}
+            <div class="mt-8 p-6 bg-gray-100 rounded-lg shadow-inner border border-gray-200">
+                <h4 class="text-xl font-bold text-gray-800 mb-4">Add a Reply</h4>
+                <form action="{% url 'course_discussion_detail' course.id topic.id %}" method="post" class="space-y-4">
+                    {% csrf_token %}
+                    <div>
+                        {{ form.content.label_tag }}
+                        {{ form.content }}
+                        {% if form.content.errors %}<p class="text-red-500 text-xs italic mt-1">{{ form.content.errors }}</p>{% endif %}
+                    </div>
+                    <button type="submit" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 px-6 rounded-full shadow-lg transition duration-300">
+                        Post Reply <i class="fas fa-reply ml-2"></i>
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+{{ block.super }} {# Keep inherited JS from base.html #}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Event listener for all like buttons (topics and posts)
+        document.querySelectorAll('.like-button').forEach(button => {
+            button.addEventListener('click', async function() {
+                const type = this.dataset.type; // 'topic' or 'post'
+                const id = this.dataset.id;
+                const courseId = this.dataset.courseId; // Needed for URL construction
+                const topicId = this.dataset.topicId; // Needed for post URLs
+
+                let url;
+                if (type === 'topic') {
+                    url = `/courses/${courseId}/discussion/${id}/like/`;
+                } else if (type === 'post') {
+                    url = `/courses/${courseId}/discussion/${topicId}/posts/${id}/like/`;
+                } else {
+                    console.error("Unknown like button type:", type);
+                    return;
+                }
+
+                try {
+                    const response = await window.ajaxPost(url);
+                    if (response.status === 'success') {
+                        // Update icon
+                        const icon = this.querySelector('i');
+                        if (response.liked) {
+                            icon.classList.remove('far');
+                            icon.classList.add('fas', 'text-red-500');
+                        } else {
+                            icon.classList.remove('fas', 'text-red-500');
+                            icon.classList.add('far');
+                        }
+                        // Update count
+                        this.querySelector('.likes-count').textContent = response.likes_count;
+                    } else {
+                        // showToast is already handled by ajaxPost for errors
+                    }
+                } catch (error) {
+                    // Error already logged and toasted by ajaxPost
+                }
+            });
+        });
+    });
+</script>
+{% endblock %}

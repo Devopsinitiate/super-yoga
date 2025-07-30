@@ -1,0 +1,130 @@
+{% extends 'yoga_app/base.html' %}
+{% load static %}
+
+{% block title %}Initiate Payment - Yoga Kailasa{% endblock %}
+
+{% block content %}
+<section class="py-16 bg-gradient-to-r from-amber-100 to-amber-50 min-h-screen flex items-center justify-center">
+    <div class="bg-white p-8 rounded-lg shadow-xl text-center max-w-md w-full">
+        <h2 class="text-2xl font-bold text-gray-800 mb-4">Confirm Your Course Enrollment</h2>
+        <p class="text-gray-600 mb-6">You are about to enroll in: <br>
+           <strong class="text-amber-600 text-lg">{{ course.title }}</strong> for
+           <strong class="text-green-600 text-xl">${{ course.price|floatformat:2 }}</strong>.
+        </p>
+        <p class="text-gray-600 mb-6">Click the button below to complete your payment securely with Paystack.</p>
+
+        <button id="paystack-button"
+                class="w-full bg-amber-500 hover:bg-amber-600 text-white font-medium py-3 px-4 rounded-lg transition duration-300 flex items-center justify-center">
+            <i class="fas fa-money-bill-wave mr-2"></i> Pay Now
+        </button>
+
+        <div id="payment-status" class="mt-4 text-sm text-gray-700"></div>
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+    {{ block.super }} {# Include any JS from base.html #}
+    <!-- Paystack Inline JavaScript SDK -->
+    <script src="https://js.paystack.co/v1/inline.js"></script>
+
+    <script>
+        // Moved declarations to a higher scope so payWithPaystack can access them
+        let paymentButton;
+        let paymentStatusDiv;
+
+        document.addEventListener('DOMContentLoaded', function() {
+            paymentButton = document.getElementById('paystack-button');
+            paymentStatusDiv = document.getElementById('payment-status');
+
+            if (paymentButton) {
+                paymentButton.addEventListener('click', function(e) {
+                    e.preventDefault(); // Prevent default form submission if any
+                    payWithPaystack();
+                });
+            } else {
+                console.error("Paystack button not found on the page.");
+            }
+        });
+
+        function payWithPaystack() {
+            const publicKey = "{{ public_key }}";
+            const email = "{{ email }}";
+            const amount = "{{ amount }}"; // Amount in kobo
+            const transactionReference = "{{ transaction_reference }}"; // Our UUID reference
+            
+            // Debugging the values before passing to PaystackPop.setup
+            console.log("Paystack Setup Debug:");
+            console.log("Public Key:", publicKey);
+            console.log("Email:", email);
+            console.log("Amount (kobo):", amount);
+            console.log("Reference:", transactionReference);
+
+            let parsedMetadata;
+            try {
+                // Ensure the metadata_json is correctly parsed
+                const metadataJsonString = '{{ metadata_json|escapejs }}';
+                console.log("Metadata JSON String from Django:", metadataJsonString);
+                parsedMetadata = JSON.parse(metadataJsonString);
+                console.log("Parsed Metadata Object:", parsedMetadata);
+            } catch (e) {
+                console.error("Error parsing metadata JSON:", e);
+                // Ensure paymentStatusDiv is available before trying to use it
+                if (paymentStatusDiv) {
+                    paymentStatusDiv.innerHTML = '<i class="fas fa-exclamation-circle text-red-500"></i> Payment initialization error: Invalid metadata.';
+                }
+                return; // Stop execution if metadata is invalid
+            }
+
+            // Ensure paymentStatusDiv is available before trying to use it
+            if (paymentStatusDiv) {
+                paymentStatusDiv.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Initializing payment...';
+            }
+
+            if (typeof PaystackPop === 'undefined') {
+                console.error("PaystackPop is not defined. Paystack SDK might not have loaded correctly.");
+                if (paymentStatusDiv) {
+                    paymentStatusDiv.innerHTML = '<i class="fas fa-exclamation-circle text-red-500"></i> Payment service not available. Please try again later.';
+                }
+                return;
+            }
+
+            try {
+                let handler = PaystackPop.setup({
+                    key: publicKey,
+                    email: email,
+                    amount: amount,
+                    currency: "NGN",
+                    ref: transactionReference, // Use 'ref' for the transaction reference
+                    metadata: parsedMetadata, // Pass the parsed object
+                    callback: function(response){
+                        const reference = response.reference;
+                        if (response.status === 'success') {
+                            if (paymentStatusDiv) {
+                                paymentStatusDiv.innerHTML = '<i class="fas fa-check-circle text-green-500"></i> Payment successful! Verifying...';
+                            }
+                            window.location.href = "{% url 'verify_payment' %}?reference=" + reference;
+                        } else {
+                            if (paymentStatusDiv) {
+                                paymentStatusDiv.innerHTML = '<i class="fas fa-times-circle text-red-500"></i> Payment cancelled or failed. Please try again.';
+                            }
+                            console.error('Paystack payment failed:', response);
+                        }
+                    },
+                    onClose: function(){
+                        if (paymentStatusDiv) {
+                            paymentStatusDiv.innerHTML = '<i class="fas fa-info-circle"></i> Payment window closed. You can try again.';
+                        }
+                        console.log('Payment window closed');
+                    },
+                });
+                handler.openIframe();
+            } catch (e) {
+                console.error("Error setting up or opening Paystack PopUp:", e);
+                if (paymentStatusDiv) {
+                    paymentStatusDiv.innerHTML = '<i class="fas fa-exclamation-circle text-red-500"></i> An error occurred with the payment popup.';
+                }
+            }
+        }
+    </script>
+{% endblock %}

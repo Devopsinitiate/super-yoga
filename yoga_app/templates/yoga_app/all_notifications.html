@@ -1,0 +1,59 @@
+{% extends 'yoga_app/base.html' %}
+{% load static %}
+
+{% block title %}All Notifications - Yoga Kailasa{% endblock %}
+
+{% block content %}
+<section class="py-16 bg-gradient-to-r from-amber-100 to-amber-50 min-h-screen">
+    <div class="container mx-auto px-4 max-w-4xl">
+        <div class="bg-white p-8 rounded-xl shadow-lg">
+            <h2 class="text-3xl font-bold text-gray-800 mb-6 text-center">Your Notifications</h2>
+            <p class="text-gray-600 text-center mb-8">Stay updated with your course activities, discussion replies, and more.</p>
+
+            {% if notifications %}
+                <div class="space-y-4">
+                    {% for notification in notifications %}
+                        <div class="p-4 rounded-lg shadow-sm border border-gray-200 flex items-start space-x-4
+                            {% if not notification.read %}bg-blue-50 border-blue-200 font-semibold{% else %}bg-gray-50{% endif %}">
+                            <div class="flex-shrink-0">
+                                <i class="text-xl
+                                    {% if notification.notification_type == 'reply' %}fas fa-reply text-blue-600
+                                    {% elif notification.notification_type == 'like' %}fas fa-heart text-red-500
+                                    {% elif notification.notification_type == 'course_update' %}fas fa-book text-green-600
+                                    {% elif notification.notification_type == 'admin_message' %}fas fa-user-shield text-purple-600
+                                    {% else %}fas fa-info-circle text-gray-500{% endif %}"></i>
+                            </div>
+                            <div class="flex-grow">
+                                <a href="{{ notification.link|default:'#' }}" class="block text-gray-800 hover:text-amber-700 transition duration-200">
+                                    <p class="text-sm">
+                                        {% if notification.sender_username %}
+                                            <span class="font-bold">{{ notification.sender_username }}</span>
+                                        {% endif %}
+                                        {{ notification.message }}
+                                    </p>
+                                    <p class="text-xs text-gray-500 mt-1">{{ notification.created_at|date:"M d, Y H:i" }}</p>
+                                </a>
+                            </div>
+                            {% if not notification.read %}
+                                {# Optional: A button to mark individual notification as read - requires AJAX #}
+                                {# For now, they are marked read on page load. #}
+                                <span class="text-xs text-blue-500 flex-shrink-0">New!</span>
+                            {% endif %}
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="text-center py-10">
+                    <i class="fas fa-bell-slash text-6xl text-gray-400 mb-4"></i>
+                    <p class="text-gray-600 text-lg">You don't have any notifications yet.</p>
+                    <p class="text-gray-500 text-sm mt-2">Activity on courses or discussions will appear here.</p>
+                </div>
+            {% endif %}
+
+            <div class="text-center mt-8">
+                <a href="{% url 'dashboard' %}" class="text-amber-600 hover:underline">Back to Dashboard</a>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

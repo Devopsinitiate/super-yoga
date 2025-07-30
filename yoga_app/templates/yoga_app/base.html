@@ -1,0 +1,964 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    {# Primary Title Block - This is where child templates will set their title #}
+    <title>{% block title %}Yoga Kailasa - Journey to Inner Peace{% endblock %}</title>
+
+    {# Primary Meta Description Block - This is where child templates will set their description #}
+    <meta name="description" content="{% block meta_description %}Yoga Kailasa offers comprehensive online yoga courses, breathing techniques, and personalized consultations to help you achieve inner peace and physical well-being. Join our community today!{% endblock %}">
+    
+    {# Open Graph Meta Tags for Social Sharing #}
+    <meta property="og:title" content="{% block og_title %}{% endblock %}">
+    <meta property="og:description" content="{% block og_description %}{% endblock %}">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="{{ request.build_absolute_uri }}">
+    <meta property="og:image" content="{% block og_image %}{% static 'yoga_app/images/hero_image.jpg' %}{% endblock %}"> {# Provide a default image #}
+    <meta property="og:site_name" content="Yoga Kailasa">
+    <meta property="og:locale" content="en_US">
+
+    {# Favicon #}
+    <link rel="icon" type="image/png" href="{% static 'yoga_app/images/favicon.png' %}">
+
+    {# Tailwind CSS CDN - REVERTED TO CDN FOR RELIABILITY #}
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        amber: {
+                            50: '#fffbeb',
+                            100: '#fff3cd',
+                            200: '#fce59f',
+                            300: '#fbd771',
+                            400: '#f9c943',
+                            500: '#f5b82e', /* Primary Amber */
+                            600: '#e59e0b',
+                            700: '#d48800',
+                            800: '#a06a00',
+                            900: '#7e5200',
+                        },
+                    }
+                }
+            }
+        }
+    </script>
+    {# Font Awesome for icons #}
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
+    {# Custom CSS for animations or overrides #}
+    {% block extra_css %}{% endblock %}
+
+    <style>
+        /* Global form styling for consistency */
+        .form-field-wrapper {
+            margin-bottom: 1rem; /* Equivalent to mb-4 */
+        }
+        .form-field-wrapper label {
+            display: block;
+            font-weight: 600; /* semibold */
+            color: #4a5568; /* gray-700 */
+            margin-bottom: 0.5rem; /* mb-2 */
+        }
+        .form-field-wrapper input[type="text"],
+        .form-field-wrapper input[type="email"],
+        .form-field-wrapper input[type="password"],
+        .form-field-wrapper input[type="number"],
+        .form-field-wrapper input[type="date"],
+        .form-field-wrapper select,
+        .form-field-wrapper textarea {
+            @apply w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500;
+        }
+        .form-field-wrapper input[type="file"] {
+            @apply w-full text-gray-700 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-amber-50 file:text-amber-700 hover:file:bg-amber-100 cursor-pointer;
+        }
+        .form-field-wrapper .helptext {
+            @apply text-sm text-gray-500 mt-1 block;
+        }
+        .form-field-wrapper .errorlist {
+            @apply text-red-500 text-xs italic mt-1 list-none p-0;
+        }
+        .form-field-wrapper .errorlist li {
+            @apply m-0 p-0;
+        }
+        /* Style for Django's default 'required' class on labels */
+        .form-field-wrapper label.required::after {
+            content: " *";
+            color: #ef4444; /* red-500 */
+        }
+        /* General message styling */
+        .messages-container {
+            position: fixed;
+            top: 1rem;
+            right: 1rem;
+            z-index: 1000;
+            width: 90%;
+            max-width: 400px;
+        }
+        .message-item {
+            padding: 1rem;
+            border-radius: 0.5rem;
+            margin-bottom: 0.5rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            display: flex;
+            align-items: center;
+        }
+        .message-item.success {
+            background-color: #d1fae5; /* green-100 */
+            color: #065f46; /* green-800 */
+        }
+        .message-item.error {
+            background-color: #fee2e2; /* red-100 */
+            color: #991b1b; /* red-800 */
+        }
+        .message-item.info {
+            background-color: #dbeafe; /* blue-100 */
+            color: #1e40af; /* blue-800 */
+        }
+        .message-item.warning {
+            background-color: #fffbeb; /* amber-100 */
+            color: #92400e; /* amber-800 */
+        }
+        .message-item .close-btn {
+            margin-left: auto;
+            background: none;
+            border: none;
+            font-size: 1.2rem;
+            cursor: pointer;
+            color: inherit;
+            opacity: 0.7;
+        }
+        .message-item .close-btn:hover {
+            opacity: 1;
+        }
+
+        /* Notification Dropdown Styling */
+        .notification-dropdown {
+            position: absolute;
+            top: 100%; /* Position below the bell icon */
+            right: 0;
+            background-color: white;
+            border-radius: 0.5rem;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            width: 300px;
+            max-height: 400px;
+            overflow-y: auto;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(10px);
+            transition: opacity 0.2s ease-out, transform 0.2s ease-out, visibility 0.2s ease-out;
+            z-index: 1000;
+            padding: 0.5rem;
+        }
+
+        .notification-dropdown.active {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        .notification-item {
+            padding: 0.75rem 1rem;
+            border-bottom: 1px solid #f3f4f6; /* gray-100 */
+            display: flex;
+            align-items: center;
+            font-size: 0.875rem; /* text-sm */
+            color: #4b5563; /* gray-700 */
+            transition: background-color 0.15s ease-in-out;
+        }
+
+        .notification-item:last-child {
+            border-bottom: none;
+        }
+
+        .notification-item.unread {
+            background-color: #fff7ed; /* amber-50 */
+            font-weight: 600; /* semibold */
+        }
+
+        .notification-item:hover {
+            background-color: #f9fafb; /* gray-50 */
+        }
+
+        .notification-item .icon {
+            flex-shrink: 0;
+            margin-right: 0.75rem;
+            color: #f59e0b; /* amber-500 */
+        }
+
+        .notification-item .timestamp {
+            font-size: 0.75rem; /* text-xs */
+            color: #6b7280; /* gray-500 */
+            margin-top: 0.25rem;
+        }
+
+        .notification-item .message-content {
+            flex-grow: 1;
+        }
+        .notification-item a {
+            color: inherit; /* Inherit color from parent */
+            text-decoration: none;
+            display: block; /* Make the whole item clickable */
+        }
+        .notification-item a:hover {
+            text-decoration: none; /* No underline on hover for the whole item */
+        }
+        .notification-item a .message-content:hover {
+            text-decoration: underline; /* Underline only the text content on hover */
+        }
+        .notification-count {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background-color: #ef4444; /* red-500 */
+            color: white;
+            font-size: 0.75rem;
+            font-weight: bold;
+            border-radius: 9999px;
+            padding: 0.1rem 0.5rem;
+            min-width: 20px;
+            text-align: center;
+        }
+        /* Mobile menu specific styling */
+        .mobile-menu {
+            transition: transform 0.3s ease-out;
+            transform: translateX(100%); /* Hidden by default */
+        }
+        .mobile-menu.active {
+            transform: translateX(0); /* Visible */
+        }
+        .mobile-menu-overlay {
+            background-color: rgba(0, 0, 0, 0.5);
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            z-index: 40; /* Below mobile menu, above content */
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease-out, visibility 0.3s ease-out;
+        }
+        .mobile-menu-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+        /* CKEditor 5 specific styling for frontend content */
+        .prose img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 0.5rem; /* rounded-lg */
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-top: 1rem;
+            margin-bottom: 1rem;
+        }
+        .prose figure {
+            margin: 0; /* Remove default figure margin */
+        }
+        .prose figcaption {
+            font-size: 0.875rem; /* text-sm */
+            color: #6b7280; /* gray-500 */
+            text-align: center;
+            margin-top: 0.5rem;
+        }
+        /* Ensure responsive video embeds */
+        .video-embed-container {
+            position: relative;
+            width: 100%;
+            padding-bottom: 56.25%; /* 16:9 aspect ratio */
+            height: 0;
+            overflow: hidden;
+            border-radius: 0.75rem; /* rounded-xl */
+        }
+        .video-embed-container iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: 0;
+        }
+
+        /* Back to Top Button Styles */
+        #backToTopBtn {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background-color: #f59e0b; /* amber-500 */
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            cursor: pointer;
+            opacity: 0; /* Hidden by default */
+            visibility: hidden; /* Hidden by default */
+            transform: translateY(10px); /* Start slightly below */
+            transition: opacity 0.3s ease-in-out, visibility 0.3s ease-in-out, transform 0.3s ease-in-out;
+            z-index: 1000; /* Ensure it's above other content */
+        }
+
+        #backToTopBtn.show {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        #backToTopBtn:hover {
+            background-color: #d97706; /* amber-600 */
+            transform: translateY(-3px); /* Slight lift effect */
+        }
+
+        /* Toast Message Specific Styles - UPDATED FOR AUTO-HIDE */
+        #toast-container {
+            position: fixed;
+            top: 1.5rem;
+            right: 1.5rem;
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+            max-width: 350px;
+            pointer-events: none; /* Allows clicks to pass through container */
+        }
+
+        .toast {
+            padding: 1rem;
+            border-radius: 0.5rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            display: flex;
+            align-items: center;
+            opacity: 0;
+            transform: translateX(100%);
+            transition: opacity 0.5s ease-out, transform 0.5s ease-out; /* Added transition for show */
+            pointer-events: auto; /* Allows interaction with toast */
+        }
+
+        .toast.show {
+            opacity: 1;
+            transform: translateX(0);
+        }
+
+        .toast.hide {
+            opacity: 0;
+            transform: translateX(100%);
+            transition: opacity 0.5s ease-in, transform 0.5s ease-in; /* Added transition for hide */
+        }
+
+        .toast.success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .toast.error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .toast.info {
+            background-color: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+        .toast.warning { /* Added warning style */
+            background-color: #fff3cd;
+            color: #664d03;
+            border: 1px solid #ffeeba;
+        }
+        .toast-icon {
+            margin-right: 0.75rem;
+            font-size: 1.25rem;
+        }
+        .toast-close-button {
+            margin-left: auto;
+            background: none;
+            border: none;
+            font-size: 1.25rem;
+            cursor: pointer;
+            padding: 0 0.25rem;
+            color: inherit; /* Inherit color from toast type */
+            opacity: 0.7;
+        }
+        .toast-close-button:hover {
+            opacity: 1;
+        }
+    </style>
+</head>
+<body class="font-sans bg-gray-50 text-gray-800">
+
+    {# Global Message Display #}
+    {# This div is still present for Django's default messages, but they will be converted to toasts by JS below #}
+    <div id="django-messages-list" class="hidden">
+        {% if messages %}
+            <ul>
+                {% for message in messages %}
+                    <li class="{{ message.tags }}">{{ message }}</li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+    </div>
+
+    {# Toast Message Container - Toasts will be dynamically added here by JavaScript #}
+    <div id="toast-container"></div>
+
+    {# Header #}
+    <header class="bg-white shadow-md py-4">
+        <div class="container mx-auto px-4 flex justify-between items-center">
+            {# Logo #}
+            <a href="{% url 'home' %}" class="flex items-center space-x-2">
+                <img src="{% static 'yoga_app/images/logo.jpg' %}" alt="Yoga Kailasa Logo" class="h-10">
+                <span class="text-2xl font-bold text-amber-600">Yoga Kailasa</span>
+            </a>
+
+            {# Desktop Navigation #}
+            <nav class="hidden md:flex items-center space-x-6">
+                <a href="{% url 'home' %}" class="text-gray-700 hover:text-amber-600 font-medium transition duration-300">Home</a>
+                <a href="{% url 'courses' %}" class="text-gray-700 hover:text-amber-600 font-medium transition duration-300">Courses</a>
+                <a href="{% url 'poses' %}" class="text-gray-700 hover:text-amber-600 font-medium transition duration-300">Poses</a>
+                <a href="{% url 'breathing' %}" class="text-gray-700 hover:text-amber-600 font-medium transition duration-300">Breathing</a>
+                <a href="{% url 'consultant_list' %}" class="text-gray-700 hover:text-amber-600 font-medium transition duration-300">Consultants</a>
+                <a href="{% url 'blog_list' %}" class="text-gray-700 hover:text-amber-600 font-medium transition duration-300">Blog</a>
+                <a href="{% url 'booking' %}" class="text-gray-700 hover:text-amber-600 font-medium transition duration-300">Booking</a>
+                <a href="{% url 'contact' %}" class="text-gray-700 hover:text-amber-600 font-medium transition duration-300">Contact</a>
+                <a href="{% url 'feedback' %}" class="text-gray-700 hover:text-amber-600 font-medium transition duration-300">Feedback</a>
+                <a href="{% url 'about' %}" class="text-gray-700 hover:text-amber-600 font-medium transition duration-300">About Us</a> {# ADDED ABOUT US LINK #}
+
+                {# User Authentication Links #}
+                {% if user.is_authenticated %}
+                    <div class="relative group">
+                        <a href="{% url 'profile_edit' %}" class="flex items-center text-gray-700 hover:text-amber-600 font-medium transition duration-300">
+                            {% if user.userprofile.profile_picture %}
+                                <img src="{{ user.userprofile.profile_picture.url }}" alt="Profile Picture" class="w-8 h-8 rounded-full object-cover mr-2">
+                            {% else %}
+                                <i class="fas fa-user-circle text-2xl mr-2"></i>
+                            {% endif %}
+                            {{ user.username }}
+                            <i class="fas fa-chevron-down ml-1 text-xs"></i>
+                        </a>
+                        <div class="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-20 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 ease-in-out transform scale-95 group-hover:scale-100">
+                            <a href="{% url 'dashboard' %}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"><i class="fas fa-tachometer-alt mr-2"></i> Dashboard</a>
+                            <a href="{% url 'profile_edit' %}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"><i class="fas fa-user mr-2"></i> My Profile</a>
+                            <a href="{% url 'all_notifications' %}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 relative" id="desktop-notifications-link">
+                                <i class="fas fa-bell mr-2"></i> Notifications
+                                {% if unread_notifications_count > 0 %}
+                                    <span class="notification-count" id="desktop-notification-count">{{ unread_notifications_count }}</span>
+                                {% endif %}
+                            </a>
+                            <form action="{% url 'logout' %}" method="post" class="block w-full"> {# Ensure form is block-level for full width click #}
+                                {% csrf_token %}
+                                <button type="submit" class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center">
+                                    <i class="fas fa-sign-out-alt mr-2"></i> Logout
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                    {# Desktop Notification Bell (standalone for quick access) #}
+                    <div class="relative ml-4">
+                        <button id="notification-bell" class="text-gray-700 hover:text-amber-600 text-xl relative">
+                            <i class="fas fa-bell"></i>
+                            {% if unread_notifications_count > 0 %}
+                                <span class="notification-count" id="notification-bell-count">{{ unread_notifications_count }}</span>
+                            {% endif %}
+                        </button>
+                        <div id="notification-dropdown" class="notification-dropdown">
+                            <div class="px-4 py-2 text-sm font-semibold text-gray-800 border-b border-gray-100">Recent Notifications</div>
+                            <div id="notification-list" class="py-1">
+                                {# Notifications will be loaded here by JS #}
+                                <div class="p-4 text-center text-gray-500">Loading notifications...</div>
+                            </div>
+                            <div class="px-4 py-2 border-t border-gray-100 text-center">
+                                <a href="{% url 'all_notifications' %}" class="text-amber-600 hover:underline text-sm">View All Notifications</a>
+                            </div>
+                        </div>
+                    </div>
+                {% else %}
+                    <a href="{% url 'login' %}" class="text-gray-700 hover:text-amber-600 font-medium transition duration-300">Login</a>
+                    <a href="{% url 'register' %}" class="bg-amber-500 hover:bg-amber-600 text-white px-5 py-2 rounded-full shadow-md transition duration-300 transform hover:scale-105">Sign Up</a>
+                {% endif %}
+            </nav>
+
+            {# Mobile Menu Button #}
+            <div class="md:hidden flex items-center space-x-4">
+                {% if user.is_authenticated %}
+                    <button id="mobile-notification-bell" class="text-gray-700 hover:text-amber-600 text-xl relative">
+                        <i class="fas fa-bell"></i>
+                        {% if unread_notifications_count > 0 %}
+                            <span class="notification-count" id="mobile-notification-count">{{ unread_notifications_count }}</span>
+                        {% endif %}
+                    </button>
+                {% endif %}
+                <button id="mobile-menu-button" class="text-gray-700 text-2xl focus:outline-none">
+                    <i class="fas fa-bars"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    {# Mobile Menu Overlay #}
+    <div id="mobile-menu-overlay" class="mobile-menu-overlay fixed inset-0 bg-black bg-opacity-50 z-40 hidden"></div>
+
+    {# Mobile Menu Sidebar #}
+    <div id="mobile-menu" class="mobile-menu fixed top-0 right-0 w-64 h-full bg-white shadow-lg z-50 p-6 transform translate-x-full md:hidden">
+        <div class="flex justify-end mb-6">
+            <button id="close-mobile-menu" class="text-gray-700 text-2xl focus:outline-none">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <nav class="flex flex-col space-y-4">
+            <a href="{% url 'home' %}" class="text-gray-700 hover:text-amber-600 font-medium text-lg">Home</a>
+            <a href="{% url 'courses' %}" class="text-gray-700 hover:text-amber-600 font-medium text-lg">Courses</a>
+            <a href="{% url 'poses' %}" class="text-gray-700 hover:text-amber-600 font-medium text-lg">Poses</a>
+            <a href="{% url 'breathing' %}" class="text-gray-700 hover:text-amber-600 font-medium text-lg">Breathing</a>
+            <a href="{% url 'consultant_list' %}" class="text-gray-700 hover:text-amber-600 font-medium text-lg">Consultants</a>
+            <a href="{% url 'blog_list' %}" class="text-gray-700 hover:text-amber-600 font-medium text-lg">Blog</a>
+            <a href="{% url 'booking' %}" class="text-gray-700 hover:text-amber-600 font-medium text-lg">Booking</a>
+            <a href="{% url 'contact' %}" class="text-gray-700 hover:text-amber-600 font-medium text-lg">Contact</a>
+            <a href="{% url 'feedback' %}" class="text-gray-700 hover:text-amber-600 font-medium text-lg">Feedback</a>
+            <a href="{% url 'about' %}" class="text-gray-700 hover:text-amber-600 font-medium text-lg">About Us</a> {# ADDED ABOUT US LINK FOR MOBILE #}
+
+            {% if user.is_authenticated %}
+                <div class="border-t border-gray-200 pt-4 mt-4">
+                    <a href="{% url 'profile_edit' %}" class="flex items-center text-gray-700 hover:text-amber-600 font-medium text-lg mb-2">
+                        {% if user.userprofile.profile_picture %}
+                            <img src="{{ user.userprofile.profile_picture.url }}" alt="Profile Picture" class="w-8 h-8 rounded-full object-cover mr-2">
+                        {% else %}
+                            <i class="fas fa-user-circle text-2xl mr-2"></i>
+                        {% endif %}
+                        {{ user.username }}
+                    </a>
+                    <a href="{% url 'all_notifications' %}" class="block px-2 py-1 text-gray-700 hover:bg-gray-100 rounded-md relative" id="mobile-notifications-link">
+                        <i class="fas fa-bell mr-2"></i> Notifications
+                        {% if unread_notifications_count > 0 %}
+                            <span class="notification-count" id="mobile-notification-count-nav">{{ unread_notifications_count }}</span>
+                        {% endif %}
+                    </a>
+                    <div id="mobile-notification-dropdown" class="notification-dropdown w-full static shadow-none mt-2 p-0">
+                        <div class="px-4 py-2 text-sm font-semibold text-gray-800 border-b border-gray-100">Recent Notifications</div>
+                        <div id="mobile-notification-list" class="py-1">
+                            {# Notifications will be loaded here by JS #}
+                            <div class="p-4 text-center text-gray-500">Loading notifications...</div>
+                        </div>
+                        <div class="px-4 py-2 border-t border-gray-100 text-center">
+                            <a href="{% url 'all_notifications' %}" class="text-amber-600 hover:underline text-sm">View All Notifications</a>
+                        </div>
+                    </div>
+                    <form action="{% url 'logout' %}" method="post" class="block w-full"> {# Ensure form is block-level for full width click #}
+                        {% csrf_token %}
+                        <button type="submit" class="w-full text-left py-2 text-gray-700 hover:text-amber-600 font-medium text-lg mt-2">
+                            Logout
+                        </button>
+                    </form>
+                </div>
+            {% else %}
+                <div class="border-t border-gray-200 pt-4 mt-4">
+                    <a href="{% url 'login' %}" class="block text-gray-700 hover:text-amber-600 font-medium text-lg">Login</a>
+                    <a href="{% url 'register' %}" class="block bg-amber-500 hover:bg-amber-600 text-white px-5 py-2 rounded-full shadow-md transition duration-300 text-center mt-3">Sign Up</a>
+                </div>
+            {% endif %}
+        </nav>
+    </div>
+
+    {# Main Content Block #}
+    <main>
+        {% block content %}{% endblock %}
+    </main>
+
+    {# Footer #}
+    <footer class="bg-gray-800 text-white py-8">
+        <div class="container mx-auto px-4 text-center">
+            <div class="flex flex-wrap justify-center gap-8 mb-6">
+                <a href="{% url 'home' %}" class="hover:text-amber-500 transition duration-300">Home</a>
+                <a href="{% url 'courses' %}" class="hover:text-amber-500 transition duration-300">Courses</a>
+                <a href="{% url 'poses' %}" class="hover:text-amber-500 transition duration-300">Poses</a>
+                <a href="{% url 'breathing' %}" class="hover:text-amber-500 transition duration-300">Breathing</a>
+                <a href="{% url 'consultant_list' %}" class="hover:text-amber-500 transition duration-300">Consultants</a>
+                <a href="{% url 'blog_list' %}" class="hover:text-amber-500 transition duration-300">Blog</a>
+                <a href="{% url 'booking' %}" class="hover:text-amber-500 transition duration-300">Booking</a>
+                <a href="{% url 'contact' %}" class="hover:text-amber-500 transition duration-300">Contact</a>
+                <a href="{% url 'feedback' %}" class="hover:text-amber-500 transition duration-300">Feedback</a>
+                <a href="{% url 'about' %}" class="hover:text-amber-500 transition duration-300">About Us</a> {# ADDED ABOUT US LINK IN FOOTER #}
+            </div>
+            <p class="text-gray-400 text-sm">&copy; {{ "now"|date:"Y" }} Yoga Kailasa. All rights reserved.</p>
+            <div class="flex justify-center space-x-4 mt-4">
+                <a href="#" class="text-gray-400 hover:text-amber-500 transition duration-300"><i class="fab fa-facebook-f"></i></a>
+                <a href="#" class="text-gray-400 hover:text-amber-500 transition duration-300"><i class="fab fa-twitter"></i></a>
+                <a href="#" class="text-gray-400 hover:text-amber-500 transition duration-300"><i class="fab fa-instagram"></i></a>
+                <a href="#" class="text-gray-400 hover:text-amber-500 transition duration-300"><i class="fab fa-youtube"></i></a>
+            </div>
+        </div>
+    </footer>
+
+    {# Back to Top Button HTML - NEWLY ADDED/REINTEGRATED #}
+    <button id="backToTopBtn" title="Go to top">
+        <i class="fas fa-arrow-up"></i>
+    </button>
+
+    {# JavaScript Block #}
+    {% block extra_js %}
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            /* Mobile Menu Toggle */
+            const mobileMenuButton = document.getElementById('mobile-menu-button');
+            const closeMobileMenuButton = document.getElementById('close-mobile-menu');
+            const mobileMenu = document.getElementById('mobile-menu');
+            const mobileMenuOverlay = document.getElementById('mobile-menu-overlay');
+
+            function toggleMobileMenu() {
+                mobileMenu.classList.toggle('translate-x-full');
+                mobileMenu.classList.toggle('active');
+                mobileMenuOverlay.classList.toggle('hidden');
+                mobileMenuOverlay.classList.toggle('active');
+                document.body.style.overflow = mobileMenu.classList.contains('active') ? 'hidden' : ''; // Prevent scrolling when menu is open
+            }
+
+            if (mobileMenuButton) mobileMenuButton.addEventListener('click', toggleMobileMenu);
+            if (closeMobileMenuButton) closeMobileMenuButton.addEventListener('click', toggleMobileMenu);
+            if (mobileMenuOverlay) mobileMenuOverlay.addEventListener('click', toggleMobileMenu); // Close when clicking outside
+
+            // Global Message close functionality
+            document.querySelectorAll('.message-item .close-btn').forEach(button => {
+                button.addEventListener('click', function() {
+                    this.parentElement.style.display = 'none';
+                });
+            });
+
+            /* Smooth Scrolling for Anchor Links (REFINED) */
+            // This now ONLY applies to links with the 'anchor-link' class.
+            document.querySelectorAll('a.anchor-link').forEach(anchor => {
+                anchor.addEventListener('click', function (e) {
+                    const href = this.getAttribute('href');
+                    const [path, hash] = href.split('#');
+                    const targetId = hash;
+                    const targetElement = document.getElementById(targetId);
+
+                    const isCurrentPageHome = (window.location.pathname === '/' || window.location.pathname === '{% url "home" %}');
+                    const isLinkToHome = (path === '' || path === '{% url "home" %}');
+
+                    if (targetElement && (isCurrentPageHome || isLinkToHome)) {
+                        e.preventDefault();
+                        window.scrollTo({
+                            top: targetElement.offsetTop - 80, // Adjust for fixed header
+                            behavior: 'smooth'
+                        });
+                        if (mobileMenu.classList.contains('active')) { // Close mobile menu if open
+                            toggleMobileMenu();
+                        }
+                    } else if (targetId) {
+                        // This part handles navigating to home and then scrolling if the link is an anchor
+                        // This is for cases where an anchor link is clicked from a non-home page
+                        window.location.href = `{% url 'home' %}?scroll_to=${targetId}`;
+                    }
+                });
+            });
+
+            /* Handle scrolling to anchor on homepage load (if redirected from another page) */
+            const urlParams = new URLSearchParams(window.location.search);
+            const scrollToId = urlParams.get('scroll_to');
+
+            if (scrollToId && (window.location.pathname === '/' || window.location.pathname === '{% url "home" %}')) {
+                const targetElement = document.getElementById(scrollToId);
+                if (targetElement) {
+                    setTimeout(() => {
+                        window.scrollTo({
+                            top: targetElement.offsetTop - 80, // Adjust for fixed header
+                            behavior: 'smooth'
+                        });
+                        history.replaceState(null, '', window.location.pathname); // Clean up URL
+                    }, 100); // Small delay to ensure page layout is stable
+                }
+            }
+
+
+            /* Toast Notification System */
+            window.showToast = function(message, type) {
+                console.log(`Attempting to show toast: Message: "${message}", Type: "${type}"`);
+                const toastContainer = document.getElementById('toast-container');
+                if (!toastContainer) {
+                    console.error("Toast container not found! Cannot display toast.");
+                    return;
+                }
+
+                const toast = document.createElement('div');
+                toast.classList.add('toast', type);
+                toast.innerHTML = `
+                    <span class="toast-icon"></span>
+                    <div>${message}</div>
+                    <button class="toast-close-button">&times;</button>
+                `;
+
+                const iconSpan = toast.querySelector('.toast-icon');
+                if (type === 'success') {
+                    iconSpan.innerHTML = '<i class="fas fa-check-circle"></i>';
+                } else if (type === 'error') {
+                    iconSpan.innerHTML = '<i class="fas fa-times-circle"></i>';
+                } else if (type === 'info') {
+                    iconSpan.innerHTML = '<i class="fas fa-info-circle"></i>';
+                } else if (type === 'warning') { // Added warning icon
+                    iconSpan.innerHTML = '<i class="fas fa-exclamation-triangle"></i>';
+                } else {
+                    iconSpan.innerHTML = '<i class="fas fa-bell"></i>';
+                }
+
+                toastContainer.appendChild(toast);
+
+                // Force reflow to ensure transition plays
+                void toast.offsetWidth;
+                toast.classList.add('show');
+
+                const hideToast = () => {
+                    toast.classList.remove('show');
+                    toast.classList.add('hide');
+                    toast.addEventListener('transitionend', function handler() {
+                        toast.remove();
+                        toast.removeEventListener('transitionend', handler);
+                    }, { once: true });
+                };
+
+                toast.querySelector('.toast-close-button').addEventListener('click', hideToast);
+
+                setTimeout(hideToast, 5000); // Auto-hide after 5 seconds
+            }
+
+            // Iterate over Django messages and display as toasts
+            const djangoMessagesList = document.getElementById('django-messages-list');
+            
+            if (djangoMessagesList) {
+                const messages = djangoMessagesList.querySelectorAll('li');
+                if (messages.length > 0) {
+                    messages.forEach(msgElement => {
+                        const messageText = msgElement.textContent.trim();
+                        const messageType = msgElement.classList.length > 0 ? msgElement.classList[0] : 'info'; 
+                        window.showToast(messageText, messageType);
+                    });
+                    // Optionally hide the original Django messages div after converting to toasts
+                    djangoMessagesList.style.display = 'none';
+                }
+            }
+
+            /* Global AJAX POST Utility for Like/Unlike */
+            function getCookie(name) {
+                let cookieValue = null;
+                if (document.cookie && document.cookie !== '') {
+                    const cookies = document.cookie.split(';');
+                    for (let i = 0; i < cookies.length; i++) {
+                        const cookie = cookies[i].trim();
+                        if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                            cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                            break;
+                        }
+                    }
+                }
+                return cookieValue;
+            }
+
+            window.ajaxPost = async function(url, data = {}) {
+                const csrftoken = getCookie('csrftoken');
+                try {
+                    const response = await fetch(url, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRFToken': csrftoken,
+                            'Accept': 'application/json'
+                        },
+                        body: JSON.stringify(data)
+                    });
+
+                    if (!response.ok) {
+                        const errorData = await response.json();
+                        throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
+                    }
+
+                    return await response.json();
+
+                } catch (error) {
+                    console.error("AJAX POST Error:", error);
+                    window.showToast(error.message || 'An unexpected error occurred.', 'error');
+                    throw error;
+                }
+            };
+
+            /* Notification System (Frontend) */
+            const notificationBell = document.getElementById('notification-bell');
+            const notificationBellCount = document.getElementById('notification-bell-count'); // Desktop badge
+            const notificationDropdown = document.getElementById('notification-dropdown');
+            const notificationList = document.getElementById('notification-list');
+
+            const mobileNotificationBell = document.getElementById('mobile-notification-bell');
+            const mobileNotificationCount = document.getElementById('mobile-notification-count'); // Mobile badge
+            const mobileNotificationDropdown = document.getElementById('mobile-notification-dropdown');
+            const mobileNotificationList = document.getElementById('mobile-notification-list');
+            const mobileNotificationNavCount = document.getElementById('mobile-notification-count-nav'); // Mobile nav link count
+
+            async function fetchNotificationsData() {
+                try {
+                    const response = await fetch("{% url 'get_notifications_api' %}");
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    const data = await response.json();
+                    return data.notifications;
+                } catch (error) {
+                    console.error("Error fetching notification data:", error);
+                    return [];
+                }
+            }
+
+            function updateNotificationCounts(notifications) {
+                const unreadCount = notifications.filter(n => !n.read).length;
+                
+                if (notificationBellCount) {
+                    notificationBellCount.textContent = unreadCount;
+                    notificationBellCount.style.display = unreadCount > 0 ? 'block' : 'none';
+                }
+                if (mobileNotificationCount) {
+                    mobileNotificationCount.textContent = unreadCount;
+                    mobileNotificationCount.style.display = unreadCount > 0 ? 'block' : 'none';
+                }
+                if (mobileNotificationNavCount) {
+                    mobileNotificationNavCount.textContent = unreadCount;
+                    mobileNotificationNavCount.style.display = unreadCount > 0 ? 'block' : 'none';
+                }
+            }
+
+            function renderNotifications(notifications, targetListElement) {
+                targetListElement.innerHTML = '';
+                if (notifications.length === 0) {
+                    targetListElement.innerHTML = '<div class="p-4 text-center text-gray-500">No notifications yet.</div>';
+                    return;
+                }
+
+                notifications.forEach(notif => {
+                    const item = document.createElement('div');
+                    item.classList.add('notification-item');
+                    if (!notif.read) {
+                        item.classList.add('unread');
+                    }
+
+                    let iconClass = 'fas fa-info-circle';
+                    if (notif.type === 'reply') {
+                        iconClass = 'fas fa-reply';
+                    } else if (notif.type === 'like' || notif.type === 'blog_post_like') {
+                        iconClass = 'fas fa-heart';
+                    } else if (notif.type === 'course_update') {
+                        iconClass = 'fas fa-book';
+                    } else if (notif.type === 'admin_message') {
+                        iconClass = 'fas fa-user-shield';
+                    } else if (notif.type === 'blog_comment') {
+                        iconClass = 'fas fa-comment-dots';
+                    } else if (notif.type === 'new_blog_post') {
+                        iconClass = 'fas fa-newspaper';
+                    }
+
+                    const senderText = notif.sender_username ? `<span class="font-semibold">${notif.sender_username}</span>` : '';
+
+                    item.innerHTML = `
+                        <span class="icon"><i class="${iconClass}"></i></span>
+                        <a href="${notif.link || '#'}" class="flex-grow">
+                            <div class="message-content">${senderText} ${notif.message}</div>
+                            <div class="timestamp">${notif.created_at}</div>
+                        </a>
+                    `;
+                    targetListElement.appendChild(item);
+                });
+            }
+
+            async function toggleNotificationDropdown(isMobile = false) {
+                const dropdown = isMobile ? mobileNotificationDropdown : notificationDropdown;
+                const listElement = isMobile ? mobileNotificationList : notificationList;
+                const bellElement = isMobile ? mobileNotificationBell : notificationBell;
+
+                if (dropdown.classList.contains('active')) {
+                    dropdown.classList.remove('active');
+                } else {
+                    listElement.innerHTML = '<div class="p-4 text-center text-gray-500">Loading notifications...</div>';
+                    dropdown.classList.add('active');
+                    const notifications = await fetchNotificationsData();
+                    renderNotifications(notifications, listElement);
+                    updateNotificationCounts(notifications); // Update counts after rendering
+                }
+            }
+
+            if (notificationBell) {
+                notificationBell.addEventListener('click', (event) => {
+                    event.stopPropagation();
+                    toggleNotificationDropdown(false);
+                });
+            }
+
+            if (mobileNotificationBell) {
+                mobileNotificationBell.addEventListener('click', (event) => {
+                    event.stopPropagation();
+                    toggleNotificationDropdown(true);
+                });
+            }
+
+            // Close notification dropdowns if clicked outside
+            document.addEventListener('click', (event) => {
+                if (notificationDropdown && notificationDropdown.classList.contains('active') && !notificationDropdown.contains(event.target) && notificationBell && !notificationBell.contains(event.target)) {
+                    notificationDropdown.classList.remove('active');
+                }
+                if (mobileNotificationDropdown && mobileNotificationDropdown.classList.contains('active') && !mobileNotificationDropdown.contains(event.target) && mobileNotificationBell && !mobileNotificationBell.contains(event.target)) {
+                    mobileNotificationDropdown.classList.remove('active');
+                }
+            });
+
+            // Initial fetch on page load (only if user is authenticated)
+            if (notificationBell || mobileNotificationBell) {
+                fetchNotificationsData().then(notifications => {
+                    updateNotificationCounts(notifications);
+                });
+                setInterval(() => {
+                    fetchNotificationsData().then(notifications => {
+                        updateNotificationCounts(notifications);
+                    });
+                }, 60000); // Poll for new notifications every 60 seconds
+            }
+
+            /* Back to Top Button Logic */
+            const backToTopBtn = document.getElementById('backToTopBtn');
+
+            if (backToTopBtn) {
+                window.addEventListener('scroll', () => {
+                    if (window.pageYOffset > 300) {
+                        backToTopBtn.classList.add('show');
+                    } else {
+                        backToTopBtn.classList.remove('show');
+                    }
+                });
+                backToTopBtn.addEventListener('click', () => {
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                });
+            }
+        });
+
+        // Function to get CSRF token from cookies (needed for POST requests)
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+    </script>
+    {% endblock %}
+</body>
+</html>

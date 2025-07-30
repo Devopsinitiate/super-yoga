@@ -1,0 +1,254 @@
+{% extends 'yoga_app/base.html' %}
+{% load static %}
+
+{% block title %}Search Results - Yoga Kailasa{% endblock %}
+
+{% block content %}
+<section class="py-16 bg-gradient-to-r from-amber-100 to-amber-50 min-h-screen">
+    <div class="container mx-auto px-4">
+        <div class="text-center mb-12">
+            <h2 class="text-3xl md:text-4xl font-bold text-gray-800 mb-2">
+                Search Results {% if query %}"{{ query }}"{% endif %}
+            </h2>
+            <p class="text-gray-600 max-w-2xl mx-auto">Find poses, breathing techniques, and courses.</p>
+        </div>
+
+        <div class="bg-white p-8 rounded-xl shadow-lg mb-8">
+            <h3 class="text-2xl font-bold text-gray-800 mb-6 border-b pb-4">Refine Your Search</h3>
+            <form action="{% url 'global_search' %}" method="get" class="grid grid-cols-1 md:grid-cols-3 gap-6 items-end">
+                <div class="col-span-full md:col-span-1">
+                    <label for="q" class="block text-gray-700 text-sm font-bold mb-2">Search Keyword:</label>
+                    <input type="text" name="q" id="q" value="{{ query|default_if_none:'' }}"
+                           class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500"
+                           placeholder="e.g., warrior, meditation, beginner">
+                </div>
+
+                <div>
+                    <label for="category" class="block text-gray-700 text-sm font-bold mb-2">Category:</label>
+                    <select name="category" id="category"
+                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500">
+                        <option value="">All Categories</option>
+                        <option value="poses" {% if category_filter == 'poses' %}selected{% endif %}>Yoga Poses</option>
+                        <option value="breathing" {% if category_filter == 'breathing' %}selected{% endif %}>Breathing Techniques</option>
+                        <option value="courses" {% if category_filter == 'courses' %}selected{% endif %}>Courses</option>
+                    </select>
+                </div>
+
+                {# Dynamic Filters based on selected category (controlled by JS or separate forms) #}
+                <div id="poseFilters" {% if category_filter != 'poses' and category_filter != '' %}class="hidden"{% endif %}>
+                    <label for="pose_difficulty" class="block text-gray-700 text-sm font-bold mb-2">Pose Difficulty:</label>
+                    <select name="pose_difficulty" id="pose_difficulty"
+                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500">
+                        <option value="">Any Difficulty</option>
+                        {% for choice_value, choice_label in difficulty_choices %}
+                            <option value="{{ choice_value }}" {% if pose_difficulty_filter == choice_value %}selected{% endif %}>{{ choice_label }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div id="courseFilters" {% if category_filter != 'courses' and category_filter != '' %}class="hidden"{% endif %}>
+                    <label for="course_price" class="block text-gray-700 text-sm font-bold mb-2">Course Price:</label>
+                    <select name="course_price" id="course_price"
+                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500">
+                        <option value="">Any Price</option>
+                        <option value="free" {% if course_price_filter == 'free' %}selected{% endif %}>Free</option>
+                        <option value="paid" {% if course_price_filter == 'paid' %}selected{% endif %}>Paid</option>
+                    </select>
+                </div>
+
+                <div class="col-span-full md:col-span-3 flex justify-center mt-4">
+                    <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-full transition duration-300">
+                        Apply Filters
+                    </button>
+                    <a href="{% url 'global_search' %}" class="ml-4 bg-gray-200 hover:bg-gray-300 text-gray-800 px-8 py-3 rounded-full transition duration-300">
+                        Clear Filters
+                    </a>
+                </div>
+            </form>
+        </div>
+
+        {# Display Results by Category #}
+        {% if yoga_poses or breathing_techniques or courses %}
+            {# Yoga Poses Results #}
+            {% if yoga_poses %}
+            <div class="bg-white p-8 rounded-xl shadow-lg mb-8">
+                <h3 class="text-2xl font-bold text-gray-800 mb-6 border-b pb-4 flex items-center">
+                    <i class="fas fa-hand-sparkles text-amber-500 mr-3"></i> Yoga Poses ({{ yoga_poses|length }})
+                </h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    {% for pose in yoga_poses %}
+                    <div class="bg-white rounded-xl shadow-md overflow-hidden border border-gray-200">
+                        <a href="{% url 'pose_detail' pose.id %}" class="block">
+                            <div class="h-48 bg-gradient-to-r from-blue-100 to-blue-50 flex items-center justify-center relative">
+                                {% if pose.image_url %}
+                                    <img src="{{ pose.image_url }}" alt="{{ pose.name }}" class="card-image">
+                                {% else %}
+                                    <div class="w-full h-full flex items-center justify-center bg-blue-100 rounded-lg">
+                                        <i class="fas fa-hand-sparkles text-6xl text-blue-500"></i>
+                                    </div>
+                                {% endif %}
+                            </div>
+                            <div class="p-6">
+                                <h4 class="text-xl font-bold text-gray-800 mb-2">{{ pose.name }}</h4>
+                                {% if pose.sanskrit_name %}
+                                    <p class="text-amber-600 text-sm mb-2">Sanskrit: {{ pose.sanskrit_name }}</p>
+                                {% endif %}
+                                <div class="flex items-center text-sm text-gray-600 mb-2">
+                                    <i class="fas fa-star text-amber-500 mr-2"></i>
+                                    <span>Difficulty: {{ pose.difficulty }}</span>
+                                </div>
+                                <p class="text-gray-600 text-sm">{{ pose.description|truncatechars:100 }}</p>
+                            </div>
+                        </a>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+
+            {# Breathing Techniques Results #}
+            {% if breathing_techniques %}
+            <div class="bg-white p-8 rounded-xl shadow-lg mb-8">
+                <h3 class="text-2xl font-bold text-gray-800 mb-6 border-b pb-4 flex items-center">
+                    <i class="fas fa-lungs text-amber-500 mr-3"></i> Breathing Techniques ({{ breathing_techniques|length }})
+                </h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    {% for technique in breathing_techniques %}
+                    <div class="bg-white rounded-xl shadow-md overflow-hidden border border-gray-200">
+                        <a href="{% url 'breathing_technique_detail' technique.id %}" class="block">
+                            <div class="h-48 bg-gradient-to-r from-purple-100 to-purple-50 flex items-center justify-center relative">
+                                {% if technique.image_url %}
+                                    <img src="{{ technique.image_url }}" alt="{{ technique.name }}" class="card-image">
+                                {% else %}
+                                    <div class="w-full h-full flex items-center justify-center bg-purple-100 rounded-lg">
+                                        <i class="fas fa-lungs text-6xl text-purple-500"></i>
+                                    </div>
+                                {% endif %}
+                            </div>
+                            <div class="p-6">
+                                <h4 class="text-xl font-bold text-gray-800 mb-2">{{ technique.name }}</h4>
+                                {% if technique.sanskrit_name %}
+                                    <p class="text-amber-600 text-sm mb-2">Sanskrit: {{ technique.sanskrit_name }}</p>
+                                {% endif %}
+                                <div class="flex items-center text-sm text-gray-600 mb-2">
+                                    <i class="fas fa-clock text-amber-500 mr-2"></i>
+                                    <span>Duration: {{ technique.duration }}</span>
+                                </div>
+                                <p class="text-gray-600 text-sm">{{ technique.description|truncatechars:100 }}</p>
+                            </div>
+                        </a>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+
+            {# Courses Results #}
+            {% if courses %}
+            <div class="bg-white p-8 rounded-xl shadow-lg mb-8">
+                <h3 class="text-2xl font-bold text-gray-800 mb-6 border-b pb-4 flex items-center">
+                    <i class="fas fa-book-open text-amber-500 mr-3"></i> Courses ({{ courses|length }})
+                </h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    {% for course in courses %}
+                    <div class="bg-white rounded-xl shadow-md overflow-hidden border border-gray-200">
+                        <a href="{% url 'course_detail' course.id %}" class="block">
+                            <div class="h-48 bg-gradient-to-r from-blue-100 to-blue-50 flex items-center justify-center relative">
+                                {% if course.image_url %}
+                                    <img src="{{ course.image_url }}" alt="{{ course.title }}" class="card-image">
+                                {% else %}
+                                    <div class="w-full h-full flex items-center justify-center bg-blue-100 rounded-lg">
+                                        <i class="fas fa-book-reader text-6xl text-blue-500"></i>
+                                    </div>
+                                {% endif %}
+                                {% if course.is_popular %}
+                                    <span class="absolute top-4 left-4 bg-amber-500 text-white text-xs font-bold px-3 py-1 rounded-full">Popular</span>
+                                {% endif %}
+                            </div>
+                            <div class="p-6">
+                                <h4 class="text-xl font-bold text-gray-800 mb-2">{{ course.title }}</h4>
+                                <p class="text-gray-600 text-sm mb-4">{{ course.description|truncatechars:100 }}</p>
+                                <div class="flex items-center text-sm text-gray-600 mb-2">
+                                    <i class="fas fa-user-tie text-amber-500 mr-2"></i>
+                                    <span>Instructor: {{ course.instructor_name }}</span>
+                                </div>
+                                <div class="flex items-center text-sm text-gray-600 mb-4">
+                                    <i class="fas fa-clock text-amber-500 mr-2"></i>
+                                    <span>Duration: {{ course.duration }}</span>
+                                </div>
+                                <div class="text-lg font-bold text-gray-800">
+                                    {% if course.is_free %}
+                                        <span class="text-green-600">Free</span>
+                                    {% else %}
+                                        ${{ course.price|floatformat:2 }}
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+        {% else %}
+            <div class="bg-white p-8 rounded-xl shadow-lg text-center">
+                <p class="text-gray-600 text-lg">No results found for your search criteria. Try adjusting your query or filters.</p>
+            </div>
+        {% endif %}
+    </div>
+</section>
+{% endblock %}
+
+
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const categorySelect = document.getElementById('category');
+        const poseFilters = document.getElementById('poseFilters');
+        const courseFilters = document.getElementById('courseFilters');
+
+        function toggleFilters() {
+            const selectedCategory = categorySelect.value;
+            
+            poseFilters.classList.add('hidden');
+            courseFilters.classList.add('hidden');
+
+            if (selectedCategory === 'poses') {
+                poseFilters.classList.remove('hidden');
+            } else if (selectedCategory === 'courses') {
+                courseFilters.classList.remove('hidden');
+            } else {
+                // If "All Categories" is selected, show all specific filters
+                poseFilters.classList.remove('hidden');
+                courseFilters.classList.remove('hidden');
+            }
+        }
+
+        // Initial toggle on page load
+        toggleFilters();
+
+        // Add event listener for category select change
+        categorySelect.addEventListener('change', toggleFilters);
+
+        // Existing delete account confirmation script (if present)
+        const deleteButton = document.getElementById('deleteAccountBtn');
+        if (deleteButton) {
+            deleteButton.addEventListener('click', function() {
+                if (confirm('Are you absolutely sure you want to delete your account? This action cannot be undone.')) {
+                    const form = document.createElement('form');
+                    form.method = 'POST';
+                    form.action = "{% url 'delete_account' %}";
+                    const csrfInput = document.createElement('input');
+                    csrfInput.type = 'hidden';
+                    csrfInput.name = 'csrfmiddlewaretoken';
+                    csrfInput.value = '{{ csrf_token }}';
+                    form.appendChild(csrfInput);
+                    document.body.appendChild(form);
+                    form.submit();
+                }
+            });
+        }
+    });
+</script>
+{% endblock %}

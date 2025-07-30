@@ -1,0 +1,102 @@
+{% extends 'yoga_app/base.html' %}
+{% load static %}
+
+{% block title %}About Us - Yoga Kailasa{% endblock %}
+
+{# NEW: Meta Description for SEO #}
+{% block meta_description %}Learn about Yoga Kailasa's mission, vision, and philosophy. Discover our commitment to authentic yoga, mindfulness, and holistic well-being.{% endblock %}
+
+{# NEW: Open Graph Tags for Social Sharing #}
+{% block og_title %}About Us - Yoga Kailasa{% endblock %}
+{% block og_description %}Learn about Yoga Kailasa's mission, vision, and philosophy. Discover our commitment to authentic yoga, mindfulness, and holistic well-being.{% endblock %}
+{% block og_image %}{% static 'yoga_app/images/default_about_og_image.jpg' %}{% endblock %} {# Using a static default image for OG #}
+
+{% block extra_css %}
+<style>
+    /* CSS for the fade-in-up animation, specific to detail pages */
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    .animate-fade-in-up {
+        opacity: 0; /* Hidden by default */
+        animation: fadeInUp 0.6s ease-out forwards;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<section class="py-16 bg-gradient-to-r from-amber-100 to-amber-50 min-h-screen">
+    <div class="container mx-auto px-4 max-w-3xl">
+        <div class="bg-white p-8 rounded-xl shadow-lg animate-fade-in-up">
+            <h2 class="text-3xl font-bold text-gray-800 mb-6 text-center animate-fade-in-up" style="animation-delay: 0.1s;">About Yoga Kailasa</h2>
+            <p class="text-gray-600 text-center mb-8 animate-fade-in-up" style="animation-delay: 0.2s;">Our journey towards inner peace and holistic well-being.</p>
+
+            <div class="prose max-w-none text-gray-700">
+                <p class="animate-fade-in-up" style="animation-delay: 0.3s;">Welcome to Yoga Kailasa, your sanctuary for authentic yoga and mindfulness practices. Founded in 2023, our mission is to guide individuals on their unique path to inner peace, physical vitality, and mental clarity through the ancient wisdom of yoga.</p>
+
+                <h3 class="animate-fade-in-up" style="animation-delay: 0.4s;">Our Vision</h3>
+                <p class="animate-fade-in-up" style="animation-delay: 0.5s;">We envision a world where everyone has access to the transformative power of yoga, fostering a global community dedicated to holistic health and harmonious living. We believe that true well-being extends beyond the physical, encompassing mental, emotional, and spiritual balance.</p>
+
+                <h3 class="animate-fade-in-up" style="animation-delay: 0.6s;">What We Offer</h3>
+                <ul class="space-y-3 list-none pl-0"> {# Removed default list styling, will add custom icons #}
+                    <li class="flex items-start animate-fade-in-up" style="animation-delay: 0.7s;">
+                        <i class="fas fa-leaf text-amber-500 mr-3 mt-1"></i>
+                        <div>
+                            <strong>Diverse Yoga Poses:</strong> Explore a wide range of asanas, from foundational poses for beginners to advanced sequences for experienced practitioners.
+                        </div>
+                    </li>
+                    <li class="flex items-start animate-fade-in-up" style="animation-delay: 0.8s;">
+                        <i class="fas fa-wind text-amber-500 mr-3 mt-1"></i>
+                        <div>
+                            <strong>Pranayama Techniques:</strong> Master various breathing exercises to enhance energy, reduce stress, and improve focus.
+                        </div>
+                    </li>
+                    <li class="flex items-start animate-fade-in-up" style="animation-delay: 0.9s;">
+                        <i class="fas fa-book-open text-amber-500 mr-3 mt-1"></i>
+                        <div>
+                            <strong>Comprehensive Courses:</strong> Enroll in structured courses designed to deepen your understanding and practice, covering different styles and philosophies of yoga.
+                        </div>
+                    </li>
+                    <li class="flex items-start animate-fade-in-up" style="animation-delay: 1.0s;">
+                        <i class="fas fa-chalkboard-teacher text-amber-500 mr-3 mt-1"></i>
+                        <div>
+                            <strong>Expert Guidance:</strong> Learn from certified and experienced instructors who are passionate about sharing their knowledge and supporting your growth.
+                        </div>
+                    </li>
+                    <li class="flex items-start animate-fade-in-up" style="animation-delay: 1.1s;">
+                        <i class="fas fa-users text-amber-500 mr-3 mt-1"></i>
+                        <div>
+                            <strong>Community and Support:</strong> Join a vibrant community of like-minded individuals, share experiences, and find encouragement on your yoga journey.
+                        </div>
+                    </li>
+                </ul>
+
+                <h3 class="animate-fade-in-up" style="animation-delay: 1.2s;">Our Philosophy</h3>
+                <p class="animate-fade-in-up" style="animation-delay: 1.3s;">At Yoga Kailasa, we honor the traditional roots of yoga while making it accessible and relevant for modern life. We emphasize mindful movement, conscious breathing, and self-awareness, encouraging you to listen to your body and cultivate a deeper connection with yourself.</p>
+
+                <p class="animate-fade-in-up" style="animation-delay: 1.4s;">Thank you for choosing Yoga Kailasa as your partner on this incredible journey. We are here to support you every step of the way.</p>
+
+                <div class="mt-8 text-center animate-fade-in-up" style="animation-delay: 1.5s;">
+                    <img src="{% static 'yoga_app/images/yoga_kailasa_team.jpg' %}" alt="Yoga Kailasa Team" class="mx-auto rounded-lg shadow-md mb-4 w-full max-w-sm object-cover h-auto"> {# Changed to static image #}
+                    <p class="text-amber-600 font-semibold">The Yoga Kailasa Team</p>
+                </div>
+
+                {# Added Call to Action #}
+                <div class="mt-10 text-center animate-fade-in-up" style="animation-delay: 1.6s;">
+                    <h4 class="text-2xl font-bold text-gray-800 mb-4">Ready to begin your journey?</h4>
+                    <a href="{% url 'courses' %}" class="bg-amber-500 hover:bg-amber-600 text-white font-bold py-3 px-8 rounded-full shadow-lg transition duration-300 transform hover:scale-105">
+                        Explore Our Courses <i class="fas fa-arrow-right ml-2"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

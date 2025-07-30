@@ -1,0 +1,264 @@
+{% extends 'yoga_app/base.html' %}
+{% load static %}
+
+{% block title %}Dashboard - {{ user.username }} - Yoga Kailasa{% endblock %}
+
+{% block meta_description %}Welcome to your Yoga Kailasa dashboard, {{ user.username }}. Track your course progress, view recent notifications, manage payments, and continue your learning journey.{% endblock %}
+
+{% block og_title %}Dashboard - {{ user.username }} - Yoga Kailasa{% endblock %}
+{% block og_description %}Welcome to your Yoga Kailasa dashboard, {{ user.username }}. Track your course progress, view recent notifications, manage payments, and continue your learning journey.{% endblock %}
+{% block og_image %}{% static 'yoga_app/images/default_dashboard_og_image.jpg' %}{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* CSS for the fade-in-up animation, specific to dashboard elements */
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    .animate-fade-in-up {
+        opacity: 0; /* Hidden by default */
+        animation: fadeInUp 0.6s ease-out forwards;
+    }
+    /* Ensure card image styling is consistent */
+    .course-progress-card .card-image {
+        width: 100%;
+        height: 128px; /* h-32 equivalent */
+        object-fit: cover; /* Ensures images cover the area without distortion */
+        border-radius: 0.375rem; /* rounded-md */
+    }
+    /* Table styling for better appearance */
+    .table-responsive {
+        border-collapse: separate;
+        border-spacing: 0;
+    }
+    .table-responsive th,
+    .table-responsive td {
+        white-space: nowrap; /* Prevent text wrapping in table cells */
+    }
+    .table-responsive thead th {
+        border-bottom: 2px solid #e2e8f0;
+    }
+    .table-responsive tbody tr:last-child td {
+        border-bottom: none;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<section class="py-16 bg-gradient-to-r from-amber-100 to-amber-50 min-h-screen">
+    <div class="container mx-auto px-4 max-w-6xl">
+        <div class="bg-white p-8 rounded-xl shadow-lg animate-fade-in-up">
+            <div class="flex flex-col md:flex-row items-center justify-center mb-6">
+                {% if user.userprofile.profile_picture %}
+                    <img src="{{ user.userprofile.profile_picture.url }}" alt="Profile Picture" class="w-24 h-24 rounded-full object-cover border-4 border-amber-300 shadow-md mb-4 md:mb-0 md:mr-6 animate-fade-in-up" style="animation-delay: 0.1s;">
+                {% else %}
+                    <div class="w-24 h-24 rounded-full bg-gray-200 flex items-center justify-center text-gray-400 text-5xl border-4 border-gray-300 shadow-md mb-4 md:mb-0 md:mr-6 animate-fade-in-up" style="animation-delay: 0.1s;">
+                        <i class="fas fa-user-circle"></i>
+                    </div>
+                {% endif %}
+                <div class="text-center md:text-left">
+                    <h2 class="text-3xl font-bold text-gray-800 mb-2 animate-fade-in-up" style="animation-delay: 0.2s;">Welcome, {{ user.username }}!</h2>
+                    <p class="text-gray-600 animate-fade-in-up" style="animation-delay: 0.3s;">Your personalized space for learning and progress.</p>
+                </div>
+            </div>
+
+            {# Quick Stats Overview #}
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10 text-center">
+                <div class="bg-blue-100 p-4 rounded-lg shadow-sm animate-fade-in-up" style="animation-delay: 0.4s;">
+                    <p class="text-blue-800 text-2xl font-bold">{{ enrolled_courses_data|length }}</p>
+                    <p class="text-blue-700 text-sm">Enrolled Courses</p>
+                </div>
+                <div class="bg-green-100 p-4 rounded-lg shadow-sm animate-fade-in-up" style="animation-delay: 0.5s;">
+                    <p class="text-green-800 text-2xl font-bold">{{ completed_courses_count }}</p>
+                    <p class="text-green-700 text-sm">Courses Completed</p>
+                </div>
+                <div class="bg-purple-100 p-4 rounded-lg shadow-sm animate-fade-in-up" style="animation-delay: 0.6s;">
+                    <p class="text-purple-800 text-2xl font-bold">{{ unread_notifications_count }}</p>
+                    <p class="text-purple-700 text-sm">Unread Notifications</p>
+                </div>
+            </div>
+
+            {# Quick Links/Actions #}
+            <div class="flex flex-wrap justify-center gap-4 mb-10 animate-fade-in-up" style="animation-delay: 0.7s;">
+                <a href="{% url 'profile_edit' %}" class="inline-flex items-center bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-full transition duration-300 transform hover:scale-105">
+                    <i class="fas fa-edit mr-2"></i> Edit Profile
+                </a>
+                <a href="{% url 'courses' %}" class="inline-flex items-center bg-amber-500 hover:bg-amber-600 text-white px-6 py-3 rounded-full transition duration-300 transform hover:scale-105">
+                    <i class="fas fa-book-open mr-2"></i> Explore More Courses
+                </a>
+                <a href="{% url 'all_notifications' %}" class="inline-flex items-center bg-purple-600 hover:bg-purple-700 text-white px-6 py-3 rounded-full transition duration-300 transform hover:scale-105">
+                    <i class="fas fa-bell mr-2"></i> View All Notifications
+                </a>
+                {# Delete Account button links to profile_edit where the actual deletion form is #}
+                <a href="{% url 'profile_edit' %}#delete-account-section" class="inline-flex items-center bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-full transition duration-300 transform hover:scale-105">
+                    <i class="fas fa-trash-alt mr-2"></i> Delete Account
+                </a>
+            </div>
+
+            {# Dashboard Grid Layout #}
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                {# Left Column for Continue Learning & Recent Notifications #}
+                <div class="lg:col-span-1 space-y-8">
+                    {# Continue Learning Section #}
+                    <div class="p-6 bg-blue-50 rounded-xl shadow-inner border border-blue-200 animate-fade-in-up" style="animation-delay: 0.8s;">
+                        <h3 class="text-2xl font-bold text-blue-800 mb-6 border-b pb-2 flex items-center">
+                            <i class="fas fa-play-circle mr-2"></i> Continue Learning
+                        </h3>
+                        {% if last_viewed_lesson %}
+                            <div class="bg-white p-4 rounded-lg shadow-md border border-gray-100">
+                                <p class="text-gray-700 text-sm mb-1">Last viewed:</p>
+                                <h4 class="text-lg font-semibold text-blue-700 mb-2">{{ last_viewed_lesson.title }}</h4>
+                                <p class="text-gray-600 text-sm mb-3">From Course: <span class="font-medium">{{ last_viewed_lesson.module.course.title }}</span></p>
+                                <a href="{% url 'course_content' last_viewed_lesson.module.course.id last_viewed_lesson.id %}" class="inline-flex items-center bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-full text-sm transition duration-300 transform hover:scale-105">
+                                    <i class="fas fa-arrow-right mr-2"></i> Go to Lesson
+                                </a>
+                            </div>
+                        {% else %}
+                            <p class="text-gray-600 text-center">No lessons viewed yet. <a href="{% url 'courses' %}" class="text-amber-500 hover:underline">Start a course!</a></p>
+                        {% endif %}
+                    </div>
+
+                    {# Recent Notifications Section #}
+                    <div class="p-6 bg-purple-50 rounded-xl shadow-inner border border-purple-200 animate-fade-in-up" style="animation-delay: 0.9s;">
+                        <h3 class="text-2xl font-bold text-purple-800 mb-6 border-b pb-2 flex items-center">
+                            <i class="fas fa-bell mr-2"></i> Recent Notifications
+                        </h3>
+                        {% if recent_notifications %}
+                            <ul class="space-y-3">
+                                {% for notification in recent_notifications %}
+                                    <li class="bg-white p-3 rounded-lg shadow-sm border border-gray-100 {% if not notification.read %}bg-purple-100 font-semibold{% endif %}">
+                                        <a href="{{ notification.link }}" class="block text-gray-700 hover:text-purple-700">
+                                            <div class="flex items-center text-sm mb-1">
+                                                <i class="
+                                                    {% if notification.notification_type == 'reply' %}fas fa-reply
+                                                    {% elif notification.notification_type == 'like' %}fas fa-heart
+                                                    {% elif notification.notification_type == 'course_update' %}fas fa-book
+                                                    {% else %}fas fa-info-circle{% endif %} text-purple-500 mr-2"></i>
+                                                <span>
+                                                    {% if notification.sender_username %}
+                                                        <span class="font-bold">{{ notification.sender_username }}</span>
+                                                    {% endif %}
+                                                    {{ notification.message }}
+                                                </span>
+                                            </div>
+                                            <p class="text-xs text-gray-500 ml-6">{{ notification.created_at|date:"M d, Y H:i" }}</p>
+                                        </a>
+                                    </li>
+                                {% endfor %}
+                            </ul>
+                            <div class="text-center mt-4">
+                                <a href="{% url 'all_notifications' %}" class="text-purple-600 hover:underline text-sm transform hover:scale-105">View All Notifications</a>
+                            </div>
+                        {% else %}
+                            <p class="text-gray-600 text-center">No recent notifications.</p>
+                        {% endif %}
+                    </div>
+                </div>
+
+                {# Right Column for Enrolled Courses & Payment History #}
+                <div class="lg:col-span-2 space-y-8">
+                    {# Enrolled Courses Section #}
+                    <div class="p-6 bg-gray-50 rounded-xl shadow-inner border border-gray-200 animate-fade-in-up" style="animation-delay: 1.0s;">
+                        <h3 class="text-2xl font-bold text-gray-800 mb-6 border-b pb-2 flex items-center">
+                            <i class="fas fa-book-reader mr-2"></i> My Enrolled Courses
+                        </h3>
+                        {% if enrolled_courses_data %}
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                {% for data in enrolled_courses_data %}
+                                    <div class="bg-white p-5 rounded-lg shadow-md border border-gray-100 course-progress-card transform transition duration-200 hover:shadow-lg hover:scale-[1.02]">
+                                        <a href="{% url 'course_content_base' data.course.id %}" class="block">
+                                            <h4 class="text-xl font-semibold text-blue-700 mb-2">{{ data.course.title }}</h4>
+                                            <p class="text-gray-600 text-sm mb-3">By {{ data.course.instructor_name }}</p>
+
+                                            {% if data.course.image_url %}
+                                                <img src="{{ data.course.image_url }}" alt="{{ data.course.title }}" class="course-progress-card-image card-image mb-3">
+                                            {% else %}
+                                                <div class="w-full h-32 bg-blue-100 flex items-center justify-center text-blue-500 text-4xl rounded-md mb-3">
+                                                    <i class="fas fa-book-reader"></i>
+                                                </div>
+                                            {% endif %}
+
+                                            {# Progress Bar #}
+                                            <div class="mb-3">
+                                                <p class="text-gray-700 text-sm mb-1">Progress: {{ data.progress_percentage }}%</p>
+                                                <div class="w-full bg-gray-200 rounded-full h-2">
+                                                    <div class="bg-green-500 h-2 rounded-full" style="width: {{ data.progress_percentage }}%;"></div>
+                                                </div>
+                                            </div>
+
+                                            {# Completion Status #}
+                                            {% if data.is_completed %}
+                                                <p class="text-green-700 font-semibold text-sm flex items-center"><i class="fas fa-check-double mr-1"></i> Completed!</p>
+                                            {% else %}
+                                                <p class="text-gray-500 text-sm flex items-center"><i class="fas fa-hourglass-half mr-1"></i> In Progress</p>
+                                            {% endif %}
+                                        </a>
+                                        <a href="{% url 'course_discussion_list' data.course.id %}" class="inline-flex items-center text-purple-600 hover:text-purple-800 text-sm mt-3 transform hover:scale-105">
+                                            <i class="fas fa-comments mr-1"></i> Discussion
+                                        </a>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            <p class="text-gray-600 text-center">You are not yet enrolled in any courses. <a href="{% url 'courses' %}" class="text-amber-500 hover:underline">Explore our courses!</a></p>
+                        {% endif %}
+                    </div>
+
+                    {# Payment History Section #}
+                    <div class="p-6 bg-gray-50 rounded-xl shadow-inner border border-gray-200 animate-fade-in-up" style="animation-delay: 1.1s;">
+                        <h3 class="text-2xl font-bold text-gray-800 mb-6 border-b pb-2 flex items-center">
+                            <i class="fas fa-credit-card mr-2"></i> Payment History
+                        </h3>
+                        {% if payment_history %}
+                            <div class="overflow-x-auto rounded-lg shadow-md border border-gray-200">
+                                <table class="min-w-full bg-white table-responsive">
+                                    <thead class="bg-gray-200 text-gray-700 uppercase text-sm leading-normal">
+                                        <tr>
+                                            <th class="py-3 px-6 text-left">Course</th>
+                                            <th class="py-3 px-6 text-left">Amount</th>
+                                            <th class="py-3 px-6 text-left">Status</th>
+                                            <th class="py-3 px-6 text-left">Date</th>
+                                            <th class="py-3 px-6 text-left">Reference</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="text-gray-600 text-sm font-light">
+                                        {% for payment in payment_history %}
+                                            <tr class="border-b border-gray-200 hover:bg-gray-100">
+                                                <td class="py-3 px-6 text-left whitespace-nowrap">
+                                                    <a href="{% url 'course_detail' payment.course.id %}" class="text-blue-600 hover:underline">
+                                                        {{ payment.course.title }}
+                                                    </a>
+                                                </td>
+                                                <td class="py-3 px-6 text-left">${{ payment.amount|floatformat:2 }}</td>
+                                                <td class="py-3 px-6 text-left">
+                                                    <span class="px-2 py-1 rounded-full text-xs font-semibold
+                                                        {% if payment.status == 'success' %}bg-green-200 text-green-800
+                                                        {% elif payment.status == 'pending' %}bg-yellow-200 text-yellow-800
+                                                        {% else %}bg-red-200 text-red-800{% endif %}">
+                                                        {{ payment.status|upper }}
+                                                    </span>
+                                                </td>
+                                                <td class="py-3 px-6 text-left">{{ payment.paid_at|date:"M d, Y H:i" }}</td>
+                                                <td class="py-3 px-6 text-left font-mono text-xs">{{ payment.reference }}</td>
+                                            </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        {% else %}
+                            <p class="text-gray-600 text-center">No payment history found.</p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

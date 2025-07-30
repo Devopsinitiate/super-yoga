@@ -1,0 +1,243 @@
+{% extends 'yoga_app/base.html' %}
+{% load static %}
+{% load app_filters %}
+
+{% block title %}Yoga Courses - Yoga Kailasa{% endblock %}
+
+{% block meta_description %}Browse all yoga courses offered by Yoga Kailasa. Filter by price, instructor, duration, and rating to find your perfect online yoga program.{% endblock %}
+
+{% block og_title %}Yoga Courses - Yoga Kailasa{% endblock %}
+{% block og_description %}Browse all yoga courses offered by Yoga Kailasa. Filter by price, instructor, duration, and rating to find your perfect online yoga program.{% endblock %}
+{% block og_image %}{% static 'yoga_app/images/default_course_og_image.jpg' %}{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* CSS for the fade-in-up animation, specific to course_list.html elements */
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    .animate-fade-in-up {
+        opacity: 0; /* Hidden by default */
+        animation: fadeInUp 0.6s ease-out forwards;
+    }
+    /* Ensure card image styling is consistent */
+    .course-card .card-image {
+        width: 100%;
+        height: 192px; /* h-48 equivalent */
+        object-fit: cover; /* Ensures images cover the area without distortion */
+        border-radius: 0.75rem 0.75rem 0 0; /* rounded-xl on top corners */
+    }
+    /* Style for the rating display */
+    .course-rating-display .fas.fa-star,
+    .course-rating-display .fas.fa-star-half-alt {
+        color: #f59e0b; /* amber-500 */
+    }
+    .course-rating-display .far.fa-star {
+        color: #d1d5db; /* gray-300 */
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<section class="py-16 bg-white">
+    <div class="container mx-auto px-4">
+        <div class="text-center mb-12">
+            <h2 class="text-3xl font-bold text-gray-800 mb-2 animate-fade-in-up" style="animation-delay: 0.1s;">All Yoga Courses</h2>
+            <p class="text-gray-600 max-w-2xl mx-auto animate-fade-in-up" style="animation-delay: 0.2s;">Choose from our complete selection of courses designed for all levels. Use search and filters to find the perfect fit.</p>
+        </div>
+
+        <!-- Search, Filter, and Sort Form -->
+        <div class="max-w-5xl mx-auto mb-12 bg-gray-50 p-6 rounded-lg shadow-sm animate-fade-in-up" style="animation-delay: 0.3s;">
+            <form method="GET" action="{% url 'courses' %}" class="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
+                {# Search Input #}
+                <div class="md:col-span-2">
+                    <label for="search" class="block text-sm font-medium text-gray-700 mb-1">Search by Title, Instructor, or Description</label>
+                    <input type="text" name="q" id="search" placeholder="e.g., Intermediate Flow"
+                           value="{{ request.GET.q }}"
+                           class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500">
+                </div>
+
+                {# Price Filter #}
+                <div>
+                    <label for="price_filter" class="block text-sm font-medium text-gray-700 mb-1">Filter by Price</label>
+                    <select name="price_filter" id="price_filter"
+                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500">
+                        <option value="">All Prices</option>
+                        <option value="free" {% if price_filter == 'free' %}selected{% endif %}>Free</option>
+                        <option value="paid" {% if price_filter == 'paid' %}selected{% endif %}>Paid</option>
+                    </select>
+                </div>
+
+                {# Instructor Filter #}
+                <div>
+                    <label for="instructor_filter" class="block text-sm font-medium text-gray-700 mb-1">Filter by Instructor</label>
+                    <select name="instructor_filter" id="instructor_filter"
+                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500">
+                        <option value="">All Instructors</option>
+                        {% for instructor in all_instructors %}
+                            <option value="{{ instructor }}" {% if instructor_filter == instructor %}selected{% endif %}>{{ instructor }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                {# Duration Filter #}
+                <div>
+                    <label for="duration_filter" class="block text-sm font-medium text-gray-700 mb-1">Filter by Duration</label>
+                    <select name="duration_filter" id="duration_filter"
+                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500">
+                        <option value="">All Durations</option>
+                        {% for duration_option in all_durations %}
+                            <option value="{{ duration_option }}" {% if duration_filter == duration_option %}selected{% endif %}>{{ duration_option }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                {# Minimum Rating Filter #}
+                <div>
+                    <label for="min_rating_filter" class="block text-sm font-medium text-gray-700 mb-1">Min. Rating (1-5)</label>
+                    <input type="number" name="min_rating_filter" id="min_rating_filter" min="0" max="5" step="0.5"
+                           value="{{ min_rating_filter|default_if_none:'' }}"
+                           class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500">
+                </div>
+
+                {# Sort By #}
+                <div>
+                    <label for="sort_by" class="block text-sm font-medium text-gray-700 mb-1">Sort By</label>
+                    <select name="sort_by" id="sort_by"
+                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500">
+                        <option value="popular_desc" {% if sort_by == 'popular_desc' %}selected{% endif %}>Popularity</option>
+                        <option value="newest" {% if sort_by == 'newest' %}selected{% endif %}>Newest</option>
+                        <option value="price_asc" {% if sort_by == 'price_asc' %}selected{% endif %}>Price: Low to High</option>
+                        <option value="price_desc" {% if sort_by == 'price_desc' %}selected{% endif %}>Price: High to Low</option>
+                        <option value="alpha_asc" {% if sort_by == 'alpha_asc' %}selected{% endif %}>Alphabetical (A-Z)</option>
+                        <option value="rating_desc" {% if sort_by == 'rating_desc' %}selected{% endif %}>Average Rating</option>
+                    </select>
+                </div>
+                
+                {# Buttons #}
+                <div class="col-span-full md:col-span-4 flex justify-end space-x-4 mt-2">
+                    <button type="submit" class="bg-amber-500 hover:bg-amber-600 text-white px-6 py-3 rounded-full transition duration-300 transform hover:scale-105">
+                        Apply Filters & Sort
+                    </button>
+                    <a href="{% url 'courses' %}" class="border border-gray-300 text-gray-700 hover:bg-gray-100 px-6 py-3 rounded-full transition duration-300 transform hover:scale-105">Clear All</a>
+                </div>
+            </form>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {% for course in courses %}
+            <div class="bg-white rounded-xl shadow-lg overflow-hidden border border-amber-100 course-card transform transition duration-300 hover:shadow-xl hover:scale-105 animate-fade-in-up" style="animation-delay: {{ forloop.counter|multiply:0.1 }}s;">
+                <a href="{% url 'course_detail' course.id %}" class="block">
+                    <div class="h-48 bg-gradient-to-r from-amber-100 to-amber-50 flex items-center justify-center relative">
+                        {% if course.image_url %}
+                            <img src="{{ course.image_url }}" alt="{{ course.title }}" class="card-image">
+                        {% else %}
+                            <i class="fas fa-heart text-6xl text-amber-500"></i>
+                        {% endif %}
+                        {% if course.is_popular %}
+                        <div class="absolute top-4 right-4 bg-amber-600 text-white text-xs px-2 py-1 rounded-full">
+                            Popular
+                        </div>
+                        {% endif %}
+                    </div>
+                    <div class="p-6">
+                        <div class="flex justify-between items-start mb-2">
+                            <h3 class="text-xl font-bold text-gray-800">{{ course.title }}</h3>
+                            {% if course.is_free %}
+                                <span class="bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full">Free</span>
+                            {% else %}
+                                <span class="bg-amber-100 text-amber-800 text-xs px-2 py-1 rounded-full">₦{{ course.price|floatformat:0 }}</span>
+                            {% endif %}
+                        </div>
+                        {# Display average rating if available #}
+                        {% if course.avg_rating %}
+                            <div class="flex items-center text-sm text-gray-600 mb-2 course-rating-display">
+                                {% for i in "12345"|make_list %}
+                                    {% if forloop.counter <= course.avg_rating %}
+                                        <i class="fas fa-star"></i>
+                                    {% elif forloop.counter0 < course.avg_rating and forloop.counter > course.avg_rating %}
+                                        <i class="fas fa-star-half-alt"></i>
+                                    {% else %}
+                                        <i class="far fa-star"></i>
+                                    {% endif %}
+                                {% endfor %}
+                                <span class="ml-1 text-gray-700">({{ course.avg_rating|floatformat:1 }})</span>
+                                <span class="ml-2 text-gray-500">({{ course.review_count }} reviews)</span>
+                            </div>
+                        {% else %}
+                            <p class="text-sm text-gray-500 mb-2">No ratings yet.</p>
+                        {% endif %}
+                        {# Apply |safe filter here #}
+                        <p class="text-gray-600 mb-4">{{ course.description|striptags|truncatechars:100|safe }}</p>
+                        <div class="mb-4">
+                            <div class="flex items-center text-sm text-gray-600 mb-2">
+                                <i class="fas fa-user-tie text-amber-500 mr-2"></i>
+                                <span>Instructor: {{ course.instructor_name }}</span>
+                            </div>
+                            <div class="flex items-center text-sm text-gray-600 mb-2">
+                                <i class="fas fa-clock text-amber-500 mr-2"></i>
+                                <span>Duration: {{ course.duration }}</span>
+                            </div>
+                            <div class="flex items-center text-sm text-gray-600">
+                                <i class="fas fa-list-ul text-amber-500 mr-2"></i>
+                                <span>Includes: {{ course.includes|striptags|truncatechars:50|safe }}</span>
+                            </div>
+                        </div>
+                    </div>
+                </a>
+                {# Enrollment/Access Button outside the main clickable area for better UX #}
+                {% if not course.is_free %}
+                <form action="{% url 'initiate_payment' course.id %}" method="post" class="p-6 pt-0">
+                    {% csrf_token %}
+                    <button type="submit" class="w-full bg-amber-500 hover:bg-amber-600 text-white px-4 py-3 rounded-full transition duration-300 transform hover:scale-105">
+                        Enroll Now
+                    </button>
+                </form>
+                {% else %}
+                <a href="{% url 'course_detail' course.id %}" class="block w-full bg-green-500 hover:bg-green-600 text-white px-4 py-3 rounded-full transition duration-300 text-center p-6 pt-0 transform hover:scale-105">
+                    Access Course
+                </a>
+                {% endif %}
+            </div>
+            {% empty %}
+            <p class="text-center col-span-full text-gray-500">No courses found matching your criteria.</p>
+            {% endfor %}
+        </div>
+
+        <!-- Pagination Controls -->
+        {% if courses.has_other_pages %}
+        <div class="flex justify-center mt-10 space-x-2 animate-fade-in-up" style="animation-delay: {{ courses.count|add:1|multiply:0.1 }}s;">
+            {% if courses.has_previous %}
+                <a href="?page={{ courses.previous_page_number }}{% if query %}&q={{ query }}{% endif %}{% if price_filter %}&price_filter={{ price_filter }}{% endif %}{% if instructor_filter %}&instructor_filter={{ instructor_filter }}{% endif %}{% if duration_filter %}&duration_filter={{ duration_filter }}{% endif %}{% if min_rating_filter %}&min_rating_filter={{ min_rating_filter }}{% endif %}{% if sort_by %}&sort_by={{ sort_by }}{% endif %}"
+                   class="bg-amber-500 hover:bg-amber-600 text-white px-4 py-2 rounded-full transition duration-300 transform hover:scale-105">Previous</a>
+            {% else %}
+                <span class="bg-gray-300 text-gray-600 px-4 py-2 rounded-full cursor-not-allowed">Previous</span>
+            {% endif %}
+
+            {% for i in courses.paginator.page_range %}
+                {% if courses.number == i %}
+                    <span class="bg-amber-700 text-white px-4 py-2 rounded-full">{{ i }}</span>
+                {% else %}
+                    <a href="?page={{ i }}{% if query %}&q={{ query }}{% endif %}{% if price_filter %}&price_filter={{ price_filter }}{% endif %}{% if instructor_filter %}&instructor_filter={{ instructor_filter }}{% endif %}{% if duration_filter %}&duration_filter={{ duration_filter }}{% endif %}{% if min_rating_filter %}&min_rating_filter={{ min_rating_filter }}{% endif %}{% if sort_by %}&sort_by={{ sort_by }}{% endif %}"
+                       class="bg-gray-200 hover:bg-gray-300 text-gray-800 px-4 py-2 rounded-full transition duration-300 transform hover:scale-105">{{ i }}</a>
+                {% endif %}
+            {% endfor %}
+
+            {% if courses.has_next %}
+                <a href="?page={{ courses.next_page_number }}{% if query %}&q={{ query }}{% endif %}{% if price_filter %}&price_filter={{ price_filter }}{% endif %}{% if instructor_filter %}&instructor_filter={{ instructor_filter }}{% endif %}{% if duration_filter %}&duration_filter={{ duration_filter }}{% endif %}{% if min_rating_filter %}&min_rating_filter={{ min_rating_filter }}{% endif %}{% if sort_by %}&sort_by={{ sort_by }}{% endif %}"
+                   class="bg-amber-500 hover:bg-amber-600 text-white px-4 py-2 rounded-full transition duration-300 transform hover:scale-105">Next</a>
+            {% else %}
+                <span class="bg-gray-300 text-gray-600 px-4 py-2 rounded-full cursor-not-allowed">Next</span>
+            {% endif %}
+        </div>
+        {% endif %}
+    </div>
+</section>
+{% endblock %}

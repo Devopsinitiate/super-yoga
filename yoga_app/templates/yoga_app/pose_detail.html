@@ -1,0 +1,68 @@
+{% extends 'yoga_app/base.html' %}
+{% load static %}
+
+{% block title %}{{ pose.name }} - Yoga Kailasa{% endblock %}
+
+{% block content %}
+<section class="py-16 bg-gradient-to-r from-amber-100 to-amber-50 min-h-screen">
+    <div class="container mx-auto px-4 max-w-3xl">
+        <div class="bg-white p-8 rounded-xl shadow-lg">
+            <div class="flex flex-col md:flex-row items-start md:space-x-8">
+                <div class="md:w-1/2 mb-6 md:mb-0">
+                    {% if pose.image_url %}
+                        <img src="{{ pose.image_url }}" alt="{{ pose.name }}" class="rounded-lg shadow-md w-full h-auto object-cover max-h-96">
+                    {% else %}
+                        <div class="w-full h-72 bg-gray-200 rounded-lg shadow-md flex items-center justify-center">
+                            <i class="fas fa-hand-sparkles text-6xl text-gray-400"></i>
+                        </div>
+                    {% endif %}
+                </div>
+                <div class="md:w-1/2">
+                    <h2 class="text-3xl font-bold text-gray-800 mb-2">{{ pose.name }}</h2>
+                    {% if pose.sanskrit_name %}
+                        <p class="text-amber-600 text-lg mb-4">Sanskrit: {{ pose.sanskrit_name }}</p>
+                    {% endif %}
+
+                    <div class="flex items-center text-gray-600 text-sm mb-4">
+                        <i class="fas fa-star text-amber-500 mr-2"></i>
+                        <span>Difficulty: {{ pose.difficulty }}</span>
+                    </div>
+
+                    <h3 class="text-xl font-bold text-gray-800 mb-2">Description:</h3>
+                    <div class="prose max-w-none text-gray-700 mb-4">
+                        <p>{{ pose.description|safe }}</p>
+                    </div>
+
+                    <h3 class="text-xl font-bold text-gray-800 mb-2">Instructions:</h3>
+                    <div class="prose max-w-none text-gray-700 mb-4">
+                        <p>{{ pose.instructions|safe }}</p>
+                    </div>
+                </div>
+            </div>
+
+            {# NEW: Video Demonstration Section #}
+            {% if pose.video_url %}
+            <div class="mt-8 pt-8 border-t border-gray-200">
+                <h3 class="text-2xl font-bold text-gray-800 mb-4 text-center">Video Demonstration</h3>
+                <div class="relative" style="padding-bottom: 56.25%; height: 0; overflow: hidden; max-width: 100%; background: #000;">
+                    <iframe
+                        src="{{ pose.video_url }}"
+                        frameborder="0"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                        allowfullscreen
+                        class="absolute top-0 left-0 w-full h-full rounded-lg shadow-md"
+                    ></iframe>
+                </div>
+                <p class="text-center text-gray-600 text-sm mt-4">Note: Ensure the video URL is an embed link (e.g., from YouTube's "Share > Embed" option).</p>
+            </div>
+            {% endif %}
+
+            <div class="mt-6 text-center">
+                <a href="{% url 'poses' %}" class="inline-block bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-full transition duration-300">
+                    Back to All Poses <i class="fas fa-arrow-left ml-2"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

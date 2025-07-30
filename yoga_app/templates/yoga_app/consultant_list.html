@@ -1,0 +1,86 @@
+{% extends 'yoga_app/base.html' %}
+{% load static %}
+{% load app_filters %}
+
+{% block title %}Our Consultants - Yoga Kailasa{% endblock %}
+
+{% block meta_description %}Meet our experienced yoga and wellness consultants. Book a personalized session to deepen your practice and address specific needs.{% endblock %}
+
+{% block og_title %}Our Consultants - Yoga Kailasa{% endblock %}
+{% block og_description %}Meet our experienced yoga and wellness consultants. Book a personalized session to deepen your practice and address specific needs.{% endblock %}
+{% block og_image %}{% static 'yoga_app/images/default_consultant_og_image.jpg' %}{% endblock %} {# Placeholder for a default consultant OG image #}
+
+{% block extra_css %}
+<style>
+    /* CSS for the fade-in-up animation, specific to consultant_list.html elements */
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    .animate-fade-in-up {
+        opacity: 0; /* Hidden by default */
+        animation: fadeInUp 0.6s ease-out forwards;
+    }
+    .consultant-card-image {
+        width: 100%;
+        height: 250px; /* Fixed height for consistent card appearance */
+        object-fit: cover;
+        border-radius: 0.75rem 0.75rem 0 0; /* rounded-xl on top corners */
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<section class="py-16 bg-gradient-to-r from-amber-100 to-amber-50 min-h-screen">
+    <div class="container mx-auto px-4 max-w-6xl">
+        <div class="text-center mb-12">
+            <h2 class="text-3xl md:text-4xl font-bold text-gray-800 mb-2 animate-fade-in-up" style="animation-delay: 0.1s;">Our Expert Consultants</h2>
+            <p class="text-gray-600 max-w-2xl mx-auto animate-fade-in-up" style="animation-delay: 0.2s;">Connect with our highly experienced yoga and wellness consultants for personalized guidance and support.</p>
+        </div>
+
+        {% if consultants %}
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {% for consultant in consultants %}
+            <div class="bg-white rounded-xl shadow-lg overflow-hidden transform transition duration-300 hover:shadow-xl hover:scale-105 animate-fade-in-up" style="animation-delay: {{ forloop.counter|multiply:0.1 }}s;">
+                <a href="{% url 'consultant_detail' consultant.id %}" class="block">
+                    {% if consultant.profile_picture_url %}
+                        <img src="{{ consultant.profile_picture_url }}" alt="{{ consultant.name }}" class="consultant-card-image">
+                    {% else %}
+                        <div class="w-full h-64 bg-gray-200 flex items-center justify-center rounded-t-xl">
+                            <i class="fas fa-user-circle text-6xl text-gray-400"></i>
+                        </div>
+                    {% endif %}
+                    <div class="p-6">
+                        <h3 class="text-2xl font-bold text-gray-800 mb-2">{{ consultant.name }}</h3>
+                        <p class="text-amber-600 font-semibold mb-3">{{ consultant.specialty }}</p>
+                        {# Apply |safe filter to bio excerpt #}
+                        <p class="text-gray-700 text-sm mb-4">{{ consultant.bio|striptags|truncatechars:120|safe }}</p>
+                        <div class="flex items-center justify-between text-gray-500 text-sm mt-4">
+                            {% if consultant.is_available %}
+                                <span class="text-green-600"><i class="fas fa-check-circle mr-1"></i> Available</span>
+                            {% else %}
+                                <span class="text-red-600"><i class="fas fa-times-circle mr-1"></i> Not Available</span>
+                            {% endif %}
+                            <span class="text-blue-600 hover:underline">View Profile <i class="fas fa-arrow-right ml-1"></i></span>
+                        </div>
+                    </div>
+                </a>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="text-center py-12 animate-fade-in-up" style="animation-delay: 0.4s;">
+            <i class="fas fa-frown text-6xl text-gray-400 mb-4"></i>
+            <p class="text-xl text-gray-700">No consultants found at the moment.</p>
+            <p class="text-gray-500 mt-2">Please check back later!</p>
+        </div>
+        {% endif %}
+    </div>
+</section>
+{% endblock %}

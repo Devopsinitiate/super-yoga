@@ -1,0 +1,54 @@
+{% extends 'yoga_app/base.html' %}
+{% load static %}
+
+{% block title %}Edit Topic - {{ topic.title }} - Yoga Kailasa{% endblock %}
+
+{% block content %}
+<section class="py-16 bg-gradient-to-r from-amber-100 to-amber-50 min-h-screen">
+    <div class="container mx-auto px-4 max-w-3xl">
+        <div class="bg-white p-8 rounded-xl shadow-lg">
+            <h2 class="text-3xl font-bold text-gray-800 mb-4 text-center">Edit Discussion Topic</h2>
+            <p class="text-gray-600 text-center mb-8">Course: <a href="{% url 'course_detail' course.id %}" class="text-blue-600 hover:underline">{{ course.title }}</a></p>
+
+            <form action="{% url 'edit_discussion_topic' course.id topic.id %}" method="post" class="space-y-6">
+                {% csrf_token %}
+                
+                {# Display non-field errors #}
+                {% if form.non_field_errors %}
+                    <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
+                        <strong class="font-bold">Error!</strong>
+                        <span class="block sm:inline">{{ form.non_field_errors }}</span>
+                    </div>
+                {% endif %}
+
+                {# Topic Title Field #}
+                <div>
+                    {{ form.title.label_tag }}
+                    {{ form.title }}
+                    {% if form.title.errors %}<p class="text-red-500 text-xs italic mt-1">{{ form.title.errors }}</p>{% endif %}
+                </div>
+
+                {# Topic Content Field #}
+                <div>
+                    {{ form.content.label_tag }}
+                    {{ form.content }}
+                    {% if form.content.errors %}<p class="text-red-500 text-xs italic mt-1">{{ form.content.errors }}</p>{% endif %}
+                </div>
+
+                {# Lesson Field (Optional, for associating topic with a specific lesson) #}
+                {# This field is typically a Select dropdown #}
+                <div>
+                    {{ form.lesson.label_tag }}
+                    {{ form.lesson }}
+                    {% if form.lesson.errors %}<p class="text-red-500 text-xs italic mt-1">{{ form.lesson.errors }}</p>{% endif %}
+                </div>
+
+                <button type="submit" class="w-full bg-amber-500 hover:bg-amber-600 text-white font-bold py-3 px-6 rounded-full shadow-lg transition duration-300">
+                    Update Topic <i class="fas fa-save ml-2"></i>
+                </button>
+                <a href="{% url 'course_discussion_detail' course.id topic.id %}" class="block text-center text-blue-600 hover:underline mt-4">Cancel</a>
+            </form>
+        </div>
+    </div>
+</section>
+{% endblock %}

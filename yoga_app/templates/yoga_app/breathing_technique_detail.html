@@ -1,0 +1,122 @@
+{% extends 'yoga_app/base.html' %}
+{% load static %}
+
+{% block title %}{{ technique.name }} - Yoga Kailasa{% endblock %}
+
+{# NEW: Meta Description for SEO #}
+{% block meta_description %}Learn the {{ technique.name }} ({{ technique.sanskrit_name }}) breathing technique. Detailed instructions and video demonstration for mastering this pranayama.{% endblock %}
+
+{# NEW: Open Graph Tags for Social Sharing #}
+{% block og_title %}{{ technique.name }} - Breathing Technique{% endblock %}
+{% block og_description %}Learn the {{ technique.name }} ({{ technique.sanskrit_name }}) breathing technique. Detailed instructions and video demonstration for mastering this pranayama.{% endblock %}
+{% block og_image %}{% if technique.image_url %}{{ technique.image_url }}{% else %}{% static 'yoga_app/images/default_breathing_og_image.jpg' %}{% endif %}{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* CSS for the fade-in-up animation, specific to detail pages */
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    .animate-fade-in-up {
+        opacity: 0; /* Hidden by default */
+        animation: fadeInUp 0.6s ease-out forwards;
+    }
+    /* Ensure image styling is consistent */
+    .detail-image {
+        width: 100%;
+        height: auto;
+        max-height: 384px; /* max-h-96 equivalent */
+        object-fit: cover;
+        border-radius: 0.5rem; /* rounded-lg */
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* shadow-md */
+    }
+    /* Ensure video container aspect ratio */
+    .video-container {
+        position: relative;
+        padding-bottom: 56.25%; /* 16:9 aspect ratio */
+        height: 0;
+        overflow: hidden;
+        max-width: 100%;
+        background: #000;
+        border-radius: 0.5rem; /* rounded-lg */
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* shadow-md */
+    }
+    .video-container iframe {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<section class="py-16 bg-gradient-to-r from-amber-100 to-amber-50 min-h-screen">
+    <div class="container mx-auto px-4 max-w-3xl">
+        <div class="bg-white p-8 rounded-xl shadow-lg animate-fade-in-up">
+            <div class="flex flex-col md:flex-row items-start md:space-x-8">
+                <div class="md:w-1/2 mb-6 md:mb-0 animate-fade-in-up" style="animation-delay: 0.2s;">
+                    {% if technique.image_url %}
+                        <img src="{{ technique.image_url }}" alt="{{ technique.name }}" class="detail-image">
+                    {% else %}
+                        <div class="w-full h-72 bg-gray-200 rounded-lg shadow-md flex items-center justify-center">
+                            <i class="fas fa-lungs text-6xl text-gray-400"></i>
+                        </div>
+                    {% endif %}
+                </div>
+                <div class="md:w-1/2 animate-fade-in-up" style="animation-delay: 0.3s;">
+                    <h2 class="text-3xl font-bold text-gray-800 mb-2">{{ technique.name }}</h2>
+                    {% if technique.sanskrit_name %}
+                        <p class="text-amber-600 text-lg mb-4">Sanskrit: {{ technique.sanskrit_name }}</p>
+                    {% endif %}
+
+                    <div class="flex items-center text-gray-600 text-sm mb-4">
+                        <i class="fas fa-clock text-amber-500 mr-2"></i>
+                        <span>Recommended Duration: {{ technique.duration }}</span>
+                    </div>
+
+                    <h3 class="text-xl font-bold text-gray-800 mb-2">Description:</h3>
+                    <div class="prose max-w-none text-gray-700 mb-4">
+                        <p>{{ technique.description|safe }}</p>
+                    </div>
+
+                    <h3 class="text-xl font-bold text-gray-800 mb-2">Instructions:</h3>
+                    <div class="prose max-w-none text-gray-700 mb-4">
+                        <p>{{ technique.instructions|safe }}</p>
+                    </div>
+                </div>
+            </div>
+
+            {# NEW: Video Demonstration Section #}
+            {% if technique.video_url %}
+            <div class="mt-8 pt-8 border-t border-gray-200 animate-fade-in-up" style="animation-delay: 0.4s;">
+                <h3 class="text-2xl font-bold text-gray-800 mb-4 text-center">Video Demonstration</h3>
+                <div class="video-container">
+                    <iframe
+                        src="{{ technique.video_url }}"
+                        frameborder="0"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                        allowfullscreen
+                    ></iframe>
+                </div>
+                <p class="text-center text-gray-600 text-sm mt-4">Note: Ensure the video URL is an embed link (e.g., from YouTube's "Share > Embed" option).</p>
+            </div>
+            {% endif %}
+
+            <div class="mt-6 text-center animate-fade-in-up" style="animation-delay: 0.5s;">
+                <a href="{% url 'breathing' %}" class="inline-block bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-full transition duration-300 transform hover:scale-105">
+                    Back to All Techniques <i class="fas fa-arrow-left ml-2"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

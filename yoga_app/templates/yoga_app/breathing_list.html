@@ -1,0 +1,135 @@
+{% extends 'yoga_app/base.html' %}
+{% load static %}
+{% load app_filters %}
+
+{% block title %}Breathing Techniques - Yoga Kailasa{% endblock %}
+
+{% block meta_description %}Explore a wide range of pranayama and breathing techniques at Yoga Kailasa to calm your mind, reduce stress, and energize your body.{% endblock %}
+
+{% block og_title %}Breathing Techniques - Yoga Kailasa{% endblock %}
+{% block og_description %}Explore a wide range of pranayama and breathing techniques at Yoga Kailasa to calm your mind, reduce stress, and energize your body.{% endblock %}
+{% block og_image %}{% static 'yoga_app/images/default_breathing_og_image.jpg' %}{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* CSS for the fade-in-up animation, specific to breathing_list.html elements */
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    .animate-fade-in-up {
+        opacity: 0; /* Hidden by default */
+        animation: fadeInUp 0.6s ease-out forwards;
+    }
+    /* Ensure card image styling is consistent */
+    .breathing-card .card-image { /* Using breathing-card for specificity */
+        width: 100%;
+        height: 192px; /* h-48 equivalent */
+        object-fit: cover; /* Ensures images cover the area without distortion */
+        border-radius: 0.75rem 0.75rem 0 0; /* rounded-xl on top corners */
+    }
+    /* Ensure the breathing circle animation is applied */
+    .breathing-circle {
+        animation: pulse 8s infinite;
+    }
+    @keyframes pulse {
+        0% { transform: scale(1); }
+        50% { transform: scale(1.05); }
+        100% { transform: scale(1); }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<section class="py-16 bg-gradient-to-r from-amber-100 to-amber-50 min-h-screen">
+    <div class="container mx-auto px-4">
+        <div class="text-center mb-12">
+            <h2 class="text-3xl md:text-4xl font-bold text-gray-800 mb-2 animate-fade-in-up" style="animation-delay: 0.1s;">Explore Breathing Techniques</h2>
+            <p class="text-gray-600 max-w-2xl mx-auto animate-fade-in-up" style="animation-delay: 0.2s;">Learn powerful pranayama techniques to calm your mind and energize your body.</p>
+        </div>
+
+        <!-- Search Form -->
+        <div class="bg-white p-6 rounded-lg shadow-md mb-8 flex flex-col md:flex-row justify-center items-center animate-fade-in-up" style="animation-delay: 0.3s;">
+            <form action="{% url 'breathing' %}" method="get" class="w-full md:w-1/2 relative">
+                <input type="search" name="q" placeholder="Search techniques..."
+                       class="pl-10 pr-4 py-2 rounded-full border border-gray-300 focus:outline-none focus:ring-1 focus:ring-amber-500 focus:border-amber-500 text-sm w-full"
+                       value="{{ request.GET.q }}">
+                <button type="submit" class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
+                    <i class="fas fa-search"></i>
+                </button>
+            </form>
+            {% if request.GET.q %}
+                <a href="{% url 'breathing' %}" class="mt-4 md:mt-0 md:ml-4 bg-gray-200 hover:bg-gray-300 text-gray-800 px-4 py-2 rounded-full transition duration-300 transform hover:scale-105">Clear Search</a>
+            {% endif %}
+        </div>
+
+        {% if breathing_techniques %}
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {% for technique in breathing_techniques %}
+            <div class="bg-white rounded-xl shadow-lg overflow-hidden breathing-card transform transition duration-300 hover:shadow-xl hover:scale-105 animate-fade-in-up" style="animation-delay: {{ forloop.counter|multiply:0.1 }}s;">
+                <a href="{% url 'breathing_technique_detail' technique.id %}" class="block">
+                    {% if technique.image_url %}
+                        <img src="{{ technique.image_url }}" alt="{{ technique.name }}" class="breathing-card-image card-image">
+                    {% else %}
+                        <div class="w-full h-48 bg-gray-200 flex items-center justify-center rounded-t-xl">
+                            <i class="fas fa-lungs text-6xl text-gray-400"></i>
+                        </div>
+                    {% endif %}
+                    <div class="p-6">
+                        <h3 class="text-xl font-bold text-gray-800 mb-2">{{ technique.name }}</h3>
+                        <p class="text-green-600 text-sm mb-2">{{ technique.sanskrit_name }}</p>
+                        <p class="text-gray-600 text-sm mb-4">{{ technique.description|striptags|truncatechars:100 }}</p>
+                        <div class="flex items-center text-sm text-gray-600">
+                            <i class="fas fa-clock text-amber-500 mr-2"></i>
+                            <span>Duration: {{ technique.duration }}</span>
+                        </div>
+                    </div>
+                </a>
+            </div>
+            {% endfor %}
+        </div>
+
+        <!-- Pagination Controls -->
+        {% if breathing_techniques.has_other_pages %}
+        <div class="flex justify-center mt-12 space-x-2 animate-fade-in-up" style="animation-delay: {{ breathing_techniques.count|add:1|multiply:0.1 }}s;">
+            {% if breathing_techniques.has_previous %}
+                <a href="?page={{ breathing_techniques.previous_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}"
+                   class="px-4 py-2 bg-amber-500 text-white rounded-full hover:bg-amber-600 transition duration-300 transform hover:scale-105">Previous</a>
+            {% else %}
+                <span class="px-4 py-2 bg-gray-300 text-gray-600 rounded-full cursor-not-allowed">Previous</span>
+            {% endif %}
+
+            {% for i in breathing_techniques.paginator.page_range %}
+                {% if breathing_techniques.number == i %}
+                    <span class="px-4 py-2 bg-amber-700 text-white rounded-full">{{ i }}</span>
+                {% else %}
+                    <a href="?page={{ i }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}"
+                       class="px-4 py-2 bg-gray-200 text-gray-700 rounded-full hover:bg-gray-300 transition duration-300 transform hover:scale-105">{{ i }}</a>
+                {% endif %}
+            {% endfor %}
+
+            {% if breathing_techniques.has_next %}
+                <a href="?page={{ breathing_techniques.next_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}"
+                   class="px-4 py-2 bg-amber-500 text-white rounded-full hover:bg-amber-600 transition duration-300 transform hover:scale-105">Next</a>
+            {% else %}
+                <span class="px-4 py-2 bg-gray-300 text-gray-600 rounded-full cursor-not-allowed">Next</span>
+            {% endif %}
+        </div>
+        {% endif %}
+
+        {% else %}
+        <div class="text-center py-12 animate-fade-in-up" style="animation-delay: 0.4s;">
+            <i class="fas fa-frown text-6xl text-gray-400 mb-4"></i>
+            <p class="text-xl text-gray-700">No breathing techniques found matching your criteria.</p>
+            <p class="text-gray-500 mt-2">Try adjusting your search or filters.</p>
+        </div>
+        {% endif %}
+    </div>
+</section>
+{% endblock %}

@@ -1,0 +1,243 @@
+{% extends 'yoga_app/base.html' %}
+{% load static %}
+
+{% block title %}
+    {% if current_lesson %}
+        {{ current_lesson.title }} - {{ course.title }} Content - Yoga Kailasa
+    {% else %}
+        {{ course.title }} Content - Yoga Kailasa
+    {% endif %}
+{% endblock %}
+
+{# NEW: Dynamic Meta Description for SEO #}
+{% block meta_description %}
+    {% if current_lesson %}
+        Learn about "{{ current_lesson.title }}" in the "{{ course.title }}" course. {{ current_lesson.content|striptags|truncatechars:160 }}
+    {% else %}
+        Explore the detailed content of the "{{ course.title }}" course. {{ course.description|striptags|truncatechars:160 }}
+    {% endif %}
+{% endblock %}
+
+{# NEW: Dynamic Open Graph Tags for Social Sharing #}
+{% block og_title %}
+    {% if current_lesson %}
+        {{ current_lesson.title }} - {{ course.title }} Content
+    {% else %}
+        {{ course.title }} Content
+    {% endif %}
+{% endblock %}
+
+{% block og_description %}
+    {% if current_lesson %}
+        Learn about "{{ current_lesson.title }}" in the "{{ course.title }}" course. {{ current_lesson.content|striptags|truncatechars:200 }}
+    {% else %}
+        Explore the detailed content of the "{{ course.title }}" course. {{ course.description|striptags|truncatechars:200 }}
+    {% endif %}
+{% endblock %}
+
+{% block og_image %}{% if course.image_url %}{{ course.image_url }}{% else %}{% static 'yoga_app/images/default_course_og_image.jpg' %}{% endif %}{% endblock %}
+
+
+{% block content %}
+<section class="py-16 bg-gradient-to-r from-amber-100 to-amber-50 min-h-screen">
+    <div class="container mx-auto px-4 max-w-6xl">
+        <div class="bg-white p-8 rounded-xl shadow-lg">
+            <h2 class="text-3xl font-bold text-gray-800 mb-4 text-center">{{ course.title }}</h2>
+            <p class="text-gray-600 text-center mb-8">Structured Course Content</p>
+
+            {# Course Progress Bar #}
+            <div class="mb-8 p-4 bg-blue-50 rounded-lg shadow-inner">
+                <h3 class="text-xl font-semibold text-blue-800 mb-2">Your Progress</h3>
+                <div class="w-full bg-gray-200 rounded-full h-4">
+                    <div class="bg-blue-600 h-4 rounded-full transition-all duration-500 ease-out" style="width: {{ progress_percentage }}%"></div>
+                </div>
+                <p class="text-blue-700 text-sm mt-2">{{ completed_lessons_count }} of {{ total_lessons }} lessons completed ({{ progress_percentage }}%)</p>
+                {# Mark Course Complete Button #}
+                {% if progress_percentage == 100 and not course_is_completed_by_user %}
+                    <form action="{% url 'mark_course_complete' course.id %}" method="post" class="mt-4 text-center">
+                        {% csrf_token %}
+                        <button type="submit" class="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-full font-bold shadow-lg transition duration-300">
+                            Mark Course as Complete <i class="fas fa-award ml-2"></i>
+                        </button>
+                    </form>
+                {% elif progress_percentage == 100 and course_is_completed_by_user %}
+                    <p class="text-center text-green-700 font-semibold mt-4"><i class="fas fa-check-double mr-2"></i> You have completed this course!</p>
+                {% endif %}
+            </div>
+
+            {# Navigation to Dashboard and Discussion Forum #}
+            <div class="flex flex-wrap justify-center gap-4 mb-8">
+                <a href="{% url 'dashboard' %}" class="inline-flex items-center bg-gray-200 hover:bg-gray-300 text-gray-800 px-6 py-3 rounded-full transition duration-300">
+                    <i class="fas fa-arrow-left mr-2"></i> Back to Dashboard
+                </a>
+                <a href="{% url 'course_discussion_list' course.id %}" class="inline-flex items-center bg-purple-600 hover:bg-purple-700 text-white px-6 py-3 rounded-full transition duration-300">
+                    <i class="fas fa-comments mr-2"></i> Course Discussion Forum
+                </a>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                {# Left Sidebar: Modules & Lessons Navigation #}
+                <div class="md:col-span-1 bg-gray-50 p-6 rounded-lg shadow-md">
+                    <h3 class="text-2xl font-bold text-gray-800 mb-6">Course Outline</h3>
+                    <nav>
+                        {% for module in modules %}
+                            <div class="mb-6">
+                                <h4 class="text-xl font-semibold text-amber-700 mb-3 flex items-center">
+                                    <i class="fas fa-folder-open mr-2"></i> {{ module.order }}. {{ module.title }}
+                                </h4>
+                                {% if module.description %}
+                                    <p class="text-gray-600 text-sm mb-3">{{ module.description }}</p>
+                                {% endif %}
+                                <ul class="space-y-2 pl-4 border-l-2 border-amber-200">
+                                    {% for lesson in module.lessons.all %}
+                                        <li>
+                                            <a href="{% url 'course_content' course.id lesson.id %}"
+                                               class="flex items-center p-2 rounded-md transition duration-200
+                                                      {% if current_lesson and lesson.id == current_lesson.id %}
+                                                          bg-amber-100 text-amber-800 font-bold shadow
+                                                      {% else %}
+                                                          text-gray-700 hover:bg-amber-50 hover:text-amber-700
+                                                      {% endif %}">
+                                                {% if lesson.id in completed_lesson_ids %}
+                                                    <i class="fas fa-check-circle text-green-500 mr-2"></i>
+                                                {% else %}
+                                                    <i class="far fa-circle text-gray-400 mr-2"></i>
+                                                {% endif %}
+                                                {{ module.order }}.{{ lesson.order }} {{ lesson.title }}
+                                            </a>
+                                        </li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                        {% empty %}
+                            <p class="text-gray-600">No modules or lessons found for this course yet.</p>
+                        {% endfor %}
+                    </nav>
+                </div>
+
+                {# Right Main Content: Current Lesson Display #}
+                <div class="md:col-span-2 bg-white p-6 rounded-lg shadow-md border border-gray-100">
+                    {% if current_lesson %}
+                        <h3 class="text-2xl font-bold text-gray-800 mb-4">{{ current_lesson.title }}</h3>
+                        <p class="text-gray-600 text-sm mb-6">Module: {{ current_lesson.module.title }}</p>
+
+                        {% if current_lesson.video_url %}
+                            <div class="aspect-w-16 aspect-h-9 mb-6 rounded-lg overflow-hidden shadow-md">
+                                <iframe src="{{ current_lesson.video_url }}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen class="w-full h-full"></iframe>
+                            </div>
+                        {% endif %}
+
+                        <div class="prose max-w-none text-gray-700 leading-relaxed mb-8">
+                            {{ current_lesson.content|safe }}
+                        </div>
+
+                        {# Mark Lesson Complete Button #}
+                        {% if current_lesson.id not in completed_lesson_ids %}
+                            <form action="{% url 'mark_lesson_complete' course.id current_lesson.id %}" method="post" class="text-center mt-6">
+                                {% csrf_token %}
+                                <button type="submit" class="bg-amber-500 hover:bg-amber-600 text-white px-6 py-3 rounded-full transition duration-300">
+                                    Mark as Complete <i class="fas fa-check ml-2"></i>
+                                </button>
+                            </form>
+                        {% else %}
+                            <p class="text-center text-green-600 font-semibold mt-6">
+                                <i class="fas fa-check-circle mr-2"></i> This lesson is complete!
+                            </p>
+                        {% endif %}
+
+                        {# Next/Previous Lesson Navigation #}
+                        <div class="flex justify-between mt-8 pt-4 border-t border-gray-200">
+                            {% if previous_lesson %}
+                                <a href="{% url 'course_content' course.id previous_lesson.id %}"
+                                   class="inline-flex items-center bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-full transition duration-300">
+                                    <i class="fas fa-chevron-left mr-2"></i> Previous Lesson
+                                </a>
+                            {% else %}
+                                <span class="inline-flex items-center bg-gray-300 text-gray-600 px-4 py-2 rounded-full cursor-not-allowed">
+                                    <i class="fas fa-chevron-left mr-2"></i> Previous Lesson
+                                </span>
+                            {% endif %}
+
+                            {% if next_lesson %}
+                                <a href="{% url 'course_content' course.id next_lesson.id %}"
+                                   class="inline-flex items-center bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-full transition duration-300">
+                                    Next Lesson <i class="fas fa-chevron-right ml-2"></i>
+                                </a>
+                            {% else %}
+                                <span class="inline-flex items-center bg-gray-300 text-gray-600 px-4 py-2 rounded-full cursor-not-allowed">
+                                    Next Lesson <i class="fas fa-chevron-right ml-2"></i>
+                                </span>
+                            {% endif %}
+                        </div>
+
+                        {# Lesson Comments Section #}
+                        <div class="mt-10 pt-8 border-t border-gray-200">
+                            <h3 class="text-2xl font-bold text-gray-800 mb-6">Lesson Comments</h3>
+
+                            {# Display existing comments #}
+                            {% if lesson_comments %}
+                                <div class="space-y-6">
+                                    {% for comment in lesson_comments %}
+                                        <div class="bg-gray-50 p-5 rounded-lg shadow-sm border border-gray-100">
+                                            <div class="flex items-center mb-3">
+                                                {# Profile Picture for Commenter #}
+                                                {% if comment.user.profile.profile_picture %}
+                                                    <img src="{{ comment.user.profile.profile_picture.url }}" alt="{{ comment.user.username }} Profile" class="w-10 h-10 rounded-full object-cover mr-3 border border-gray-300">
+                                                {% else %}
+                                                    <div class="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center text-gray-400 text-xl mr-3 border border-gray-300">
+                                                        <i class="fas fa-user-circle"></i>
+                                                    </div>
+                                                {% endif %}
+                                                <div>
+                                                    <p class="font-semibold text-gray-800">{{ comment.user.username }}</p>
+                                                    <p class="text-gray-500 text-xs">{{ comment.created_at|date:"M d, Y H:i" }}</p>
+                                                </div>
+                                            </div>
+                                            <p class="text-gray-700 leading-relaxed">{{ comment.content }}</p>
+                                        </div>
+                                    {% endfor %}
+                                </div>
+                            {% else %}
+                                <p class="text-gray-600 text-center mb-6">No comments yet. Be the first to share your thoughts!</p>
+                            {% endif %}
+
+                            {# Comment Submission Form #}
+                            {% if user.is_authenticated %}
+                                <div class="mt-8 p-6 bg-gray-100 rounded-lg shadow-inner border border-gray-200">
+                                    <h4 class="text-xl font-bold text-gray-800 mb-4">Add Your Comment</h4>
+                                    <form action="{% url 'course_content' course.id current_lesson.id %}" method="post" class="space-y-4">
+                                        {% csrf_token %}
+                                        <div>
+                                            {{ comment_form.content.label_tag }}
+                                            {{ comment_form.content }}
+                                            {% if comment_form.content.errors %}<p class="text-red-500 text-xs italic mt-1">{{ comment_form.content.errors }}</p>{% endif %}
+                                        </div>
+                                        <button type="submit" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 px-6 rounded-full shadow-lg transition duration-300">
+                                            Post Comment <i class="fas fa-paper-plane ml-2"></i>
+                                        </button>
+                                    </form>
+                                </div>
+                            {% else %}
+                                <p class="text-center text-gray-600 mt-8">Please <a href="{% url 'login' %}" class="text-amber-500 hover:underline">log in</a> to post a comment.</p>
+                            {% endif %}
+                        </div>
+
+                    {% else %}
+                        {# Original placeholder content #}
+                        <div class="text-center text-gray-600 p-10">
+                            <i class="fas fa-info-circle text-5xl mb-4 text-gray-400"></i>
+                            <p class="text-lg">Select a lesson from the left sidebar to begin.</p>
+                            {% if course.overview_content %}
+                                <div class="prose max-w-none text-gray-700 mt-6">
+                                    <h4 class="font-semibold text-gray-800 mb-2">Course Overview:</h4>
+                                    {{ course.overview_content|safe }}
+                                </div>
+                            {% endif %}
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

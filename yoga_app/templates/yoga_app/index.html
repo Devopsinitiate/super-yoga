@@ -1,0 +1,339 @@
+{% extends 'yoga_app/base.html' %}
+{% load static %}
+{% load app_filters %}
+
+{% block title %}Yoga Kailasa - Journey to Inner Peace{% endblock %}
+
+{% block meta_description %}Yoga Kailasa offers comprehensive online yoga courses, breathing techniques, and personalized consultations to help you achieve inner peace and physical well-being. Join our community today!{% endblock %}
+
+{% block og_title %}Yoga Kailasa - Journey to Inner Peace{% endblock %}
+{% block og_description %}Yoga Kailasa offers comprehensive online yoga courses, breathing techniques, and personalized consultations to help you achieve inner peace and physical well-being. Join our community today!{% endblock %}
+{% block og_image %}{% static 'yoga_app/images/hero_image.jpg' %}{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* CSS for the fade-in-up animation */
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    .animate-fade-in-up {
+        opacity: 0; /* Hidden by default */
+        animation: fadeInUp 0.6s ease-out forwards;
+    }
+    /* Specific styles for hero section if needed */
+    .hero-section {
+        background-image: url("{% static 'yoga_app/images/hero_image.jpg' %}");
+        background-size: cover;
+        background-position: center;
+        position: relative;
+        color: white;
+    }
+    .hero-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5); /* Dark overlay */
+    }
+    .hero-content {
+        position: relative;
+        z-index: 10;
+    }
+    /* Consultant card image on homepage */
+    .consultant-card-image-home {
+        width: 100%;
+        height: 200px; /* Fixed height for consistency */
+        object-fit: cover;
+        border-radius: 0.75rem 0.75rem 0 0; /* rounded-xl on top corners */
+    }
+    /* Testimonial card styling */
+    .testimonial-card {
+        background-color: #ffffff;
+        border-radius: 0.75rem; /* rounded-xl */
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        padding: 1.5rem;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+    }
+    .testimonial-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+    }
+    .testimonial-card .star-rating {
+        color: #f5b82e; /* amber-500 */
+        margin-bottom: 0.75rem;
+    }
+    .testimonial-card .quote-icon {
+        color: #fbd771; /* amber-300 */
+        font-size: 2.5rem;
+        margin-bottom: 1rem;
+    }
+    .testimonial-card .author {
+        font-weight: 600; /* semibold */
+        color: #4a5568; /* gray-700 */
+        margin-top: 1rem;
+    }
+    /* Card image for poses */
+    .pose-card-image {
+        width: 100%;
+        height: 192px; /* h-48 equivalent */
+        object-fit: cover;
+        border-radius: 0.75rem 0.75rem 0 0; /* rounded-xl on top corners */
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+    {# Hero Section #}
+    <section class="hero-section relative py-20 md:py-32 flex items-center justify-center text-center px-4">
+        <div class="hero-overlay"></div>
+        <div class="hero-content z-10 max-w-4xl mx-auto">
+            <h1 class="text-4xl md:text-6xl font-extrabold leading-tight mb-6 animate-fade-in-up">
+                Discover Inner Peace and Well-being
+            </h1>
+            <p class="text-lg md:text-xl text-gray-200 mb-8 animate-fade-in-up" style="animation-delay: 0.2s;">
+                Join Yoga Kailasa for transformative online yoga courses, breathing techniques, and personalized consultations.
+            </p>
+            <div class="space-y-4 sm:space-y-0 sm:space-x-4 flex flex-col sm:flex-row justify-center animate-fade-in-up" style="animation-delay: 0.4s;">
+                <a href="{% url 'courses' %}" class="bg-amber-500 hover:bg-amber-600 text-white font-bold py-3 px-8 rounded-full shadow-lg transition duration-300 transform hover:scale-105">
+                    Explore Courses
+                </a>
+                <a href="{% url 'booking' %}" class="bg-white hover:bg-gray-100 text-amber-700 font-bold py-3 px-8 rounded-full shadow-lg transition duration-300 transform hover:scale-105">
+                    Book a Session
+                </a>
+            </div>
+        </div>
+    </section>
+
+    {# About Us Section #}
+    <section class="py-16 bg-white">
+        <div class="container mx-auto px-4 max-w-6xl">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+                <div class="animate-fade-in-up" style="animation-delay: 0.1s;">
+                    <img src="{% static 'yoga_app/images/about.png' %}" alt="About Us Yoga" class="rounded-xl shadow-lg w-full h-auto object-cover">
+                </div>
+                <div class="animate-fade-in-up" style="animation-delay: 0.3s;">
+                    <h2 class="text-3xl md:text-4xl font-bold text-gray-800 mb-6">Our Philosophy</h2>
+                    <p class="text-gray-700 leading-relaxed mb-4">
+                        At Yoga Kailasa, we believe that yoga is more than just physical postures; it's a holistic path to inner peace, physical health, and spiritual growth. Our mission is to make authentic yoga teachings accessible to everyone, regardless of their experience level or location.
+                    </p>
+                    <p class="text-gray-700 leading-relaxed">
+                        We offer a diverse range of courses, from foundational practices to advanced techniques, all designed to support your journey towards a balanced and harmonious life. Our expert instructors guide you every step of the way.
+                    </p>
+                    <a href="{% url 'contact' %}" class="inline-block mt-6 bg-amber-500 hover:bg-amber-600 text-white font-bold py-3 px-6 rounded-full shadow-md transition duration-300 transform hover:scale-105">
+                        Learn More
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    {# Featured Yoga Poses Section - NEWLY ADDED #}
+    <section class="py-16 bg-gradient-to-r from-amber-50 to-amber-100">
+        <div class="container mx-auto px-4 max-w-6xl">
+            <h2 class="text-3xl md:text-4xl font-bold text-gray-800 mb-10 text-center animate-fade-in-up" style="animation-delay: 0.1s;">Featured Yoga Poses</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                {% for pose in yoga_poses %} {# Loop through yoga_poses context variable #}
+                <div class="bg-white rounded-xl shadow-lg overflow-hidden transform transition duration-300 hover:shadow-xl hover:scale-105 animate-fade-in-up" style="animation-delay: {{ forloop.counter|multiply:0.1 }}s;">
+                    <a href="{% url 'pose_detail' pose.id %}" class="block">
+                        {% if pose.image_url %}
+                            <img src="{{ pose.image_url }}" alt="{{ pose.name }}" class="pose-card-image">
+                        {% else %}
+                            <div class="w-full h-48 bg-gray-200 flex items-center justify-center rounded-t-xl">
+                                <i class="fas fa-child text-6xl text-gray-400"></i> {# Generic pose icon #}
+                            </div>
+                        {% endif %}
+                        <div class="p-6">
+                            <h3 class="text-xl font-bold text-gray-800 mb-2">{{ pose.name }}</h3>
+                            {% if pose.sanskrit_name %}<p class="text-amber-600 font-semibold mb-3">{{ pose.sanskrit_name }}</p>{% endif %}
+                            <p class="text-gray-700 text-sm mb-4">{{ pose.description|striptags|truncatechars:100 }}</p>
+                            <div class="flex items-center justify-between text-gray-500 text-sm">
+                                <span><i class="fas fa-level-up-alt mr-1"></i> {{ pose.get_difficulty_display }}</span>
+                                <span class="text-blue-600 hover:underline">View Pose <i class="fas fa-arrow-right ml-1"></i></span>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+                {% empty %}
+                <div class="col-span-full text-center py-8">
+                    <p class="text-gray-600">No featured yoga poses found yet.</p>
+                </div>
+                {% endfor %}
+            </div>
+            <div class="text-center mt-12 animate-fade-in-up" style="animation-delay: 0.5s;">
+                <a href="{% url 'poses' %}" class="inline-block bg-amber-500 hover:bg-amber-600 text-white font-bold py-3 px-8 rounded-full shadow-lg transition duration-300 transform hover:scale-105">
+                    View All Poses
+                </a>
+            </div>
+        </div>
+    </section>
+
+    {# Featured Courses Section #}
+    <section class="py-16 bg-white">
+        <div class="container mx-auto px-4 max-w-6xl">
+            <h2 class="text-3xl md:text-4xl font-bold text-gray-800 mb-10 text-center animate-fade-in-up" style="animation-delay: 0.1s;">Our Popular Courses</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                {# Loop through a few popular courses #}
+                {% for course in courses|slice:":3" %} {# Assuming 'courses' context variable holds popular courses #}
+                <div class="bg-white rounded-xl shadow-lg overflow-hidden transform transition duration-300 hover:shadow-xl hover:scale-105 animate-fade-in-up" style="animation-delay: {{ forloop.counter|multiply:0.1 }}s;">
+                    <a href="{% url 'course_detail' course.id %}" class="block">
+                        {% if course.image_url %}
+                            <img src="{{ course.image_url }}" alt="{{ course.title }}" class="w-full h-48 object-cover rounded-t-xl">
+                        {% else %}
+                            <div class="w-full h-48 bg-gray-200 flex items-center justify-center rounded-t-xl">
+                                <i class="fas fa-yoga text-6xl text-gray-400"></i>
+                            </div>
+                        {% endif %}
+                        <div class="p-6">
+                            <h3 class="text-xl font-bold text-gray-800 mb-2">{{ course.title }}</h3>
+                            <p class="text-amber-600 font-semibold mb-3">{{ course.instructor_name }}</p>
+                            <p class="text-gray-700 text-sm mb-4">{{ course.description|striptags|truncatechars:100 }}</p>
+                            <div class="flex items-center justify-between text-gray-500 text-sm">
+                                <span><i class="fas fa-clock mr-1"></i> {{ course.duration }}</span>
+                                {% if course.is_free %}
+                                    <span class="text-green-600 font-bold">FREE</span>
+                                {% else %}
+                                    <span class="text-gray-800 font-bold">${{ course.price }}</span>
+                                {% endif %}
+                            </div>
+                            <div class="mt-4 text-center">
+                                <span class="text-amber-500">
+                                    {% for i in "12345"|make_list %}
+                                        {% if course.avg_rating >= forloop.counter %}
+                                            <i class="fas fa-star"></i>
+                                        {% elif course.avg_rating > forloop.counter|add:"-1" and course.avg_rating < forloop.counter %}
+                                            <i class="fas fa-star-half-alt"></i>
+                                        {% else %}
+                                            <i class="far fa-star"></i>
+                                        {% endif %}
+                                    {% endfor %}
+                                </span>
+                                <span class="text-gray-600 text-sm ml-2">({{ course.review_count }} reviews)</span>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+                {% empty %}
+                <div class="col-span-full text-center py-8">
+                    <p class="text-gray-600">No popular courses found yet.</p>
+                </div>
+                {% endfor %}
+            </div>
+            <div class="text-center mt-12 animate-fade-in-up" style="animation-delay: 0.5s;">
+                <a href="{% url 'courses' %}" class="inline-block bg-amber-500 hover:bg-amber-600 text-white font-bold py-3 px-8 rounded-full shadow-lg transition duration-300 transform hover:scale-105">
+                    View All Courses
+                </a>
+            </div>
+        </div>
+    </section>
+
+    {# Consultants Section #}
+    <section class="py-16 bg-gradient-to-r from-amber-50 to-amber-100">
+        <div class="container mx-auto px-4 max-w-6xl">
+            <h2 class="text-3xl md:text-4xl font-bold text-gray-800 mb-10 text-center animate-fade-in-up" style="animation-delay: 0.1s;">Meet Our Expert Consultants</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                {% for consultant in consultants|slice:":3" %} {# Display up to 3 consultants #}
+                <div class="bg-white rounded-xl shadow-lg overflow-hidden transform transition duration-300 hover:shadow-xl hover:scale-105 animate-fade-in-up" style="animation-delay: {{ forloop.counter|multiply:0.1 }}s;">
+                    <a href="{% url 'consultant_detail' consultant.id %}" class="block">
+                        {% if consultant.profile_picture_url %}
+                            <img src="{{ consultant.profile_picture_url }}" alt="{{ consultant.name }}" class="consultant-card-image-home">
+                        {% else %}
+                            <div class="w-full h-48 bg-gray-200 flex items-center justify-center rounded-t-xl">
+                                <i class="fas fa-user-circle text-6xl text-gray-400"></i>
+                            </div>
+                        {% endif %}
+                        <div class="p-6">
+                            <h3 class="text-2xl font-bold text-gray-800 mb-2">{{ consultant.name }}</h3>
+                            <p class="text-amber-600 font-semibold mb-3">{{ consultant.specialty }}</p>
+                            <p class="text-gray-700 text-sm mb-4">{{ consultant.bio|striptags|truncatechars:100|safe }}</p>
+                            <div class="flex items-center justify-between text-gray-500 text-sm mt-4">
+                                {% if consultant.is_available %}
+                                    <span class="text-green-600"><i class="fas fa-check-circle mr-1"></i> Available</span>
+                                {% else %}
+                                    <span class="text-red-600"><i class="fas fa-times-circle mr-1"></i> Not Available</span>
+                                {% endif %}
+                                <span class="text-blue-600 hover:underline">View Profile <i class="fas fa-arrow-right ml-1"></i></span>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+                {% empty %}
+                <div class="col-span-full text-center py-8">
+                    <p class="text-gray-600">No consultants found at the moment.</p>
+                </div>
+                {% endfor %}
+            </div>
+            <div class="text-center mt-12 animate-fade-in-up" style="animation-delay: 0.5s;">
+                <a href="{% url 'consultant_list' %}" class="inline-block bg-amber-500 hover:bg-amber-600 text-white font-bold py-3 px-8 rounded-full shadow-lg transition duration-300 transform hover:scale-105">
+                    View All Consultants
+                </a>
+            </div>
+        </div>
+    </section>
+
+    {# Testimonials Section #}
+    <section class="py-16 bg-white">
+        <div class="container mx-auto px-4 max-w-6xl">
+            <h2 class="text-3xl md:text-4xl font-bold text-gray-800 mb-10 text-center animate-fade-in-up" style="animation-delay: 0.1s;">What Our Students Say</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                {% for testimonial in testimonials %}
+                <div class="testimonial-card animate-fade-in-up" style="animation-delay: {{ forloop.counter|multiply:0.1 }}s;">
+                    <div class="star-rating">
+                        {% for i in "12345"|make_list %}
+                            {% if testimonial.rating >= forloop.counter %}
+                                <i class="fas fa-star"></i>
+                            {% else %}
+                                <i class="far fa-star"></i>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                    <i class="fas fa-quote-right quote-icon"></i>
+                    <p class="text-gray-700 italic mb-4">"{{ testimonial.feedback_text }}"</p>
+                    <p class="author">- {{ testimonial.author_name }}</p>
+                </div>
+                {% empty %}
+                <div class="col-span-full text-center py-8">
+                    <p class="text-gray-600">No testimonials found yet.</p>
+                </div>
+                {% endfor %}
+            </div>
+            <div class="text-center mt-12 animate-fade-in-up" style="animation-delay: 0.5s;">
+                <a href="{% url 'feedback' %}" class="inline-block bg-amber-500 hover:bg-amber-600 text-white font-bold py-3 px-8 rounded-full shadow-lg transition duration-300 transform hover:scale-105">
+                    Share Your Feedback
+                </a>
+            </div>
+        </div>
+    </section>
+
+    {# Newsletter Section #}
+    <section class="py-16 bg-gradient-to-r from-amber-50 to-amber-100">
+        <div class="container mx-auto px-4 max-w-3xl text-center">
+            <h2 class="text-3xl md:text-4xl font-bold text-gray-800 mb-6 animate-fade-in-up" style="animation-delay: 0.1s;">Stay Connected</h2>
+            <p class="text-gray-700 mb-8 animate-fade-in-up" style="animation-delay: 0.2s;">
+                Subscribe to our newsletter for the latest updates on courses, workshops, and exclusive content delivered straight to your inbox.
+            </p>
+            <div class="animate-fade-in-up" style="animation-delay: 0.3s;">
+                <form action="{% url 'newsletter_subscribe' %}" method="post" class="flex flex-col sm:flex-row items-center justify-center space-y-4 sm:space-y-0 sm:space-x-4">
+                    {% csrf_token %}
+                    <input type="email" name="email" placeholder="Enter your email address" required
+                           class="w-full sm:w-auto flex-grow px-5 py-3 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-amber-500">
+                    <button type="submit" class="w-full sm:w-auto bg-amber-500 hover:bg-amber-600 text-white font-bold py-3 px-8 rounded-full shadow-lg transition duration-300 transform hover:scale-105">
+                        Subscribe Now
+                    </button>
+                </form>
+            </div>
+        </div>
+    </section>
+
+{% endblock %}

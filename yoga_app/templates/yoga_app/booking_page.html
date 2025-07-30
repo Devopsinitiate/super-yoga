@@ -1,0 +1,133 @@
+{% extends 'yoga_app/base.html' %}
+{% load static %}
+
+{% block title %}Book a Session - Yoga Kailasa{% endblock %}
+
+{% block meta_description %}Schedule a personalized yoga or wellness consultation with our expert team. Book your session easily online.{% endblock %}
+
+{% block og_title %}Book Your Consultation - Yoga Kailasa{% endblock %}
+{% block og_description %}Schedule a personalized yoga or wellness consultation with our expert team. Book your session easily online.{% endblock %}
+{% block og_image %}{% static 'yoga_app/images/default_booking_og_image.jpg' %}{% endblock %} {# Placeholder for a default booking OG image #}
+
+{% block extra_css %}
+<style>
+    /* CSS for the fade-in-up animation, specific to booking_page.html elements */
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    .animate-fade-in-up {
+        opacity: 0; /* Hidden by default */
+        animation: fadeInUp 0.6s ease-out forwards;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<section class="py-16 bg-gradient-to-r from-amber-100 to-amber-50 min-h-screen">
+    <div class="container mx-auto px-4 max-w-4xl">
+        <div class="bg-white p-8 rounded-xl shadow-lg">
+            <h2 class="text-3xl md:text-4xl font-bold text-gray-800 mb-6 text-center animate-fade-in-up" style="animation-delay: 0.1s;">Book Your Personalized Session</h2>
+            <p class="text-gray-600 text-center mb-8 animate-fade-in-up" style="animation-delay: 0.2s;">Fill out the form below to schedule a session with one of our expert consultants. We'll get back to you to confirm the details.</p>
+
+            <div class="booking-form-container animate-fade-in-up" style="animation-delay: 0.3s;">
+                <form method="post" action="{% url 'booking' %}" class="space-y-6">
+                    {% csrf_token %}
+                    
+                    {# Display non-field errors #}
+                    {% if form.non_field_errors %}
+                        <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
+                            <strong class="font-bold">Error!</strong>
+                            <span class="block sm:inline">{{ form.non_field_errors }}</span>
+                        </div>
+                    {% endif %}
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="form-field-wrapper">
+                            {{ form.full_name.label_tag }}
+                            {{ form.full_name }}
+                            {% if form.full_name.help_text %}<p class="helptext">{{ form.full_name.help_text }}</p>{% endif %}
+                            {% for error in form.full_name.errors %}<p class="errorlist">{{ error }}</p>{% endfor %}
+                        </div>
+                        <div class="form-field-wrapper">
+                            {{ form.email.label_tag }}
+                            {{ form.email }}
+                            {% if form.email.help_text %}<p class="helptext">{{ form.email.help_text }}</p>{% endif %}
+                            {% for error in form.email.errors %}<p class="errorlist">{{ error }}</p>{% endfor %}
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="form-field-wrapper">
+                            {{ form.phone_number.label_tag }}
+                            {{ form.phone_number }}
+                            {% if form.phone_number.help_text %}<p class="helptext">{{ form.phone_number.help_text }}</p>{% endif %}
+                            {% for error in form.phone_number.errors %}<p class="errorlist">{{ error }}</p>{% endfor %}
+                        </div>
+                        <div class="form-field-wrapper">
+                            {{ form.consultant.label_tag }}
+                            {{ form.consultant }}
+                            {% if form.consultant.help_text %}<p class="helptext">{{ form.consultant.help_text }}</p>{% endif %}
+                            {% for error in form.consultant.errors %}<p class="errorlist">{{ error }}</p>{% endfor %}
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="form-field-wrapper">
+                            {{ form.preferred_date.label_tag }}
+                            {{ form.preferred_date }}
+                            {% if form.preferred_date.help_text %}<p class="helptext">{{ form.preferred_date.help_text }}</p>{% endif %}
+                            {% for error in form.preferred_date.errors %}<p class="errorlist">{{ error }}</p>{% endfor %}
+                        </div>
+                        <div class="form-field-wrapper">
+                            {{ form.preferred_time.label_tag }}
+                            {{ form.preferred_time }}
+                            {% if form.preferred_time.help_text %}<p class="helptext">{{ form.preferred_time.help_text }}</p>{% endif %}
+                            {% for error in form.preferred_time.errors %}<p class="errorlist">{{ error }}</p>{% endfor %}
+                        </div>
+                    </div>
+
+                    <div class="form-field-wrapper">
+                        {{ form.message.label_tag }}
+                        {{ form.message }}
+                        {% if form.message.help_text %}<p class="helptext">{{ form.message.help_text }}</p>{% endif %}
+                        {% for error in form.message.errors %}<p class="errorlist">{{ error }}</p>{% endfor %}
+                    </div>
+
+                    <button type="submit" class="w-full bg-amber-500 hover:bg-amber-600 text-white font-bold py-3 px-6 rounded-full shadow-lg transition duration-300 transform hover:scale-105 flex items-center justify-center">
+                        <i class="fas fa-calendar-alt mr-2"></i> Submit Booking Request
+                    </button>
+                </form>
+            </div>
+
+            {% if consultants %}
+            <div class="mt-12 text-center animate-fade-in-up" style="animation-delay: 0.4s;">
+                <h3 class="text-2xl font-bold text-gray-800 mb-6">Our Available Consultants</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {% for consultant in consultants %}
+                    <div class="bg-gray-50 border border-gray-200 rounded-lg p-4 shadow-sm flex flex-col items-center text-center">
+                        {% if consultant.profile_picture_url %}
+                            <img src="{{ consultant.profile_picture_url }}" alt="{{ consultant.name }}" class="w-24 h-24 rounded-full object-cover mb-3 border-2 border-amber-300">
+                        {% else %}
+                            <div class="w-24 h-24 rounded-full bg-gray-200 flex items-center justify-center text-gray-400 text-5xl mb-3 border-2 border-amber-300">
+                                <i class="fas fa-user-circle"></i>
+                            </div>
+                        {% endif %}
+                        <h4 class="text-lg font-semibold text-gray-800">{{ consultant.name }}</h4>
+                        <p class="text-amber-600 text-sm">{{ consultant.specialty }}</p>
+                        <a href="{% url 'consultant_detail' consultant.id %}" class="mt-3 text-blue-600 hover:underline text-sm">View Profile</a>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</section>
+{% endblock %}

@@ -1,0 +1,136 @@
+{% extends 'yoga_app/base.html' %}
+{% load static %}
+
+{% block title %}{{ consultant.name }} - Yoga Kailasa Consultant{% endblock %}
+
+{% block meta_description %}Learn more about {{ consultant.name }}, our expert in {{ consultant.specialty }}. View their bio and contact information for personalized sessions.{% endblock %}
+
+{% block og_title %}{{ consultant.name }} - Yoga Kailasa Consultant{% endblock %}
+{% block og_description %}Learn more about {{ consultant.name }}, our expert in {{ consultant.specialty }}. View their bio and contact information for personalized sessions.{% endblock %}
+{% block og_image %}{% if consultant.profile_picture_url %}{{ consultant.profile_picture_url }}{% else %}{% static 'yoga_app/images/default_consultant_og_image.jpg' %}{% endif %}{% endblock %}
+
+
+{% block extra_css %}
+<style>
+    /* CSS for the fade-in-up animation, specific to consultant_detail.html elements */
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    .animate-fade-in-up {
+        opacity: 0; /* Hidden by default */
+        animation: fadeInUp 0.6s ease-out forwards;
+    }
+    /* Styling for CKEditor content within the consultant bio */
+    .consultant-bio-content h1, .consultant-bio-content h2, .consultant-bio-content h3, .consultant-bio-content h4, .consultant-bio-content h5, .consultant-bio-content h6 {
+        @apply text-gray-800 font-bold mt-6 mb-3;
+    }
+    .consultant-bio-content h1 { @apply text-3xl; }
+    .consultant-bio-content h2 { @apply text-2xl; }
+    .consultant-bio-content h3 { @apply text-xl; }
+    .consultant-bio-content p {
+        @apply mb-4 leading-relaxed;
+    }
+    .consultant-bio-content ul, .consultant-bio-content ol {
+        @apply list-inside mb-4 pl-4;
+    }
+    .consultant-bio-content ul { @apply list-disc; }
+    .consultant-bio-content ol { @apply list-decimal; }
+    .consultant-bio-content a {
+        @apply text-blue-600 hover:underline;
+    }
+    .consultant-bio-content img {
+        @apply max-w-full h-auto rounded-lg shadow-md my-6 mx-auto block;
+    }
+    .consultant-bio-content blockquote {
+        @apply border-l-4 border-amber-500 pl-4 py-2 my-4 italic text-gray-700;
+    }
+    .consultant-bio-content pre {
+        @apply bg-gray-100 p-4 rounded-md overflow-x-auto text-sm font-mono my-4;
+    }
+    .consultant-bio-content code {
+        @apply bg-gray-200 px-1 py-0.5 rounded text-sm font-mono;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<section class="py-16 bg-gradient-to-r from-amber-100 to-amber-50 min-h-screen">
+    <div class="container mx-auto px-4 max-w-4xl">
+        <div class="bg-white p-8 rounded-xl shadow-lg text-center">
+            {# Consultant Profile Picture #}
+            <div class="mb-8 animate-fade-in-up" style="animation-delay: 0.1s;">
+                {% if consultant.profile_picture_url %}
+                    <img src="{{ consultant.profile_picture_url }}" alt="{{ consultant.name }}" class="w-48 h-48 rounded-full object-cover mx-auto shadow-md border-4 border-amber-200">
+                {% else %}
+                    <div class="w-48 h-48 rounded-full bg-gray-200 flex items-center justify-center mx-auto text-gray-400 text-8xl shadow-md border-4 border-amber-200">
+                        <i class="fas fa-user-circle"></i>
+                    </div>
+                {% endif %}
+            </div>
+
+            {# Consultant Name and Specialty #}
+            <h2 class="text-4xl font-bold text-gray-800 mb-2 animate-fade-in-up" style="animation-delay: 0.2s;">{{ consultant.name }}</h2>
+            <p class="text-amber-600 text-xl font-semibold mb-6 animate-fade-in-up" style="animation-delay: 0.3s;">{{ consultant.specialty }}</p>
+
+            {# Consultant Bio (Rich Text Content) #}
+            <div class="text-gray-700 leading-relaxed text-left consultant-bio-content prose max-w-none mx-auto mb-8 p-4 bg-gray-50 rounded-lg shadow-inner animate-fade-in-up" style="animation-delay: 0.4s;">
+                <h3 class="text-2xl font-bold text-gray-800 mb-4 border-b pb-2">About {{ consultant.name }}</h3>
+                {# Apply |safe filter here for the rich text bio #}
+                {{ consultant.bio|safe }}
+            </div>
+
+            {# Contact and Availability Info #}
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-left text-gray-700 mb-8 animate-fade-in-up" style="animation-delay: 0.5s;">
+                {% if consultant.contact_email %}
+                    <div class="flex items-center bg-white p-4 rounded-lg shadow-sm border border-gray-200">
+                        <i class="fas fa-envelope text-amber-500 mr-3 text-xl"></i>
+                        <span>Email: <a href="mailto:{{ consultant.contact_email }}" class="text-blue-600 hover:underline">{{ consultant.contact_email }}</a></span>
+                    </div>
+                {% endif %}
+                {% if consultant.phone_number %}
+                    <div class="flex items-center bg-white p-4 rounded-lg shadow-sm border border-gray-200">
+                        <i class="fas fa-phone-alt text-amber-500 mr-3 text-xl"></i>
+                        <span>Phone: <a href="tel:{{ consultant.phone_number }}" class="text-blue-600 hover:underline">{{ consultant.phone_number }}</a></span>
+                    </div>
+                {% endif %}
+                <div class="flex items-center bg-white p-4 rounded-lg shadow-sm border border-gray-200">
+                    {% if consultant.is_available %}
+                        <i class="fas fa-check-circle text-green-600 mr-3 text-xl"></i>
+                        <span class="font-semibold text-green-700">Currently Available for Sessions</span>
+                    {% else %}
+                        <i class="fas fa-times-circle text-red-600 mr-3 text-xl"></i>
+                        <span class="font-semibold text-red-700">Currently Unavailable</span>
+                    {% endif %}
+                </div>
+                {% if consultant.icon_class %}
+                    <div class="flex items-center bg-white p-4 rounded-lg shadow-sm border border-gray-200">
+                        <i class="{{ consultant.icon_class }} text-amber-500 mr-3 text-xl"></i>
+                        <span>Special Icon: {{ consultant.icon_class }}</span>
+                    </div>
+                {% endif %}
+            </div>
+
+            {# Call to Action Button #}
+            <div class="mt-8 animate-fade-in-up" style="animation-delay: 0.6s;">
+                <a href="{% url 'booking' %}" class="inline-flex items-center bg-amber-500 hover:bg-amber-600 text-white font-bold py-4 px-8 rounded-full shadow-lg transition duration-300 transform hover:scale-105">
+                    <i class="fas fa-calendar-check mr-3"></i> Book a Session with {{ consultant.name }}
+                </a>
+            </div>
+
+            {# Back to Consultants List #}
+            <div class="mt-8 animate-fade-in-up" style="animation-delay: 0.7s;">
+                <a href="{% url 'consultant_list' %}" class="inline-flex items-center text-gray-600 hover:text-amber-600 transition duration-300">
+                    <i class="fas fa-arrow-left mr-2"></i> Back to All Consultants
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

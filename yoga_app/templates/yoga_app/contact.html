@@ -1,0 +1,108 @@
+{% extends 'yoga_app/base.html' %}
+{% load static %}
+
+
+{% block title %}Contact Us - Yoga Kailasa{% endblock %}
+
+{# NEW: Meta Description for SEO #}
+{% block meta_description %}Have questions or feedback for Yoga Kailasa? Contact us via our online form, email, or phone. We're here to help you on your yoga journey.{% endblock %}
+
+{# NEW: Open Graph Tags for Social Sharing #}
+{% block og_title %}Contact Us - Yoga Kailasa{% endblock %}
+{% block og_description %}Have questions or feedback for Yoga Kailasa? Contact us via our online form, email, or phone. We're here to help you on your yoga journey.{% endblock %}
+{% block og_image %}{% static 'yoga_app/images/default_contact_og_image.jpg' %}{% endblock %} {# Using a static default image for OG #}
+
+{% block extra_css %}
+<style>
+    /* CSS for the fade-in-up animation, specific to contact.html elements */
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    .animate-fade-in-up {
+        opacity: 0; /* Hidden by default */
+        animation: fadeInUp 0.6s ease-out forwards;
+    }
+    /* Ensure form fields have consistent styling */
+    .contact-form input[type="text"],
+    .contact-form input[type="email"],
+    .contact-form textarea {
+        @apply w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500;
+    }
+    .contact-form textarea {
+        @apply resize-y;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<section class="py-16 bg-gradient-to-r from-amber-100 to-amber-50 min-h-screen flex items-center justify-center">
+    <div class="container mx-auto px-4 max-w-2xl">
+        <div class="bg-white p-8 rounded-xl shadow-lg animate-fade-in-up">
+            <h2 class="text-3xl font-bold text-gray-800 mb-6 text-center animate-fade-in-up" style="animation-delay: 0.1s;">Get in Touch</h2>
+            <p class="text-gray-600 text-center mb-8 animate-fade-in-up" style="animation-delay: 0.2s;">Have a question, feedback, or just want to say hello? Fill out the form below and we'll get back to you as soon as possible.</p>
+
+            {# Display Messages (handled by base.html toast system) #}
+            {% if messages %}
+                <div class="mb-6 animate-fade-in-up" style="animation-delay: 0.3s;">
+                    {% for message in messages %}
+                        <div class="p-3 rounded-md mb-2 text-sm {% if message.tags == 'success' %}bg-green-100 text-green-800{% elif message.tags == 'error' %}bg-red-100 text-red-800{% elif message.tags == 'info' %}bg-blue-100 text-blue-800{% endif %}">
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+
+            <form method="post" action="{% url 'contact' %}" class="space-y-6 animate-fade-in-up contact-form" style="animation-delay: 0.4s;">
+                {% csrf_token %}
+                {# Render the form fields. Use |crispy if you have crispy forms installed. #}
+                {# Otherwise, use form.as_p, form.as_table, or form.as_ul for basic rendering. #}
+                {# IMPORTANT: Ensure your forms.py widgets apply Tailwind classes like TAILWIND_INPUT_CLASSES #}
+                {{ form.as_p }} 
+                
+                <button type="submit" class="w-full bg-amber-500 hover:bg-amber-600 text-white px-6 py-3 rounded-full shadow-lg transition duration-300 mt-6 transform hover:scale-105">
+                    Send Message <i class="fas fa-paper-plane ml-2"></i>
+                </button>
+            </form>
+
+            <div class="text-center mt-8 text-gray-700 animate-fade-in-up" style="animation-delay: 0.5s;">
+                <p class="text-lg font-semibold mb-4">You can also reach us directly:</p>
+                <p class="mt-2 text-lg"><i class="fas fa-envelope mr-2 text-amber-500"></i> Email: <a href="mailto:support@yogakailasa.com" class="text-blue-600 hover:underline">support@yogakailasa.com</a></p>
+                <p class="mt-2 text-lg"><i class="fas fa-phone-alt mr-2 text-amber-500"></i> Phone: +1 (123) 456-7890</p>
+                
+                {# Optional: Social Media Links #}
+                <div class="flex justify-center space-x-6 mt-6">
+                    <a href="#" class="text-gray-600 hover:text-amber-500 transition duration-300 transform hover:scale-110"><i class="fab fa-facebook-f text-2xl"></i></a>
+                    <a href="#" class="text-gray-600 hover:text-amber-500 transition duration-300 transform hover:scale-110"><i class="fab fa-instagram text-2xl"></i></a>
+                    <a href="#" class="text-gray-600 hover:text-amber-500 transition duration-300 transform hover:scale-110"><i class="fab fa-twitter text-2xl"></i></a>
+                    <a href="#" class="text-gray-600 hover:text-amber-500 transition duration-300 transform hover:scale-110"><i class="fab fa-youtube text-2xl"></i></a>
+                </div>
+
+                {# Optional: Embedded Map #}
+                <div class="mt-10 rounded-lg overflow-hidden shadow-md border border-gray-200">
+                    <h4 class="text-xl font-semibold text-gray-800 mb-4">Find Us on the Map</h4>
+                    <div class="relative" style="padding-bottom: 75%; height: 0; overflow: hidden;">
+                        <iframe
+                            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3455.518178825838!2d78.31871231508826!3d30.08698188188566!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x390916a2b8e0e6ff%3A0x7d7b7e8d7e8d7e8d!2sRishikesh%2C%20Uttarakhand%2C%20India!5e0!3m2!1sen!2sus!4v1678901234567!5m2!1sen!2sus"
+                            width="600"
+                            height="450"
+                            style="border:0;"
+                            allowfullscreen=""
+                            loading="lazy"
+                            referrerpolicy="no-referrer-when-downgrade"
+                            class="absolute top-0 left-0 w-full h-full"
+                        ></iframe>
+                    </div>
+                    <p class="text-gray-500 text-sm mt-4">Visit us at 123 Yoga Street, Rishikesh, India.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
