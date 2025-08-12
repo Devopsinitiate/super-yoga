@@ -1,3 +1,11 @@
+# Celery configuration
+CELERY_BROKER_URL = 'redis://192.168.80.130:6379/16'
+CELERY_RESULT_BACKEND = 'redis://192.168.80.130:6379/16'
+CELERY_ACCEPT_CONTENT = ['json']
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_RESULT_SERIALIZER = 'json'
+CELERY_TIMEZONE = 'UTC'
+
 """
 Django settings for yoga_kailasa project.
 
@@ -11,32 +19,30 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 import os
 from pathlib import Path
+from dotenv import load_dotenv
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+# Load .env file
+load_dotenv(os.path.join(BASE_DIR, '.env'))
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = ''
+SECRET_KEY = os.environ.get('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.environ.get('DEBUG', 'False')
 
-ALLOWED_HOSTS = ['127.0.0.1', 'localhost', '.ngrok-free.app', 'https://495eeb47094f.ngrok-free.app'] # Add your ngrok domain here
-# Example: ALLOWED_HOSTS = ['127.0.0.1', 'localhost', 'abcdef12345.ngrok-free.app']
-# If you have a paid ngrok plan with a custom domain, add that too.
-# The '.ngrok-free.app' allows all subdomains of ngrok-free.app, which is convenient for free tier.
-
-# ... other settings ...
+ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS', 'localhost').split(',')
 
 CSRF_TRUSTED_ORIGINS = [
     'http://localhost:8000',
     'http://127.0.0.1:8000',
     'https://*.ngrok-free.app', # Allow all ngrok-free.app subdomains
-    'https://495eeb47094f.ngrok-free.app', # Or your specific ngrok subdomain
+    'https://49640ad4bbe8.ngrok-free.app', # Or your specific ngrok subdomain
 ]
 
 
@@ -50,7 +56,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django_ckeditor_5',
-    'yoga_app'
+    'yoga_app',
 ]
 
 MIDDLEWARE = [
@@ -90,21 +96,34 @@ WSGI_APPLICATION = 'yoga_kailasa.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'yogakailasa_db',  # Your PostgreSQL database name
-        'USER': 'postgres', # Your PostgreSQL user
-        'PASSWORD': '', # Your PostgreSQL password
-        'HOST': 'localhost',       # Or the IP address of your PostgreSQL server
-        'PORT': '5432',                # Default PostgreSQL port is 5432. Leave empty for default.
+        'NAME': os.environ.get('POSTGRES_DB'),  # Your PostgreSQL database name
+        'USER': os.environ.get('POSTGRES_USER'), # Your PostgreSQL user
+        'PASSWORD': os.environ.get('POSTGRES_PASSWORD'), # Your PostgreSQL password
+        'HOST': os.environ.get('POSTGRES_HOST'),       # Or the IP address of your PostgreSQL server
+        'PORT': os.environ.get('POSTGRES_PORT'),                # Default PostgreSQL port is 5432. Leave empty for default.
     }
 }
 
 
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+        'LOCATION': 'unique-snowflake', # A unique string to identify this cache instance
+        'TIMEOUT': 300, # Cache timeout in seconds (5 minutes)
+        'OPTIONS': {
+            'MAX_ENTRIES': 1000 # Maximum number of entries in the cache
+        }
+    }
+}
+
+
+
 # Paystack API Keys
 # IMPORTANT: For production, load these from environment variables or a secure vault!
-PAYSTACK_SECRET_KEY = os.environ.get('PAYSTACK_SECRET_KEY', 'sk_test_feb9c7c09c874c6fadd43ed5b4912238d4aed024')
-PAYSTACK_PUBLIC_KEY = os.environ.get('PAYSTACK_PUBLIC_KEY', 'pk_test_64e27102e90285ecdbf38aa086ed27e564126074')
+PAYSTACK_SECRET_KEY = os.environ.get('PAYSTACK_SECRET_KEY')
+PAYSTACK_PUBLIC_KEY = os.environ.get('PAYSTACK_PUBLIC_KEY')
 PAYSTACK_BASE_URL = 'https://api.paystack.co' # Base URL for Paystack API
-PAYSTACK_WEBHOOK_URL='https://495eeb47094f.ngrok-free.app/payments/webhook/paystack/'  # Replace with your actual webhook URL
+PAYSTACK_WEBHOOK_URL='https://49640ad4bbe8.ngrok-free.app/payments/webhook/paystack/'  # Replace with your actual webhook URL
 
 
 # Password validation
@@ -116,12 +135,18 @@ AUTH_PASSWORD_VALIDATORS = [
     },
     {
         'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
+        'OPTIONS': {
+            'min_length': 8, # Require a minimum of 8 characters
+        }
     },
     {
         'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
     },
     {
         'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
+    },
+    {
+        'NAME': 'yoga_app.validators.PasswordComplexityValidator',
     },
 ]
 
@@ -156,6 +181,8 @@ STATICFILES_DIRS = [
     os.path.join(BASE_DIR, 'yoga_app', 'static'), # Look for static files in your app's 'static' folder
     
 ]
+
+
 
 
 

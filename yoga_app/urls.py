@@ -119,4 +119,7 @@ urlpatterns = [
     # NEW: Consultant URLs
     path('consultants/', views.consultant_list_view, name='consultant_list'),
     path('consultants/<int:consultant_id>/', views.consultant_detail_view, name='consultant_detail'),
+
+    # NEW: Report Request URL
+    path('request-report/', views.request_report_view, name='request_report'),
 ]

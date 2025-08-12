@@ -23,6 +23,12 @@ from django.contrib.auth.models import User
 from django.contrib.auth.forms import PasswordChangeForm # Keep this import for the base form if needed elsewhere
 from django.contrib.auth.views import LoginView, LogoutView
 
+from django_ratelimit.decorators import ratelimit # Import ratelimit decorator
+from django.utils.decorators import method_decorator # NEW: Import method_decorator
+
+from django.views.decorators.cache import cache_page # NEW: Import cache_page decorator
+
+from .tasks import send_newsletter_email, send_booking_confirmation_email, generate_report_task # NEW: Import the Celery tasks
 
 from .models import (
     YogaPose,
@@ -68,7 +74,11 @@ from .forms import (
 )
 
 # Custom LoginView with success message
+@method_decorator(ratelimit(key='ip', rate='5/m', block=True), name='dispatch')
 class CustomLoginView(LoginView):
+    # The @ratelimit decorator is now correctly applied to the 'dispatch' method
+    # using method_decorator, ensuring it receives the HttpRequest object.
+    
     def form_valid(self, form):
         response = super().form_valid(form)
         messages.success(self.request, f"Welcome back, {self.request.user.username}! You have logged in successfully.")
@@ -84,11 +94,12 @@ class CustomLogoutView(LogoutView):
         messages.success(request, "You have logged out successfully.")
         return super().dispatch(request, *args, **kwargs)
 
-
+@cache_page(60 * 5) # Cache the homepage for 5 minutes (300 seconds)
 def home_view(request):
     """
     Renders the homepage, fetching data from various models to populate sections.
     Optimized with prefetch_related/select_related for efficient data retrieval.
+    This view's output is now cached for 5 minutes.
     """
     yoga_poses = YogaPose.objects.all().order_by('?')[:3]
     breathing_techniques = BreathingTechnique.objects.all().order_by('name')
@@ -99,10 +110,8 @@ def home_view(request):
     ).order_by('-is_popular', 'price')
     
     consultants = Consultant.objects.all().order_by('name')
-    testimonials = Testimonial.objects.all().order_by('-submitted_at')[:3]
+    testimonials = Testimonial.objects.filter(is_approved=True).order_by('-submitted_at')[:3] # Filter for approved testimonials
 
-    # Removed: booking_form, testimonial_form, newsletter_form initialization from home_view
-    # These forms will now be handled on their respective dedicated pages or modals.
     contact_form = ContactMessageForm()
 
     context = {
@@ -115,6 +124,7 @@ def home_view(request):
     }
     return render(request, 'yoga_app/index.html', context)
 
+@ratelimit(key='ip', rate='5/m', block=True) # Apply rate limiting to registration
 def register_view(request):
     if request.method == 'POST':
         form = UserRegisterForm(request.POST)
@@ -142,8 +152,10 @@ def booking_view(request):
             if request.user.is_authenticated:
                 booking.user = request.user
             booking.save()
+            # Trigger async booking confirmation email
+            send_booking_confirmation_email.delay(booking.user.email if booking.user else booking.email, booking.id)
             messages.success(request, 'Your booking request has been submitted successfully! We will contact you shortly.')
-            return redirect('booking') # Redirect to the same dedicated booking page
+            return redirect('booking')
         else:
             messages.error(request, 'There was an error with your booking. Please correct the errors below.')
     else:
@@ -159,6 +171,7 @@ def booking_view(request):
     # RENDER NEW DEDICATED TEMPLATE
     return render(request, 'yoga_app/booking_page.html', context)
 
+@ratelimit(key='ip', rate='3/m', block=True) # Apply rate limiting to feedback submission
 def feedback_view(request):
     """
     Handles submission of the testimonial/feedback form.
@@ -195,6 +208,12 @@ def newsletter_subscribe_view(request):
                 messages.info(request, 'You are already subscribed to our newsletter!')
             else:
                 form.save()
+                # Trigger async newsletter email (example usage)
+                send_newsletter_email.delay(
+                    'Welcome to Yoga Kailasa Newsletter!',
+                    'Thank you for subscribing to our newsletter.',
+                    [email]
+                )
                 messages.success(request, 'Thank you for subscribing to our newsletter!')
             return redirect('home')
         else:
@@ -978,6 +997,7 @@ def profile_update_view(request):
     }
     return render(request, 'yoga_app/profile_edit.html', context)
 
+@ratelimit(key='ip', rate='3/m', block=True) # Apply rate limiting to contact form
 def contact_view(request):
     """
     Handles displaying and processing the contact message form.
@@ -1154,7 +1174,7 @@ def mark_lesson_complete_view(request, course_id, lesson_id):
         user_profile = get_object_or_404(UserProfile, user=user)
         if not user_profile.enrolled_courses.filter(id=course_id).exists():
             messages.error(request, f"You are not enrolled in '{lesson.module.course.title}'. Cannot mark lesson as complete.")
-            return redirect('course_detail', course_id=course_id)
+            return redirect('course_detail', course_id=course.id)
 
         if UserLessonCompletion.objects.filter(user=user, lesson=lesson).exists():
             messages.info(request, f"Lesson '{lesson.title}' is already marked as complete.")
@@ -1180,6 +1200,7 @@ def mark_lesson_complete_view(request, course_id, lesson_id):
 
 
 @login_required
+@ratelimit(key='ip', rate='5/m', block=True) # Apply rate limiting to discussion topic creation
 def course_discussion_list_view(request, course_id):
     """
     Displays a list of discussion topics for a course and allows creation of new topics.
@@ -1219,6 +1240,7 @@ def course_discussion_list_view(request, course_id):
 
 
 @login_required
+@ratelimit(key='ip', rate='10/m', block=True) # Apply rate limiting to discussion post creation
 def discussion_topic_detail_view(request, course_id, topic_id):
     """
     Displays a single discussion topic and its posts.
@@ -1445,7 +1467,7 @@ def toggle_topic_like(request, course_id, topic_id):
                     Notification.objects.create(
                         recipient=topic.user,
                         sender=user,
-                        notification_type='like',
+                        notification_type='reply',
                         message=f"{user.username} liked your topic: '{topic.title}'",
                         link=reverse('course_discussion_detail', args=[course_id, topic.id])
                     )
@@ -1486,7 +1508,7 @@ def toggle_post_like(request, course_id, topic_id, post_id):
                     Notification.objects.create(
                         recipient=post.user,
                         sender=user,
-                        notification_type='like',
+                        notification_type='reply',
                         message=f"{user.username} liked your post in topic: '{post.topic.title}'",
                         link=reverse('course_discussion_detail', args=[course_id, topic_id])
                     )
@@ -1758,6 +1780,7 @@ def blog_detail_view(request, post_slug):
     return render(request, 'yoga_app/blog_detail.html', context)
 
 @login_required
+@ratelimit(key='ip', rate='5/m', block=True) # Apply rate limiting to blog comment submission
 def add_blog_comment_view(request, post_slug):
     """
     Handles submission of new comments for a blog post.
@@ -1843,3 +1866,20 @@ def consultant_detail_view(request, consultant_id):
         'consultant': consultant,
     }
     return render(request, 'yoga_app/consultant_detail.html', context)
+
+@login_required
+def request_report_view(request):
+    """
+    Allows a logged-in user to request a report (e.g., progress, payment, or activity report).
+    Triggers the async report generation Celery task and notifies the user.
+    """
+    if request.method == 'POST':
+        report_type = request.POST.get('report_type', 'progress')
+        user_email = request.user.email
+        if user_email:
+            generate_report_task.delay(report_type, user_email)
+            messages.success(request, f"Your {report_type} report is being generated and will be sent to {user_email}.")
+        else:
+            messages.error(request, "No email address found for your account. Please update your profile.")
+        return redirect('dashboard')
+    return render(request, 'yoga_app/request_report.html')

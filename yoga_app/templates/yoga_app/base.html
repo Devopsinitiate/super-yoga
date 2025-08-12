@@ -397,6 +397,14 @@
 </head>
 <body class="font-sans bg-gray-50 text-gray-800">
 
+    <!-- Global AJAX Loading Spinner Overlay -->
+    <div id="global-ajax-spinner" class="fixed inset-0 z-50 flex items-center justify-center bg-gray-100 bg-opacity-70 hidden">
+        <div class="flex flex-col items-center">
+            <span class="animate-spin rounded-full border-8 border-amber-500 border-t-transparent h-16 w-16 mb-4"></span>
+            <span class="text-lg font-semibold text-amber-700">Loading...</span>
+        </div>
+    </div>
+
     {# Global Message Display #}
     {# This div is still present for Django's default messages, but they will be converted to toasts by JS below #}
     <div id="django-messages-list" class="hidden">
@@ -529,7 +537,7 @@
 
             {% if user.is_authenticated %}
                 <div class="border-t border-gray-200 pt-4 mt-4">
-                    <a href="{% url 'profile_edit' %}" class="flex items-center text-gray-700 hover:text-amber-600 font-medium text-lg mb-2">
+                    <a href="{% url 'profile_edit' %}" class="flex items-center text-gray-700 hover:text-amber-600 font-medium text-lg mb-2" id="mobile-profile-link">
                         {% if user.userprofile.profile_picture %}
                             <img src="{{ user.userprofile.profile_picture.url }}" alt="Profile Picture" class="w-8 h-8 rounded-full object-cover mr-2">
                         {% else %}
@@ -543,23 +551,27 @@
                             <span class="notification-count" id="mobile-notification-count-nav">{{ unread_notifications_count }}</span>
                         {% endif %}
                     </a>
-                    <div id="mobile-notification-dropdown" class="notification-dropdown w-full static shadow-none mt-2 p-0">
-                        <div class="px-4 py-2 text-sm font-semibold text-gray-800 border-b border-gray-100">Recent Notifications</div>
-                        <div id="mobile-notification-list" class="py-1">
-                            {# Notifications will be loaded here by JS #}
-                            <div class="p-4 text-center text-gray-500">Loading notifications...</div>
-                        </div>
-                        <div class="px-4 py-2 border-t border-gray-100 text-center">
-                            <a href="{% url 'all_notifications' %}" class="text-amber-600 hover:underline text-sm">View All Notifications</a>
-                        </div>
-                    </div>
-                    <form action="{% url 'logout' %}" method="post" class="block w-full"> {# Ensure form is block-level for full width click #}
+                    <a href="{% url 'dashboard' %}" class="block px-2 py-1 text-gray-700 hover:bg-gray-100 rounded-md"><i class="fas fa-tachometer-alt mr-2"></i> Dashboard</a>
+                    <a href="{% url 'profile_edit' %}" class="block px-2 py-1 text-gray-700 hover:bg-gray-100 rounded-md"><i class="fas fa-user mr-2"></i> My Profile</a>
+                    <form action="{% url 'logout' %}" method="post" class="block w-full mt-2">
                         {% csrf_token %}
-                        <button type="submit" class="w-full text-left py-2 text-gray-700 hover:text-amber-600 font-medium text-lg mt-2">
-                            Logout
+                        <button type="submit" class="w-full text-left py-2 text-white bg-red-600 hover:bg-red-700 font-bold text-lg flex items-center justify-center rounded" id="mobile-logout-btn">
+                            <i class="fas fa-sign-out-alt mr-2"></i> Logout
                         </button>
                     </form>
                 </div>
+                <script>
+                document.addEventListener('DOMContentLoaded', function() {
+                    var profileLink = document.getElementById('mobile-profile-link');
+                    var logoutBtn = document.getElementById('mobile-logout-btn');
+                    if (profileLink && logoutBtn) {
+                        profileLink.addEventListener('click', function(e) {
+                            e.preventDefault();
+                            logoutBtn.click();
+                        });
+                    }
+                });
+                </script>
             {% else %}
                 <div class="border-t border-gray-200 pt-4 mt-4">
                     <a href="{% url 'login' %}" class="block text-gray-700 hover:text-amber-600 font-medium text-lg">Login</a>
@@ -608,6 +620,13 @@
     {% block extra_js %}
     <script>
         document.addEventListener('DOMContentLoaded', function() {
+            // GLOBAL AJAX SPINNER HELPERS
+            window.showGlobalSpinner = function() {
+                document.getElementById('global-ajax-spinner').classList.remove('hidden');
+            }
+            window.hideGlobalSpinner = function() {
+                document.getElementById('global-ajax-spinner').classList.add('hidden');
+            }
             /* Mobile Menu Toggle */
             const mobileMenuButton = document.getElementById('mobile-menu-button');
             const closeMobileMenuButton = document.getElementById('close-mobile-menu');
@@ -763,6 +782,7 @@
             }
 
             window.ajaxPost = async function(url, data = {}) {
+                showGlobalSpinner();
                 const csrftoken = getCookie('csrftoken');
                 try {
                     const response = await fetch(url, {
@@ -780,9 +800,13 @@
                         throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
                     }
 
-                    return await response.json();
+
+                    const result = await response.json();
+                    hideGlobalSpinner();
+                    return result;
 
                 } catch (error) {
+                    hideGlobalSpinner();
                     console.error("AJAX POST Error:", error);
                     window.showToast(error.message || 'An unexpected error occurred.', 'error');
                     throw error;

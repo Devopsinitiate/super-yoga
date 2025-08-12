@@ -1,0 +1,17 @@
+{% extends 'yoga_app/base.html' %}
+{% block content %}
+<div class="max-w-lg mx-auto mt-10 p-6 bg-white rounded shadow">
+    <h2 class="text-2xl font-bold mb-4">Request a Report</h2>
+    <form method="post">
+        {% csrf_token %}
+        <label for="report_type" class="block mb-2 font-semibold">Select Report Type:</label>
+        <select name="report_type" id="report_type" class="w-full mb-4 p-2 border rounded">
+            <option value="progress">Progress Report</option>
+            <option value="payment">Payment Report</option>
+            <option value="activity">Activity Report</option>
+        </select>
+        <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded w-full">Request Report</button>
+    </form>
+    <p class="mt-4 text-gray-600 text-sm">A link to your report will be sent to your email address on file.</p>
+</div>
+{% endblock %}

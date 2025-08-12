@@ -143,7 +143,9 @@
     <section class="py-16 bg-gradient-to-r from-amber-50 to-amber-100">
         <div class="container mx-auto px-4 max-w-6xl">
             <h2 class="text-3xl md:text-4xl font-bold text-gray-800 mb-10 text-center animate-fade-in-up" style="animation-delay: 0.1s;">Featured Yoga Poses</h2>
+            {% load cache %}
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                {% cache 300 featured_poses %}
                 {% for pose in yoga_poses %} {# Loop through yoga_poses context variable #}
                 <div class="bg-white rounded-xl shadow-lg overflow-hidden transform transition duration-300 hover:shadow-xl hover:scale-105 animate-fade-in-up" style="animation-delay: {{ forloop.counter|multiply:0.1 }}s;">
                     <a href="{% url 'pose_detail' pose.id %}" class="block">
@@ -166,10 +168,15 @@
                     </a>
                 </div>
                 {% empty %}
-                <div class="col-span-full text-center py-8">
-                    <p class="text-gray-600">No featured yoga poses found yet.</p>
+                <div class="col-span-full text-center py-12 animate-fade-in-up" style="animation-delay: 0.4s;">
+                    <div class="flex flex-col items-center">
+                        <span class="text-6xl text-amber-300 mb-4"><i class="fas fa-child"></i></span>
+                        <p class="text-lg font-semibold text-gray-700 mb-2">No featured yoga poses found yet.</p>
+                        <p class="text-gray-500 mb-4">Check back soon or <a href="{% url 'poses' %}" class="text-amber-600 underline">explore all poses</a>.</p>
+                    </div>
                 </div>
                 {% endfor %}
+                {% endcache %}
             </div>
             <div class="text-center mt-12 animate-fade-in-up" style="animation-delay: 0.5s;">
                 <a href="{% url 'poses' %}" class="inline-block bg-amber-500 hover:bg-amber-600 text-white font-bold py-3 px-8 rounded-full shadow-lg transition duration-300 transform hover:scale-105">
@@ -183,7 +190,9 @@
     <section class="py-16 bg-white">
         <div class="container mx-auto px-4 max-w-6xl">
             <h2 class="text-3xl md:text-4xl font-bold text-gray-800 mb-10 text-center animate-fade-in-up" style="animation-delay: 0.1s;">Our Popular Courses</h2>
+            {% load cache %}
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                {% cache 300 popular_courses %}
                 {# Loop through a few popular courses #}
                 {% for course in courses|slice:":3" %} {# Assuming 'courses' context variable holds popular courses #}
                 <div class="bg-white rounded-xl shadow-lg overflow-hidden transform transition duration-300 hover:shadow-xl hover:scale-105 animate-fade-in-up" style="animation-delay: {{ forloop.counter|multiply:0.1 }}s;">
@@ -225,10 +234,15 @@
                     </a>
                 </div>
                 {% empty %}
-                <div class="col-span-full text-center py-8">
-                    <p class="text-gray-600">No popular courses found yet.</p>
+                <div class="col-span-full text-center py-12 animate-fade-in-up" style="animation-delay: 0.4s;">
+                    <div class="flex flex-col items-center">
+                        <span class="text-6xl text-amber-300 mb-4"><i class="fas fa-book-open"></i></span>
+                        <p class="text-lg font-semibold text-gray-700 mb-2">No popular courses found yet.</p>
+                        <p class="text-gray-500 mb-4">Browse our <a href="{% url 'courses' %}" class="text-amber-600 underline">full course catalog</a> to get started.</p>
+                    </div>
                 </div>
                 {% endfor %}
+                {% endcache %}
             </div>
             <div class="text-center mt-12 animate-fade-in-up" style="animation-delay: 0.5s;">
                 <a href="{% url 'courses' %}" class="inline-block bg-amber-500 hover:bg-amber-600 text-white font-bold py-3 px-8 rounded-full shadow-lg transition duration-300 transform hover:scale-105">
@@ -269,8 +283,12 @@
                     </a>
                 </div>
                 {% empty %}
-                <div class="col-span-full text-center py-8">
-                    <p class="text-gray-600">No consultants found at the moment.</p>
+                <div class="col-span-full text-center py-12 animate-fade-in-up" style="animation-delay: 0.4s;">
+                    <div class="flex flex-col items-center">
+                        <span class="text-6xl text-amber-300 mb-4"><i class="fas fa-user-friends"></i></span>
+                        <p class="text-lg font-semibold text-gray-700 mb-2">No consultants found at the moment.</p>
+                        <p class="text-gray-500 mb-4">Our team is growing! <a href="{% url 'about' %}" class="text-amber-600 underline">Learn more about us</a>.</p>
+                    </div>
                 </div>
                 {% endfor %}
             </div>
@@ -303,8 +321,12 @@
                     <p class="author">- {{ testimonial.author_name }}</p>
                 </div>
                 {% empty %}
-                <div class="col-span-full text-center py-8">
-                    <p class="text-gray-600">No testimonials found yet.</p>
+                <div class="col-span-full text-center py-12 animate-fade-in-up" style="animation-delay: 0.4s;">
+                    <div class="flex flex-col items-center">
+                        <span class="text-6xl text-amber-300 mb-4"><i class="fas fa-comment-dots"></i></span>
+                        <p class="text-lg font-semibold text-gray-700 mb-2">No testimonials found yet.</p>
+                        <p class="text-gray-500 mb-4">Be the first to <a href="{% url 'feedback' %}" class="text-amber-600 underline">share your experience</a>!</p>
+                    </div>
                 </div>
                 {% endfor %}
             </div>

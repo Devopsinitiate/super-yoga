@@ -86,7 +86,7 @@
                                     <i class="fas fa-folder-open mr-2"></i> {{ module.order }}. {{ module.title }}
                                 </h4>
                                 {% if module.description %}
-                                    <p class="text-gray-600 text-sm mb-3">{{ module.description }}</p>
+                                    <p class="text-gray-600 text-sm mb-3">{{ module.description|safe }}</p>
                                 {% endif %}
                                 <ul class="space-y-2 pl-4 border-l-2 border-amber-200">
                                     {% for lesson in module.lessons.all %}

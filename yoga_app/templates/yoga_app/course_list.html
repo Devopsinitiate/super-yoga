@@ -131,7 +131,9 @@
             </form>
         </div>
 
+        {% load cache %}
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {% cache 300 course_list request.GET.q request.GET.price_filter request.GET.instructor_filter request.GET.duration_filter request.GET.min_rating_filter request.GET.sort_by request.GET.page %}
             {% for course in courses %}
             <div class="bg-white rounded-xl shadow-lg overflow-hidden border border-amber-100 course-card transform transition duration-300 hover:shadow-xl hover:scale-105 animate-fade-in-up" style="animation-delay: {{ forloop.counter|multiply:0.1 }}s;">
                 <a href="{% url 'course_detail' course.id %}" class="block">
@@ -207,8 +209,16 @@
                 {% endif %}
             </div>
             {% empty %}
-            <p class="text-center col-span-full text-gray-500">No courses found matching your criteria.</p>
+            <div class="col-span-full text-center py-12 animate-fade-in-up" style="animation-delay: 0.4s;">
+                <div class="flex flex-col items-center">
+                    <span class="text-6xl text-amber-300 mb-4"><i class="fas fa-search"></i></span>
+                    <p class="text-lg font-semibold text-gray-700 mb-2">No courses found matching your criteria.</p>
+                    <p class="text-gray-500 mb-4">Try adjusting your filters or browse all available courses.</p>
+                    <a href="{% url 'courses' %}" class="inline-block bg-amber-500 hover:bg-amber-600 text-white font-bold py-2 px-6 rounded-full shadow-md transition duration-300 transform hover:scale-105">View All Courses</a>
+                </div>
+            </div>
             {% endfor %}
+            {% endcache %}
         </div>
 
         <!-- Pagination Controls -->
