@@ -56,15 +56,15 @@ jobs:
           coverage html
           coverage xml
 
-        - name: Send email on failure
-          if: failure()
-          uses: dawidd6/action-send-mail@v3
-          with:
-            server_address: ${{ secrets.SMTP_SERVER }}
-            server_port: ${{ secrets.SMTP_PORT }}
-            username: ${{ secrets.SMTP_USER }}
-            password: ${{ secrets.SMTP_PASSWORD }}
-            subject: "CI Test Failed on super-yoga"
-            to: ${{ secrets.EMAIL_TO }}
-            from: ${{ secrets.SMTP_USER }}
-            body: "The CI workflow failed. Please check the logs at https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}."
+      - name: Send email on failure
+        if: failure()
+        uses: dawidd6/action-send-mail@v3
+        with:
+          server_address: ${{ secrets.SMTP_SERVER }}
+          server_port: ${{ secrets.SMTP_PORT }}
+          username: ${{ secrets.SMTP_USER }}
+          password: ${{ secrets.SMTP_PASSWORD }}
+          subject: "CI Test Failed on super-yoga"
+          to: ${{ secrets.EMAIL_TO }}
+          from: ${{ secrets.SMTP_USER }}
+          body: "The CI workflow failed. Please check the logs at https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}."
