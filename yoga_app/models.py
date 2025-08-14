@@ -595,7 +595,6 @@ class BlogPost(models.Model):
             self.published_date = timezone.now() # Set published_date only if it's being published for the first time
         super().save(*args, **kwargs)
     
-    
 
     
 # NEW: Blog Comment Model
