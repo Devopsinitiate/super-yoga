@@ -1,6 +1,6 @@
 # Celery configuration
-CELERY_BROKER_URL = 'redis://192.168.80.130:6379/16'
-CELERY_RESULT_BACKEND = 'redis://192.168.80.130:6379/16'
+CELERY_BROKER_URL = 'redis://localhost:6379/0'
+CELERY_RESULT_BACKEND = 'redis://localhost:6379/0'
 CELERY_ACCEPT_CONTENT = ['json']
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
@@ -42,9 +42,8 @@ CSRF_TRUSTED_ORIGINS = [
     'http://localhost:8000',
     'http://127.0.0.1:8000',
     'https://*.ngrok-free.app', # Allow all ngrok-free.app subdomains
-    'https://49640ad4bbe8.ngrok-free.app', # Or your specific ngrok subdomain
+    'https://8e0eceac1ca2.ngrok-free.app', # Or your specific ngrok subdomain
 ]
-
 
 # Application definition
 
@@ -81,6 +80,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'yoga_app.context_processors.user_profile_processor',
             ],
         },
     },
@@ -123,8 +123,7 @@ CACHES = {
 PAYSTACK_SECRET_KEY = os.environ.get('PAYSTACK_SECRET_KEY')
 PAYSTACK_PUBLIC_KEY = os.environ.get('PAYSTACK_PUBLIC_KEY')
 PAYSTACK_BASE_URL = 'https://api.paystack.co' # Base URL for Paystack API
-PAYSTACK_WEBHOOK_URL='https://49640ad4bbe8.ngrok-free.app/payments/webhook/paystack/'  # Replace with your actual webhook URL
-
+PAYSTACK_WEBHOOK_URL='https://8e0eceac1ca2.ngrok-free.app/payments/webhook/paystack/'  # Replace with your actual webhook URL
 
 # Password validation
 # https://docs.djangoproject.com/en/5.2/ref/settings/#auth-password-validators

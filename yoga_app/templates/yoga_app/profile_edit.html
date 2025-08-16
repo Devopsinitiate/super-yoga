@@ -41,7 +41,12 @@
                     {# Current Profile Picture Display #}
                     <div class="mb-6 text-center">
                         {% if user_profile.profile_picture %}
-                            <img src="{{ user_profile.profile_picture.url }}" alt="Profile Picture" class="w-32 h-32 rounded-full mx-auto object-cover border-4 border-amber-300 shadow-md">
+                            <picture>
+                                {% if user_profile.profile_picture_webp %}
+                                    <source srcset="{{ user_profile.profile_picture_webp.url }}" type="image/webp">
+                                {% endif %}
+                                <img src="{{ user_profile.profile_picture.url }}" alt="Profile Picture" class="w-32 h-32 rounded-full mx-auto object-cover border-4 border-amber-300 shadow-md">
+                            </picture>
                         {% else %}
                             <div class="w-32 h-32 rounded-full mx-auto bg-gray-200 flex items-center justify-center text-gray-400 text-5xl border-4 border-gray-300 shadow-md">
                                 <i class="fas fa-user-circle"></i>
@@ -141,6 +146,8 @@
 
             <div class="text-center mt-8 animate-fade-in-up" style="animation-delay: 0.6s;">
                 <a href="{% url 'dashboard' %}" class="text-amber-600 hover:underline">Back to Dashboard</a>
+                <span class="mx-2 text-gray-400">|</span>
+                <a href="{% url 'request_report' %}" class="text-blue-600 hover:underline">Request a Report</a>
             </div>
         </div>
     </div>

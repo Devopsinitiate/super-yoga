@@ -1,5 +1,7 @@
 # yoga_app/models.py
-
+from django.conf import settings
+from yoga_app.utils.image_optimize import optimize_image
+import os
 from django.db import models
 from django.contrib.auth.models import User
 from django.db.models.signals import post_save # Import post_save signal
@@ -58,6 +60,13 @@ class UserProfile(models.Model):
         # Define what constitutes a "complete" profile
         required_fields = [self.profile_picture, self.bio, self.date_of_birth, self.phone_number, self.address, self.city, self.country]
         return all(field is not None and field != '' for field in required_fields)
+    
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+        if self.profile_picture:
+            optimized_path = optimize_image(self.profile_picture.path)
+            self.profile_picture.name = os.path.relpath(optimized_path, settings.MEDIA_ROOT)
+            super().save(update_fields=['profile_picture'])
 
 
 # Signal to create or update UserProfile when User is created/updated
@@ -592,8 +601,17 @@ class BlogPost(models.Model):
         if not self.slug:
             self.slug = slugify(self.title)
         if self.is_published and not self.published_date:
-            self.published_date = timezone.now() # Set published_date only if it's being published for the first time
-        super().save(*args, **kwargs)
+            self.published_date = timezone.now()  # Set published_date only if it's being published for the first time
+        
+        super().save(*args, **kwargs)  # Save the model first
+
+        if self.featured_image:
+            # Optimize the image and update the field
+            optimized_path = optimize_image(self.featured_image.path)
+            self.featured_image.name = os.path.relpath(optimized_path, settings.MEDIA_ROOT)
+            
+            # Save the model again with the updated image path
+            super().save(update_fields=['featured_image'])
     
 
     

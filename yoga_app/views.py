@@ -28,6 +28,7 @@ from django.utils.decorators import method_decorator # NEW: Import method_decora
 
 from django.views.decorators.cache import cache_page # NEW: Import cache_page decorator
 
+from django.views.decorators.cache import never_cache # Import never_cache
 from .tasks import send_newsletter_email, send_booking_confirmation_email, generate_report_task # NEW: Import the Celery tasks
 
 from .models import (
@@ -75,6 +76,7 @@ from .forms import (
 
 # Custom LoginView with success message
 @method_decorator(ratelimit(key='ip', rate='5/m', block=True), name='dispatch')
+
 class CustomLoginView(LoginView):
     # The @ratelimit decorator is now correctly applied to the 'dispatch' method
     # using method_decorator, ensuring it receives the HttpRequest object.
@@ -90,39 +92,75 @@ class CustomLoginView(LoginView):
 
 # Custom LogoutView with success message
 class CustomLogoutView(LogoutView):
+    @method_decorator(never_cache) # Apply never_cache decorator
     def dispatch(self, request, *args, **kwargs):
         messages.success(request, "You have logged out successfully.")
-        return super().dispatch(request, *args, **kwargs)
+        response = super().dispatch(request, *args, **kwargs)
+        # Explicitly set headers to prevent caching
+        response['Cache-Control'] = 'no-cache, no-store, must-revalidate'
+        response['Pragma'] = 'no-cache'
+        response['Expires'] = '0'
+        return response
 
-@cache_page(60 * 5) # Cache the homepage for 5 minutes (300 seconds)
 def home_view(request):
     """
     Renders the homepage, fetching data from various models to populate sections.
     Optimized with prefetch_related/select_related for efficient data retrieval.
-    This view's output is now cached for 5 minutes.
+    This view's output is now conditionally cached.
     """
-    yoga_poses = YogaPose.objects.all().order_by('?')[:3]
-    breathing_techniques = BreathingTechnique.objects.all().order_by('name')
-    
-    courses = Course.objects.annotate(
-        avg_rating=Avg('reviews__rating'),
-        review_count=Count('reviews')
-    ).order_by('-is_popular', 'price')
-    
-    consultants = Consultant.objects.all().order_by('name')
-    testimonials = Testimonial.objects.filter(is_approved=True).order_by('-submitted_at')[:3] # Filter for approved testimonials
+    # If there are messages, do not cache this response to ensure messages are consumed.
+    if messages.get_messages(request):
+        yoga_poses = YogaPose.objects.all().order_by('?')[:3]
+        breathing_techniques = BreathingTechnique.objects.all().order_by('name')
+        
+        courses = Course.objects.annotate(
+            avg_rating=Avg('reviews__rating'),
+            review_count=Count('reviews')
+        ).order_by('-is_popular', 'price')
+        
+        consultants = Consultant.objects.all().order_by('name')
+        testimonials = Testimonial.objects.filter(is_approved=True).order_by('-submitted_at')[:3] # Filter for approved testimonials
 
-    contact_form = ContactMessageForm()
+        contact_form = ContactMessageForm()
 
-    context = {
-        'yoga_poses': yoga_poses,
-        'breathing_techniques': breathing_techniques,
-        'courses': courses,
-        'consultants': consultants,
-        'testimonials': testimonials,
-        'contact_form': contact_form,
-    }
-    return render(request, 'yoga_app/index.html', context)
+        context = {
+            'yoga_poses': yoga_poses,
+            'breathing_techniques': breathing_techniques,
+            'courses': courses,
+            'consultants': consultants,
+            'testimonials': testimonials,
+            'contact_form': contact_form,
+        }
+        response = render(request, 'yoga_app/index.html', context)
+        return response
+
+    # Otherwise, cache the page for 5 minutes
+    @cache_page(60 * 5)
+    def _home_view_cached(request):
+        yoga_poses = YogaPose.objects.all().order_by('?')[:3]
+        breathing_techniques = BreathingTechnique.objects.all().order_by('name')
+        
+        courses = Course.objects.annotate(
+            avg_rating=Avg('reviews__rating'),
+            review_count=Count('reviews')
+        ).order_by('-is_popular', 'price')
+        
+        consultants = Consultant.objects.all().order_by('name')
+        testimonials = Testimonial.objects.filter(is_approved=True).order_by('-submitted_at')[:3] # Filter for approved testimonials
+
+        contact_form = ContactMessageForm()
+
+        context = {
+            'yoga_poses': yoga_poses,
+            'breathing_techniques': breathing_techniques,
+            'courses': courses,
+            'consultants': consultants,
+            'testimonials': testimonials,
+            'contact_form': contact_form,
+        }
+        return render(request, 'yoga_app/index.html', context)
+
+    return _home_view_cached(request)
 
 @ratelimit(key='ip', rate='5/m', block=True) # Apply rate limiting to registration
 def register_view(request):
@@ -199,26 +237,29 @@ def feedback_view(request):
     }
     return render(request, 'yoga_app/feedback.html', context) # Render the dedicated feedback.html
 
+from django.views.decorators.csrf import csrf_exempt # Add this import
+
 def newsletter_subscribe_view(request):
     if request.method == 'POST':
         form = NewsletterSubscriptionForm(request.POST)
         if form.is_valid():
             email = form.cleaned_data['email']
-            if NewsletterSubscription.objects.filter(email=email).exists():
+            form.save()
+            # Trigger async newsletter email (example usage)
+            send_newsletter_email.delay(
+                'Welcome to Yoga Kailasa Newsletter!',
+                'Thank you for subscribing to our newsletter.',
+                [email]
+            )
+            messages.success(request, 'Thank you for subscribing to our newsletter!')
+            return redirect('home')
+        else: # form.is_valid() is False
+            # Check for specific unique email error
+            if 'email' in form.errors and any('already exists' in e for e in form.errors['email']):
                 messages.info(request, 'You are already subscribed to our newsletter!')
             else:
-                form.save()
-                # Trigger async newsletter email (example usage)
-                send_newsletter_email.delay(
-                    'Welcome to Yoga Kailasa Newsletter!',
-                    'Thank you for subscribing to our newsletter.',
-                    [email]
-                )
-                messages.success(request, 'Thank you for subscribing to our newsletter!')
-            return redirect('home')
-        else:
-            messages.error(request, 'Please enter a valid email address to subscribe.')
-            print(f"Newsletter Form Errors: {form.errors}")
+                messages.error(request, 'Please enter a valid email address to subscribe.')
+                print(f"Newsletter Form Errors: {form.errors}")
             return redirect('home')
     return redirect('home')
 
@@ -650,12 +691,14 @@ def user_dashboard_view(request):
             'progress_percentage': progress_percentage,
         })
 
+    # Calculate the total number of courses completed by the user
+    completed_courses_count = UserCourseCompletion.objects.filter(user=user).count()
+
     payment_history = Payment.objects.filter(user=user).select_related('course').order_by('-paid_at')
 
     last_viewed_lesson = user_profile.last_viewed_lesson
     if last_viewed_lesson:
         last_viewed_lesson = Lesson.objects.filter(id=last_viewed_lesson.id).select_related('module__course').first()
-
 
     recent_notifications = Notification.objects.filter(recipient=user).select_related('sender').order_by('-created_at')[:5]
 
@@ -665,6 +708,7 @@ def user_dashboard_view(request):
         'payment_history': payment_history,
         'last_viewed_lesson': last_viewed_lesson,
         'recent_notifications': recent_notifications,
+        'completed_courses_count': completed_courses_count, # <--- Add this to context
     }
     return render(request, 'yoga_app/user_dashboard.html', context)
 
@@ -932,6 +976,8 @@ def mark_course_complete_view(request, course_id):
         messages.error(request, "Invalid request to mark course complete.")
         return redirect('home')
 
+from django.contrib.auth import update_session_auth_hash, get_user_model # Import get_user_model
+
 @login_required
 def profile_update_view(request):
     """
@@ -965,6 +1011,9 @@ def profile_update_view(request):
             if 'update_profile' in request.POST:
                 if user_profile_form.is_valid():
                     user_profile_form.save()
+                    # After saving UserProfile, refresh the user object in the session
+                    # to reflect changes immediately in the navbar/other templates
+                    request.user = get_user_model().objects.get(pk=request.user.pk)
                     messages.success(request, 'Your profile picture and bio have been updated successfully!')
                     user_profile_updated = True
                 else:
@@ -1081,6 +1130,61 @@ def global_search_view(request):
         'difficulty_choices': YogaPose.DIFFICULTY_CHOICES,
     }
     return render(request, 'yoga_app/search_results.html', context)
+
+def global_search_suggestions_api(request):
+    query = request.GET.get('q', '')
+    suggestions = []
+
+    if query:
+        # Search Yoga Poses
+        poses = YogaPose.objects.filter(
+            Q(name__icontains=query) | Q(sanskrit_name__icontains=query)
+        ).values('id', 'name')[:5] # Limit to 5 suggestions
+
+        for pose in poses:
+            suggestions.append({
+                'type': 'pose',
+                'title': pose['name'],
+                'url': reverse('pose_detail', args=[pose['id']])
+            })
+
+        # Search Breathing Techniques
+        techniques = BreathingTechnique.objects.filter(
+            Q(name__icontains=query) | Q(sanskrit_name__icontains=query)
+        ).values('id', 'name')[:5] # Limit to 5 suggestions
+
+        for tech in techniques:
+            suggestions.append({
+                'type': 'breathing',
+                'title': tech['name'],
+                'url': reverse('breathing_technique_detail', args=[tech['id']])
+            })
+
+        # Search Courses
+        courses = Course.objects.filter(
+            Q(title__icontains=query) | Q(instructor_name__icontains=query)
+        ).values('id', 'title')[:5] # Limit to 5 suggestions
+
+        for course in courses:
+            suggestions.append({
+                'type': 'course',
+                'title': course['title'],
+                'url': reverse('course_detail', args=[course['id']])
+            })
+            
+        # Search Blog Posts
+        blog_posts = BlogPost.objects.filter(
+            Q(title__icontains=query) | Q(excerpt__icontains=query)
+        ).values('slug', 'title')[:5] # Limit to 5 suggestions
+
+        for blog_post in blog_posts:
+            suggestions.append({
+                'type': 'blog_post',
+                'title': blog_post['title'],
+                'url': reverse('blog_detail', args=[blog_post['slug']])
+            })
+
+    return JsonResponse({'suggestions': suggestions})
 
 def about_view(request):
     """

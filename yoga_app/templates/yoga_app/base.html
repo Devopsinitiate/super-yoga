@@ -20,35 +20,10 @@
     <meta property="og:locale" content="en_US">
 
     {# Favicon #}
-    <link rel="icon" type="image/png" href="{% static 'yoga_app/images/favicon.png' %}">
+    <link rel="icon" type="image/x-icon" href="{% static 'yoga_app/images/favicon.ico' %}">
 
     {# Tailwind CSS CDN - REVERTED TO CDN FOR RELIABILITY #}
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    fontFamily: {
-                        sans: ['Inter', 'sans-serif'],
-                    },
-                    colors: {
-                        amber: {
-                            50: '#fffbeb',
-                            100: '#fff3cd',
-                            200: '#fce59f',
-                            300: '#fbd771',
-                            400: '#f9c943',
-                            500: '#f5b82e', /* Primary Amber */
-                            600: '#e59e0b',
-                            700: '#d48800',
-                            800: '#a06a00',
-                            900: '#7e5200',
-                        },
-                    }
-                }
-            }
-        }
-    </script>
+    <link rel="stylesheet" href="{% static 'css/output.css' %}">
     {# Font Awesome for icons #}
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 
@@ -393,9 +368,33 @@
         .toast-close-button:hover {
             opacity: 1;
         }
+
+        /* Skip link styles for accessibility */
+        .skip-link {
+            position: absolute;
+            left: -999px;
+            top: auto;
+            width: 1px;
+            height: 1px;
+            overflow: hidden;
+            z-index: 10000;
+            background: #f59e0b;
+            color: #fff;
+            padding: 8px 16px;
+            border-radius: 4px;
+        }
+        .skip-link:focus {
+            left: 16px;
+            top: 16px;
+            width: auto;
+            height: auto;
+            outline: 2px solid #d97706;
+        }
     </style>
 </head>
 <body class="font-sans bg-gray-50 text-gray-800">
+    <!-- Skip to main content link for keyboard users -->
+    <a href="#main-content" class="skip-link">Skip to main content</a>
 
     <!-- Global AJAX Loading Spinner Overlay -->
     <div id="global-ajax-spinner" class="fixed inset-0 z-50 flex items-center justify-center bg-gray-100 bg-opacity-70 hidden">
@@ -407,7 +406,7 @@
 
     {# Global Message Display #}
     {# This div is still present for Django's default messages, but they will be converted to toasts by JS below #}
-    <div id="django-messages-list" class="hidden">
+    <div id="django-messages-list">
         {% if messages %}
             <ul>
                 {% for message in messages %}
@@ -421,16 +420,27 @@
     <div id="toast-container"></div>
 
     {# Header #}
-    <header class="bg-white shadow-md py-4">
+    <header class="bg-white shadow-md py-4" role="banner">
         <div class="container mx-auto px-4 flex justify-between items-center">
             {# Logo #}
             <a href="{% url 'home' %}" class="flex items-center space-x-2">
-                <img src="{% static 'yoga_app/images/logo.jpg' %}" alt="Yoga Kailasa Logo" class="h-10">
+                <img src="{% static 'yoga_app/images/logo.jpg' %}" alt="Yoga Kailasa Logo" aria-hidden="false" class="h-10">
                 <span class="text-2xl font-bold text-amber-600">Yoga Kailasa</span>
             </a>
 
             {# Desktop Navigation #}
-            <nav class="hidden md:flex items-center space-x-6">
+            <nav class="hidden md:flex items-center space-x-6" role="navigation" aria-label="Main navigation">
+                {# Global Search Bar with Suggestions #}
+                <div class="relative flex items-center">
+                    <input type="text" id="global-search-input" placeholder="Search..."
+                           class="pl-4 pr-10 py-2 rounded-full border border-gray-300 focus:outline-none focus:ring-1 focus:ring-amber-500 focus:border-amber-500 text-sm w-48">
+                    <button type="submit" class="absolute right-3 text-gray-400 hover:text-amber-600">
+                        <i class="fas fa-search"></i>
+                    </button>
+                    <div id="search-suggestions-container" class="absolute top-full left-0 w-full bg-white border border-gray-200 rounded-md shadow-lg z-30 hidden mt-1">
+                        {# Suggestions will be loaded here by JavaScript #}
+                    </div>
+                </div>
                 <a href="{% url 'home' %}" class="text-gray-700 hover:text-amber-600 font-medium transition duration-300">Home</a>
                 <a href="{% url 'courses' %}" class="text-gray-700 hover:text-amber-600 font-medium transition duration-300">Courses</a>
                 <a href="{% url 'poses' %}" class="text-gray-700 hover:text-amber-600 font-medium transition duration-300">Poses</a>
@@ -446,8 +456,8 @@
                 {% if user.is_authenticated %}
                     <div class="relative group">
                         <a href="{% url 'profile_edit' %}" class="flex items-center text-gray-700 hover:text-amber-600 font-medium transition duration-300">
-                            {% if user.userprofile.profile_picture %}
-                                <img src="{{ user.userprofile.profile_picture.url }}" alt="Profile Picture" class="w-8 h-8 rounded-full object-cover mr-2">
+                            {% if user_profile.profile_picture %}
+                                <img src="{{ user_profile.profile_picture.url }}" alt="{{ user.username }}'s profile picture" class="w-8 h-8 rounded-full object-cover mr-2">
                             {% else %}
                                 <i class="fas fa-user-circle text-2xl mr-2"></i>
                             {% endif %}
@@ -463,6 +473,7 @@
                                     <span class="notification-count" id="desktop-notification-count">{{ unread_notifications_count }}</span>
                                 {% endif %}
                             </a>
+                            <a href="{% url 'request_report' %}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"><i class="fas fa-file-alt mr-2"></i> Request a Report</a>
                             <form action="{% url 'logout' %}" method="post" class="block w-full"> {# Ensure form is block-level for full width click #}
                                 {% csrf_token %}
                                 <button type="submit" class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center">
@@ -538,8 +549,8 @@
             {% if user.is_authenticated %}
                 <div class="border-t border-gray-200 pt-4 mt-4">
                     <a href="{% url 'profile_edit' %}" class="flex items-center text-gray-700 hover:text-amber-600 font-medium text-lg mb-2" id="mobile-profile-link">
-                        {% if user.userprofile.profile_picture %}
-                            <img src="{{ user.userprofile.profile_picture.url }}" alt="Profile Picture" class="w-8 h-8 rounded-full object-cover mr-2">
+                        {% if user_profile.profile_picture %}
+                            <img src="{{ user_profile.profile_picture.url }}" alt="Profile Picture" class="w-8 h-8 rounded-full object-cover mr-2">
                         {% else %}
                             <i class="fas fa-user-circle text-2xl mr-2"></i>
                         {% endif %}
@@ -560,18 +571,6 @@
                         </button>
                     </form>
                 </div>
-                <script>
-                document.addEventListener('DOMContentLoaded', function() {
-                    var profileLink = document.getElementById('mobile-profile-link');
-                    var logoutBtn = document.getElementById('mobile-logout-btn');
-                    if (profileLink && logoutBtn) {
-                        profileLink.addEventListener('click', function(e) {
-                            e.preventDefault();
-                            logoutBtn.click();
-                        });
-                    }
-                });
-                </script>
             {% else %}
                 <div class="border-t border-gray-200 pt-4 mt-4">
                     <a href="{% url 'login' %}" class="block text-gray-700 hover:text-amber-600 font-medium text-lg">Login</a>
@@ -582,12 +581,12 @@
     </div>
 
     {# Main Content Block #}
-    <main>
+    <main id="main-content" role="main" tabindex="-1">
         {% block content %}{% endblock %}
     </main>
 
     {# Footer #}
-    <footer class="bg-gray-800 text-white py-8">
+    <footer class="bg-gray-800 text-white py-8" role="contentinfo">
         <div class="container mx-auto px-4 text-center">
             <div class="flex flex-wrap justify-center gap-8 mb-6">
                 <a href="{% url 'home' %}" class="hover:text-amber-500 transition duration-300">Home</a>
@@ -964,6 +963,87 @@
                 backToTopBtn.addEventListener('click', () => {
                     window.scrollTo({ top: 0, behavior: 'smooth' });
                 });
+            }
+
+            // Live Search Suggestions
+            const searchInput = document.getElementById('global-search-input');
+            const suggestionsContainer = document.getElementById('search-suggestions-container');
+            const searchUrl = "{% url 'global_search_suggestions_api' %}";
+            const fullSearchUrl = "{% url 'global_search' %}";
+
+            let debounceTimer;
+
+            if (searchInput && suggestionsContainer) {
+                searchInput.addEventListener('input', function() {
+                    clearTimeout(debounceTimer);
+                    const query = this.value.trim();
+
+                    if (query.length > 2) { // Only search if query is at least 3 characters
+                        debounceTimer = setTimeout(() => {
+                            fetch(`${searchUrl}?q=${encodeURIComponent(query)}`)
+                                .then(response => response.json())
+                                .then(data => {
+                                    displaySuggestions(data.suggestions);
+                                })
+                                .catch(error => {
+                                    console.error('Error fetching search suggestions:', error);
+                                    suggestionsContainer.innerHTML = '<div class="p-2 text-gray-500">Error loading suggestions.</div>';
+                                    suggestionsContainer.classList.remove('hidden');
+                                });
+                        }, 300); // Debounce for 300ms
+                    } else {
+                        suggestionsContainer.classList.add('hidden');
+                        suggestionsContainer.innerHTML = '';
+                    }
+                });
+
+                // Handle clicking outside to hide suggestions
+                document.addEventListener('click', function(event) {
+                    if (!searchInput.contains(event.target) && !suggestionsContainer.contains(event.target)) {
+                        suggestionsContainer.classList.add('hidden');
+                    }
+                });
+
+                // Handle pressing Enter in the search input
+                searchInput.addEventListener('keypress', function(event) {
+                    if (event.key === 'Enter') {
+                        event.preventDefault(); // Prevent form submission if it's part of a form
+                        const query = this.value.trim();
+                        if (query) {
+                            window.location.href = `${fullSearchUrl}?q=${encodeURIComponent(query)}`;
+                        }
+                    }
+                });
+            }
+
+            function displaySuggestions(suggestions) {
+                suggestionsContainer.innerHTML = '';
+                if (suggestions.length === 0) {
+                    suggestionsContainer.innerHTML = '<div class="p-2 text-gray-500">No suggestions found.</div>';
+                    suggestionsContainer.classList.remove('hidden');
+                    return;
+                }
+
+                suggestions.forEach(item => {
+                    const suggestionItem = document.createElement('a');
+                    suggestionItem.href = item.url;
+                    suggestionItem.classList.add('block', 'p-2', 'text-gray-700', 'hover:bg-gray-100', 'transition', 'duration-150');
+                    
+                    let icon = '';
+                    if (item.type === 'pose') {
+                        icon = '<i class="fas fa-spa mr-2"></i>';
+                    } else if (item.type === 'breathing') {
+                        icon = '<i class="fas fa-wind mr-2"></i>';
+                    } else if (item.type === 'course') {
+                        icon = '<i class="fas fa-book-open mr-2"></i>';
+                    } else if (item.type === 'blog_post') {
+                        icon = '<i class="fas fa-newspaper mr-2"></i>';
+                    }
+
+                    suggestionItem.innerHTML = `${icon}<span>${item.title}</span>`;
+                    suggestionsContainer.appendChild(suggestionItem);
+                });
+                suggestionsContainer.classList.remove('hidden');
             }
         });
 

@@ -70,6 +70,7 @@ urlpatterns = [
 
     # URL for global search
     path('search/', views.global_search_view, name='global_search'),
+    path('search/suggestions/', views.global_search_suggestions_api, name='global_search_suggestions_api'),
 
     # URL for the Contact Us page
     path('contact/', views.contact_view, name='contact'),
