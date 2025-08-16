@@ -130,7 +130,12 @@
                     {{ post.title }}
                 </h1>
                 <p class="text-gray-600 text-lg mb-2 animate-fade-in-up" style="animation-delay: 0.2s;">
-                    <i class="fas fa-user-edit mr-2 text-amber-500"></i> By <a href="{% url 'consultant_detail' post.author.consultant.id %}" class="font-semibold">{{ post.author.username }}</a>
+                    <i class="fas fa-user-edit mr-2 text-amber-500"></i> By 
+                    {% if post.author.consultant %}
+                        <a href="{% url 'consultant_detail' post.author.consultant.id %}" class="font-semibold">{{ post.author.username }}</a>
+                    {% else %}
+                        <span class="font-semibold">{{ post.author.username }}</span>
+                    {% endif %}
                 </p>
                 <p class="text-gray-500 text-sm animate-fade-in-up" style="animation-delay: 0.3s;">
                     <i class="fas fa-calendar-alt mr-2 text-amber-500"></i> Published on {{ post.published_date|date:"F d, Y" }}
