@@ -8,17 +8,34 @@ from functools import cached_property
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.core.validators import MinValueValidator, MaxValueValidator
-from django.db import models
+from django.db import models, connection
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.utils import timezone
-from django.contrib.postgres.indexes import GinIndex
-from django.contrib.postgres.search import SearchVectorField
 from django.utils.text import slugify
 from django_ckeditor_5.fields import CKEditor5Field
 from yoga_app.utils.image_optimize import optimize_image
 
 logger = logging.getLogger(__name__)
+
+
+def _is_postgres():
+    """Returns True if the current database backend is PostgreSQL."""
+    try:
+        return connection.vendor == 'postgresql'
+    except Exception:
+        return False
+
+
+# Conditional PostgreSQL-only imports
+try:
+    from django.contrib.postgres.indexes import GinIndex
+    from django.contrib.postgres.search import SearchVectorField
+    _POSTGRES_AVAILABLE = True
+except ImportError:
+    _POSTGRES_AVAILABLE = False
+    GinIndex = None
+    SearchVectorField = None
 
 
 # User Profile Model to extend Django's built-in User model
@@ -121,7 +138,7 @@ class YogaPose(models.Model):
     image_url = models.URLField(max_length=500, blank=True, null=True, help_text="URL for an image representing the pose (e.g., Unsplash link, placeholder).")
     image = models.ImageField(upload_to='poses/', blank=True, null=True, help_text="Uploaded image for the pose (takes priority over image_url when set).")
     video_url = models.URLField(max_length=500, blank=True, null=True, help_text="Embed URL for a video demonstration (e.g., YouTube embed link)")
-    search_vector = SearchVectorField(null=True, blank=True, editable=False)
+    search_vector = SearchVectorField(null=True, blank=True, editable=False) if _POSTGRES_AVAILABLE else models.TextField(null=True, blank=True, editable=False)
     created_at = models.DateTimeField(auto_now_add=True,)
     updated_at = models.DateTimeField(auto_now=True,)
 
@@ -131,7 +148,7 @@ class YogaPose(models.Model):
         ordering = ['name']
         indexes = [
             GinIndex(fields=['search_vector'], name='idx_yogapose_search_vector'),
-        ]
+        ] if _POSTGRES_AVAILABLE else []
 
 
     def __str__(self):
@@ -157,7 +174,7 @@ class BreathingTechnique(models.Model):
     image_url = models.URLField(max_length=500, blank=True, null=True, help_text="URL for an image representing the technique (e.g., Unsplash link, placeholder).")
     image = models.ImageField(upload_to='breathing/', blank=True, null=True, help_text="Uploaded image for the technique (takes priority over image_url when set).")
     video_url = models.URLField(max_length=500, blank=True, null=True, help_text="Embed URL for a video demonstration (e.g., YouTube embed link)")
-    search_vector = SearchVectorField(null=True, blank=True, editable=False)
+    search_vector = SearchVectorField(null=True, blank=True, editable=False) if _POSTGRES_AVAILABLE else models.TextField(null=True, blank=True, editable=False)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -167,7 +184,7 @@ class BreathingTechnique(models.Model):
         ordering = ['name']
         indexes = [
             GinIndex(fields=['search_vector'], name='idx_breathing_search_vector'),
-        ]
+        ] if _POSTGRES_AVAILABLE else []
 
     def __str__(self):
         return self.name
@@ -195,7 +212,7 @@ class Course(models.Model):
     image = models.ImageField(upload_to='courses/', blank=True, null=True, help_text="Uploaded image for the course (takes priority over image_url when set).")
     is_popular = models.BooleanField(default=False, help_text="Mark as true to highlight this course as popular.", db_index=True)
     start_date = models.DateField(blank=True, null=True, help_text="Optional start date for the course.")
-    search_vector = SearchVectorField(null=True, blank=True, editable=False)
+    search_vector = SearchVectorField(null=True, blank=True, editable=False) if _POSTGRES_AVAILABLE else models.TextField(null=True, blank=True, editable=False)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -207,8 +224,7 @@ class Course(models.Model):
             models.Index(fields=['-is_popular', 'price'], name='idx_course_popular_price'),
             models.Index(fields=['-created_at'], name='idx_course_created'),
             models.Index(fields=['is_free'], name='idx_course_free'),
-            GinIndex(fields=['search_vector'], name='idx_course_search_vector'),
-        ]
+        ] + ([GinIndex(fields=['search_vector'], name='idx_course_search_vector')] if _POSTGRES_AVAILABLE else [])
 
     def __str__(self):
         return self.title

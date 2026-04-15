@@ -1,13 +1,18 @@
 from django.db.models import Q, Avg, Count
 from django.db import connection
-from django.contrib.postgres.search import SearchVector, SearchQuery, SearchRank
 from django.utils import timezone
 from datetime import timedelta
 from yoga_app.models import YogaPose, BreathingTechnique, Course, BlogPost
 
+try:
+    from django.contrib.postgres.search import SearchVector, SearchQuery, SearchRank
+    _POSTGRES_SEARCH_AVAILABLE = True
+except ImportError:
+    _POSTGRES_SEARCH_AVAILABLE = False
+
 
 def is_postgres():
-    return connection.vendor == 'postgresql'
+    return connection.vendor == 'postgresql' and _POSTGRES_SEARCH_AVAILABLE
 
 
 class SearchService:

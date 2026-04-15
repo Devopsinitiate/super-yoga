@@ -4,6 +4,42 @@ import django.contrib.postgres.indexes
 import django.contrib.postgres.search
 from django.db import migrations
 
+
+class RunSQLPostgresOnly(migrations.RunSQL):
+    """Runs SQL only when the database backend is PostgreSQL. No-ops on SQLite."""
+
+    def database_forwards(self, app_label, schema_editor, from_state, to_state):
+        if schema_editor.connection.vendor != 'postgresql':
+            return
+        super().database_forwards(app_label, schema_editor, from_state, to_state)
+
+    def database_backwards(self, app_label, schema_editor, from_state, to_state):
+        if schema_editor.connection.vendor != 'postgresql':
+            return
+        super().database_backwards(app_label, schema_editor, from_state, to_state)
+
+
+class PostgresOnlyOperation:
+    """Mixin that skips any migration operation on non-PostgreSQL databases."""
+
+    def database_forwards(self, app_label, schema_editor, from_state, to_state):
+        if schema_editor.connection.vendor != 'postgresql':
+            return
+        super().database_forwards(app_label, schema_editor, from_state, to_state)
+
+    def database_backwards(self, app_label, schema_editor, from_state, to_state):
+        if schema_editor.connection.vendor != 'postgresql':
+            return
+        super().database_backwards(app_label, schema_editor, from_state, to_state)
+
+
+class AddFieldPostgresOnly(PostgresOnlyOperation, migrations.AddField):
+    pass
+
+
+class AddIndexPostgresOnly(PostgresOnlyOperation, migrations.AddIndex):
+    pass
+
 # ── PostgreSQL trigger functions ──────────────────────────────────────────────
 # Each trigger keeps search_vector in sync automatically on INSERT/UPDATE.
 # Weights: A = name/title (highest), B = sanskrit_name/instructor, C = description
@@ -98,39 +134,39 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.AddField(
+        AddFieldPostgresOnly(
             model_name='breathingtechnique',
             name='search_vector',
             field=django.contrib.postgres.search.SearchVectorField(blank=True, editable=False, null=True),
         ),
-        migrations.AddField(
+        AddFieldPostgresOnly(
             model_name='course',
             name='search_vector',
             field=django.contrib.postgres.search.SearchVectorField(blank=True, editable=False, null=True),
         ),
-        migrations.AddField(
+        AddFieldPostgresOnly(
             model_name='yogapose',
             name='search_vector',
             field=django.contrib.postgres.search.SearchVectorField(blank=True, editable=False, null=True),
         ),
-        migrations.AddIndex(
+        AddIndexPostgresOnly(
             model_name='breathingtechnique',
             index=django.contrib.postgres.indexes.GinIndex(fields=['search_vector'], name='idx_breathing_search_vector'),
         ),
-        migrations.AddIndex(
+        AddIndexPostgresOnly(
             model_name='course',
             index=django.contrib.postgres.indexes.GinIndex(fields=['search_vector'], name='idx_course_search_vector'),
         ),
-        migrations.AddIndex(
+        AddIndexPostgresOnly(
             model_name='yogapose',
             index=django.contrib.postgres.indexes.GinIndex(fields=['search_vector'], name='idx_yogapose_search_vector'),
         ),
-        # Create trigger functions and triggers
-        migrations.RunSQL(_YOGAPOSE_TRIGGER_FUNC + _YOGAPOSE_TRIGGER),
-        migrations.RunSQL(_BREATHING_TRIGGER_FUNC + _BREATHING_TRIGGER),
-        migrations.RunSQL(_COURSE_TRIGGER_FUNC + _COURSE_TRIGGER),
-        # Backfill existing rows
-        migrations.RunSQL(_YOGAPOSE_BACKFILL),
-        migrations.RunSQL(_BREATHING_BACKFILL),
-        migrations.RunSQL(_COURSE_BACKFILL),
+        # Create trigger functions and triggers — PostgreSQL only
+        RunSQLPostgresOnly(_YOGAPOSE_TRIGGER_FUNC + _YOGAPOSE_TRIGGER),
+        RunSQLPostgresOnly(_BREATHING_TRIGGER_FUNC + _BREATHING_TRIGGER),
+        RunSQLPostgresOnly(_COURSE_TRIGGER_FUNC + _COURSE_TRIGGER),
+        # Backfill existing rows — PostgreSQL only
+        RunSQLPostgresOnly(_YOGAPOSE_BACKFILL),
+        RunSQLPostgresOnly(_BREATHING_BACKFILL),
+        RunSQLPostgresOnly(_COURSE_BACKFILL),
     ]
