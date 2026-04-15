@@ -138,7 +138,6 @@ class YogaPose(models.Model):
     image_url = models.URLField(max_length=500, blank=True, null=True, help_text="URL for an image representing the pose (e.g., Unsplash link, placeholder).")
     image = models.ImageField(upload_to='poses/', blank=True, null=True, help_text="Uploaded image for the pose (takes priority over image_url when set).")
     video_url = models.URLField(max_length=500, blank=True, null=True, help_text="Embed URL for a video demonstration (e.g., YouTube embed link)")
-    search_vector = SearchVectorField(null=True, blank=True, editable=False) if _POSTGRES_AVAILABLE else models.TextField(null=True, blank=True, editable=False)
     created_at = models.DateTimeField(auto_now_add=True,)
     updated_at = models.DateTimeField(auto_now=True,)
 
@@ -146,9 +145,7 @@ class YogaPose(models.Model):
         verbose_name = "Yoga Pose"
         verbose_name_plural = "Yoga Poses"
         ordering = ['name']
-        indexes = [
-            GinIndex(fields=['search_vector'], name='idx_yogapose_search_vector'),
-        ] if _POSTGRES_AVAILABLE else []
+        indexes = []
 
 
     def __str__(self):
@@ -174,7 +171,6 @@ class BreathingTechnique(models.Model):
     image_url = models.URLField(max_length=500, blank=True, null=True, help_text="URL for an image representing the technique (e.g., Unsplash link, placeholder).")
     image = models.ImageField(upload_to='breathing/', blank=True, null=True, help_text="Uploaded image for the technique (takes priority over image_url when set).")
     video_url = models.URLField(max_length=500, blank=True, null=True, help_text="Embed URL for a video demonstration (e.g., YouTube embed link)")
-    search_vector = SearchVectorField(null=True, blank=True, editable=False) if _POSTGRES_AVAILABLE else models.TextField(null=True, blank=True, editable=False)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -182,9 +178,7 @@ class BreathingTechnique(models.Model):
         verbose_name = "Breathing Technique"
         verbose_name_plural = "Breathing Techniques"
         ordering = ['name']
-        indexes = [
-            GinIndex(fields=['search_vector'], name='idx_breathing_search_vector'),
-        ] if _POSTGRES_AVAILABLE else []
+        indexes = []
 
     def __str__(self):
         return self.name
@@ -212,7 +206,6 @@ class Course(models.Model):
     image = models.ImageField(upload_to='courses/', blank=True, null=True, help_text="Uploaded image for the course (takes priority over image_url when set).")
     is_popular = models.BooleanField(default=False, help_text="Mark as true to highlight this course as popular.", db_index=True)
     start_date = models.DateField(blank=True, null=True, help_text="Optional start date for the course.")
-    search_vector = SearchVectorField(null=True, blank=True, editable=False) if _POSTGRES_AVAILABLE else models.TextField(null=True, blank=True, editable=False)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -224,7 +217,7 @@ class Course(models.Model):
             models.Index(fields=['-is_popular', 'price'], name='idx_course_popular_price'),
             models.Index(fields=['-created_at'], name='idx_course_created'),
             models.Index(fields=['is_free'], name='idx_course_free'),
-        ] + ([GinIndex(fields=['search_vector'], name='idx_course_search_vector')] if _POSTGRES_AVAILABLE else [])
+        ]
 
     def __str__(self):
         return self.title
