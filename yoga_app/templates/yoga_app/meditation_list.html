@@ -1,0 +1,149 @@
+{% extends 'yoga_app/base.html' %}
+{% load static %}
+
+{% block title %}Meditation Library — Yoga Kailasa{% endblock %}
+{% block meta_description %}Guided meditations for sleep, focus, healing, morning awakening, and chakra balancing. Find your stillness.{% endblock %}
+
+{% block extra_css %}
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif:ital,wght@0,400;0,700;1,400&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+    body { font-family:'Manrope',sans-serif; background:#fff8f3; }
+    .rs-headline { font-family:'Noto Serif',serif; line-height:1.4; }
+    .rs-glass { background:rgba(255,248,243,0.85); backdrop-filter:blur(20px); }
+    .rs-btn-primary { background:linear-gradient(135deg,#855300 0%,#f59e0b 100%); color:#fff; transition:all .3s; }
+    .rs-btn-primary:hover { opacity:.92; transform:scale(1.02); }
+    .rs-btn-secondary { background-color:#f1e7db; color:#855300; transition:all .3s; }
+    .rs-btn-secondary:hover { background-color:#ebe1d6; }
+    .med-card { transition:all .4s ease; }
+    .med-card:hover { background-color:#ebe1d6; transform:translateY(-4px); }
+    .med-card:hover .med-img { transform:scale(1.05); }
+    .med-img { transition:transform .6s ease; }
+    .category-badge { display:inline-block; padding:.2rem .75rem; border-radius:999px; font-size:.7rem; font-weight:700; text-transform:uppercase; letter-spacing:.05em; }
+    /* Breathing animation for hero */
+    @keyframes breathe { 0%,100%{transform:scale(1);opacity:.6;} 50%{transform:scale(1.15);opacity:1;} }
+    .breathe-ring { animation:breathe 6s ease-in-out infinite; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="min-h-screen" style="background:#fff8f3;">
+
+    {# Hero #}
+    <section class="px-6 md:px-12 pt-32 pb-20" style="background:#fff8f3;">
+        <div class="max-w-7xl mx-auto flex flex-col md:flex-row items-center gap-12">
+            <div class="w-full md:w-1/2 space-y-6">
+                <p class="text-xs uppercase tracking-widest font-semibold" style="color:#867461;">Inner Stillness</p>
+                <h1 class="rs-headline text-5xl md:text-7xl font-bold leading-tight" style="color:#855300;">The Meditation<br><em class="font-normal">Sanctuary</em></h1>
+                <p class="text-xl leading-relaxed max-w-lg" style="color:#534434;">
+                    Guided sessions for every state of being — from morning awakening to deep sleep, from focused clarity to chakra healing.
+                </p>
+                <div class="flex gap-4 flex-wrap">
+                    <a href="{% url 'daily_practice' %}" class="rs-btn-primary px-6 py-3 rounded-lg font-semibold text-sm">Log Your Practice</a>
+                    <a href="{% url 'mudras' %}" class="rs-btn-secondary px-6 py-3 rounded-lg font-semibold text-sm">Explore Mudras</a>
+                </div>
+            </div>
+            <div class="w-full md:w-1/2 flex items-center justify-center relative py-12">
+                <div class="breathe-ring absolute w-72 h-72 rounded-full" style="background:rgba(133,83,0,0.06);"></div>
+                <div class="breathe-ring absolute w-56 h-56 rounded-full" style="background:rgba(133,83,0,0.1);animation-delay:1s;"></div>
+                <div class="w-40 h-40 rounded-full flex items-center justify-center" style="background:linear-gradient(135deg,#855300,#f59e0b);">
+                    <i class="fas fa-om text-5xl text-white"></i>
+                </div>
+                <div class="absolute bottom-4 right-8 px-6 py-4 rounded-xl shadow-lg" style="background:#ffffff;">
+                    <p class="text-xs uppercase tracking-widest mb-1" style="color:#867461;">Sessions available</p>
+                    <p class="rs-headline text-2xl font-bold" style="color:#855300;">{{ total_count }} Meditations</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    {# Category pills #}
+    <section class="px-6 md:px-12 py-4">
+        <div class="max-w-7xl mx-auto flex flex-wrap gap-3">
+            <a href="{% url 'meditations' %}" class="category-badge {% if not category_filter %}text-white{% else %}text-[#855300]{% endif %}"
+               style="background:{% if not category_filter %}#855300{% else %}#f1e7db{% endif %};">All</a>
+            {% for val, label in category_choices %}
+            <a href="?category={{ val }}" class="category-badge {% if category_filter == val %}text-white{% else %}text-[#855300]{% endif %}"
+               style="background:{% if category_filter == val %}#855300{% else %}#f1e7db{% endif %};">{{ label }}</a>
+            {% endfor %}
+        </div>
+    </section>
+
+    {# Search bar #}
+    <section class="sticky top-0 z-40 px-6 md:px-12 py-3 rs-glass shadow-sm">
+        <div class="max-w-7xl mx-auto">
+            <form method="GET" action="{% url 'meditations' %}" class="flex flex-wrap gap-4 items-center">
+                <input type="hidden" name="category" value="{{ category_filter }}">
+                <div class="flex-1 min-w-[200px] relative">
+                    <i class="fas fa-search absolute left-4 top-1/2 -translate-y-1/2" style="color:#867461;"></i>
+                    <input type="search" name="q" value="{{ query }}" placeholder="Search meditations..."
+                           class="w-full pl-10 pr-4 py-3 rounded-lg border-none focus:ring-1 focus:ring-[#855300] outline-none"
+                           style="background:#fdf2e7;color:#1f1b14;">
+                </div>
+                <select name="difficulty" class="px-4 py-3 rounded-lg border-none outline-none text-sm" style="background:#f1e7db;color:#855300;">
+                    <option value="">All Levels</option>
+                    {% for val, label in difficulty_choices %}
+                    <option value="{{ val }}" {% if difficulty_filter == val %}selected{% endif %}>{{ label }}</option>
+                    {% endfor %}
+                </select>
+                <button type="submit" class="rs-btn-primary px-6 py-3 rounded-lg font-semibold text-sm">Search</button>
+            </form>
+        </div>
+    </section>
+
+    {# Grid #}
+    <section class="px-6 md:px-12 py-16">
+        <div class="max-w-7xl mx-auto">
+            {% if meditations %}
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                {% for med in meditations %}
+                <a href="{% url 'meditation_detail' med.id %}" class="med-card block rounded-2xl overflow-hidden" style="background:#fdf2e7;">
+                    <div class="aspect-[16/9] overflow-hidden relative" style="background:#f1e7db;">
+                        {% if med.image_url %}
+                        <img src="{{ med.image_url }}" alt="{{ med.title }}" class="med-img w-full h-full object-cover">
+                        {% else %}
+                        <div class="w-full h-full flex items-center justify-center">
+                            <i class="fas fa-om text-5xl" style="color:#d8c3ad;"></i>
+                        </div>
+                        {% endif %}
+                        <div class="absolute top-3 left-3">
+                            <span class="category-badge text-white" style="background:#855300;">{{ med.get_category_display }}</span>
+                        </div>
+                        <div class="absolute bottom-3 right-3 px-3 py-1 rounded-full text-xs font-bold" style="background:rgba(255,248,243,0.9);color:#534434;">
+                            <i class="fas fa-clock mr-1"></i>{{ med.duration_minutes }} min
+                        </div>
+                    </div>
+                    <div class="p-6">
+                        <h3 class="rs-headline text-xl font-bold mb-1" style="color:#1f1b14;">{{ med.title }}</h3>
+                        {% if med.guided_by %}
+                        <p class="text-sm mb-3 italic" style="color:#867461;">Guided by {{ med.guided_by }}</p>
+                        {% endif %}
+                        <p class="text-sm leading-relaxed" style="color:#534434;">{{ med.description|truncatechars:100 }}</p>
+                    </div>
+                </a>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="text-center py-24">
+                <i class="fas fa-om text-6xl mb-6" style="color:#d8c3ad;"></i>
+                <p class="rs-headline text-2xl mb-2" style="color:#1f1b14;">No meditations found</p>
+                <a href="{% url 'meditations' %}" class="rs-btn-primary px-8 py-3 rounded-lg font-semibold">View All</a>
+            </div>
+            {% endif %}
+        </div>
+    </section>
+
+    <footer class="py-10 px-6 mt-12" style="background:#f1e7db;">
+        <div class="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
+            <p class="rs-headline text-lg font-bold" style="color:#855300;">Yoga Kailasa</p>
+            <div class="flex gap-6 text-xs uppercase tracking-widest" style="color:#867461;">
+                <a href="{% url 'poses' %}" class="hover:underline">Poses</a>
+                <a href="{% url 'breathing' %}" class="hover:underline">Breathing</a>
+                <a href="{% url 'mudras' %}" class="hover:underline">Mudras</a>
+                <a href="{% url 'meditations' %}" class="hover:underline" style="color:#855300;font-weight:600;">Meditation</a>
+                <a href="{% url 'chakra_guide' %}" class="hover:underline">Chakras</a>
+            </div>
+            <p class="text-xs" style="color:#867461;">© {% now "Y" %} Yoga Kailasa</p>
+        </div>
+    </footer>
+</div>
+{% endblock %}

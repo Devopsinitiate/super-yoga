@@ -1,9 +1,7 @@
 {% extends 'yoga_app/base.html' %}
 {% load static %}
-{% load custom_filters %} {# Ensure this is loaded for add_class filter #}
 
-
-{% block title %}Edit Profile - Yoga Kailasa{% endblock %}
+{% block title %}Sanctuary Profile Management - Yoga Kailasa{% endblock %}
 
 {% block meta_description %}Manage your Yoga Kailasa user profile. Update your email address, change your password, upload a profile picture, or update your bio securely.{% endblock %}
 
@@ -11,164 +9,464 @@
 {% block og_description %}Manage your Yoga Kailasa user profile. Update your email address, change your password, upload a profile picture, or update your bio securely.{% endblock %}
 {% block og_image %}{% static 'yoga_app/images/default_profile_og_image.jpg' %}{% endblock %}
 
+{% block extra_css %}
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif:wght@400;700&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+    .profile-page {
+        font-family: 'Manrope', sans-serif;
+        background-color: #fff8f3;
+        color: #1f1b14;
+    }
+    .profile-page .rs-headline {
+        font-family: 'Noto Serif', serif;
+        line-height: 1.4;
+    }
+    .profile-page .rs-glass {
+        background-color: rgba(255, 248, 243, 0.8);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+    }
+    .profile-page .rs-btn-primary {
+        background: linear-gradient(135deg, #855300 0%, #f59e0b 100%);
+        color: #ffffff;
+        transition: all 0.3s ease;
+    }
+    .profile-page .rs-btn-primary:hover {
+        opacity: 0.92;
+        transform: scale(1.02);
+    }
+    .profile-page .rs-btn-primary:active {
+        transform: scale(0.98);
+    }
+    .profile-page .rs-btn-secondary {
+        background-color: #f1e7db;
+        color: #855300;
+        transition: all 0.3s ease;
+    }
+    .profile-page .rs-btn-secondary:hover {
+        background-color: #ebe1d6;
+    }
+    .profile-page .rs-btn-danger {
+        background-color: #ffffff;
+        color: #ba1a1a;
+        border: 1px solid rgba(186, 26, 26, 0.2);
+        transition: all 0.3s ease;
+    }
+    .profile-page .rs-btn-danger:hover {
+        background-color: rgba(255, 218, 214, 0.5);
+    }
+    .profile-page .rs-btn-cancel {
+        color: #855300;
+        transition: all 0.3s ease;
+    }
+    .profile-page .rs-btn-cancel:hover {
+        background-color: #f7ece1;
+    }
+    .profile-page .rs-text-primary { color: #855300; }
+    .profile-page .rs-text-secondary { color: #a73a00; }
+    .profile-page .rs-text-on-surface { color: #1f1b14; }
+    .profile-page .rs-text-on-surface-variant { color: #534434; }
+    .profile-page .rs-text-outline { color: #867461; }
+    .profile-page .rs-text-outline-variant { color: #d8c3ad; }
+    .profile-page .rs-text-on-primary { color: #ffffff; }
+    .profile-page .rs-text-on-primary-container { color: #613b00; }
+    .profile-page .rs-text-on-error-container { color: #93000a; }
+    .profile-page .rs-text-error { color: #ba1a1a; }
+    .profile-page .rs-bg-surface { background-color: #fff8f3; }
+    .profile-page .rs-bg-surface-container { background-color: #f7ece1; }
+    .profile-page .rs-bg-surface-container-low { background-color: #fdf2e7; }
+    .profile-page .rs-bg-surface-container-lowest { background-color: #ffffff; }
+    .profile-page .rs-bg-surface-container-high { background-color: #f1e7db; }
+    .profile-page .rs-bg-surface-container-highest { background-color: #ebe1d6; }
+    .profile-page .rs-bg-surface-dim { background-color: #e2d8cd; }
+    .profile-page .rs-bg-primary { background-color: #855300; }
+    .profile-page .rs-bg-primary-container { background-color: #f59e0b; }
+    .profile-page .rs-bg-error-container { background-color: #ffdad6; }
+    .profile-page .rs-border-outline-variant { border-color: rgba(216, 195, 173, 0.2); }
+    .profile-page .rs-border-primary { border-color: rgba(133, 83, 0, 0.3); }
+    .profile-page .rs-border-error { border-color: rgba(186, 26, 26, 0.3); }
+    .profile-page .rs-input-field {
+        background-color: #fdf2e7;
+        border: none;
+        border-bottom: 1px solid rgba(216, 195, 173, 0.3);
+        transition: all 0.3s ease;
+    }
+    .profile-page .rs-input-field:focus {
+        outline: none;
+        border-bottom-color: #855300;
+        background-color: #ffffff;
+    }
+    .profile-page .rs-input-field::placeholder {
+        color: rgba(134, 116, 97, 0.6);
+    }
+    .profile-page .rs-avatar-ring {
+        border: 4px solid #ebe1d6;
+    }
+    .profile-page .rs-section-line {
+        width: 32px;
+        height: 2px;
+        background-color: #f59e0b;
+    }
+    .profile-page .rs-nav-item {
+        transition: all 0.2s ease-in-out;
+    }
+    .profile-page .rs-nav-item:hover {
+        background-color: #f1e7db;
+    }
+    .profile-page .rs-nav-item.active {
+        background-color: rgba(245, 158, 11, 0.1);
+        color: #855300;
+    }
+    .profile-page .rs-toggle {
+        width: 44px;
+        height: 24px;
+        background-color: #ebe1d6;
+        border-radius: 9999px;
+        position: relative;
+        transition: all 0.3s ease;
+        cursor: pointer;
+    }
+    .profile-page .rs-toggle.active {
+        background-color: #f59e0b;
+    }
+    .profile-page .rs-toggle::after {
+        content: '';
+        position: absolute;
+        top: 2px;
+        left: 2px;
+        width: 20px;
+        height: 20px;
+        background-color: #ffffff;
+        border-radius: 50%;
+        transition: all 0.3s ease;
+    }
+    .profile-page .rs-toggle.active::after {
+        left: 22px;
+    }
+    .profile-page .rs-modal-overlay {
+        background-color: rgba(0, 0, 0, 0.5);
+    }
+    .profile-page .rs-modal-content {
+        transition: all 0.3s ease;
+    }
+    
+    /* Hide base.html elements */
+    .profile-page > header,
+    .profile-page > #mobile-menu,
+    .profile-page > #mobile-menu-overlay,
+    .profile-page > #backToTopBtn,
+    .profile-page > #toast-container {
+        display: none !important;
+    }
+</style>
+{% endblock %}
 
 {% block content %}
-<section class="py-16 bg-gradient-to-r from-amber-100 to-amber-50 min-h-screen flex items-center justify-center">
-    <div class="container mx-auto px-4 max-w-2xl">
-        <div class="bg-white p-8 rounded-xl shadow-lg animate-fade-in-up" style="animation-delay: 0.1s;">
-            <h2 class="text-3xl font-bold text-gray-800 mb-6 text-center">Edit Your Profile</h2>
-            <p class="text-gray-600 text-center mb-8">Update your account details, profile picture, bio, or change your password.</p>
-
-            {# Display Messages (handled by base.html toast system) #}
-            {# The Django messages are captured by JS in base.html and displayed as toasts #}
-            {# This block can remain as a fallback or for server-side redirects without JS #}
-            {% if messages %}
-                <div class="mb-6">
-                    {% for message in messages %}
-                        <div class="p-3 rounded-md mb-2 text-sm {% if message.tags == 'success' %}bg-green-100 text-green-800{% elif message.tags == 'error' %}bg-red-100 text-red-800{% elif message.tags == 'info' %}bg-blue-100 text-blue-800{% endif %}">
-                            {{ message }}
-                        </div>
-                    {% endfor %}
+<div class="profile-page min-h-screen">
+    {# Top Navigation #}
+    <header class="w-full top-0 sticky z-50 rs-bg-surface dark:bg-[#1f1b14]">
+        <div class="flex justify-between items-center px-6 md:px-8 py-4 max-w-screen-2xl mx-auto">
+            <a href="{% url 'home' %}" class="text-2xl rs-headline rs-text-primary tracking-tight">Yoga Kailasa</a>
+            <nav class="hidden md:flex gap-8 items-center">
+                <a href="{% url 'courses' %}" class="rs-text-on-surface-variant/70 font-medium hover:rs-text-primary transition-colors duration-300">Practice</a>
+                <a href="{% url 'consultant_list' %}" class="rs-text-on-surface-variant/70 font-medium hover:rs-text-primary transition-colors duration-300">Teachers</a>
+                <a href="{% url 'booking' %}" class="rs-text-on-surface-variant/70 font-medium hover:rs-text-primary transition-colors duration-300">Retreats</a>
+            </nav>
+            <div class="flex items-center gap-4">
+                <a href="{% url 'all_notifications' %}" class="rs-text-primary scale-95 active:duration-150">
+                    <i class="fas fa-bell"></i>
+                </a>
+                {% if user_profile.profile_picture %}
+                <img src="{{ user_profile.profile_picture.url }}" alt="User profile avatar" class="w-10 h-10 rounded-full object-cover rs-avatar-ring">
+                {% else %}
+                <div class="w-10 h-10 rounded-full rs-bg-surface-container flex items-center justify-center rs-avatar-ring">
+                    <i class="fas fa-user rs-text-primary"></i>
                 </div>
-            {% endif %}
-
-            {# Profile Picture & Bio Update Form #}
-            <div class="mb-8 p-6 border border-gray-200 rounded-lg animate-fade-in-up" style="animation-delay: 0.2s;">
-                <h3 class="text-xl font-semibold text-gray-800 mb-4">Update Profile Details</h3>
-                <form method="post" action="{% url 'profile_edit' %}" enctype="multipart/form-data">
-                    {% csrf_token %}
-                    
-                    {# Current Profile Picture Display #}
-                    <div class="mb-6 text-center">
-                        {% if user_profile.profile_picture %}
-                            <picture>
-                                {% if user_profile.profile_picture_webp %}
-                                    <source srcset="{{ user_profile.profile_picture_webp.url }}" type="image/webp">
-                                {% endif %}
-                                <img src="{{ user_profile.profile_picture.url }}" alt="Profile Picture" class="w-32 h-32 rounded-full mx-auto object-cover border-4 border-amber-300 shadow-md">
-                            </picture>
-                        {% else %}
-                            <div class="w-32 h-32 rounded-full mx-auto bg-gray-200 flex items-center justify-center text-gray-400 text-5xl border-4 border-gray-300 shadow-md">
-                                <i class="fas fa-user-circle"></i>
-                            </div>
-                        {% endif %}
-                        <p class="text-gray-600 text-sm mt-2">Current Profile Picture</p>
-                    </div>
-
-                    {# Profile Picture Field #}
-                    <div class="mb-4">
-                        {{ user_profile_form.profile_picture.label_tag }}
-                        {{ user_profile_form.profile_picture|add_class:'w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100' }}
-                        {% if user_profile_form.profile_picture.errors %}<p class="text-red-500 text-xs italic mt-1">{{ user_profile_form.profile_picture.errors }}</p>{% endif %}
-                    </div>
-
-                    {# Bio Field #}
-                    <div class="mb-4">
-                        {{ user_profile_form.bio.label_tag }}
-                        {{ user_profile_form.bio|add_class:'w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500' }}
-                        {% if user_profile_form.bio.errors %}<p class="text-red-500 text-xs italic mt-1">{{ user_profile_form.bio.errors }}</p>{% endif %}
-                    </div>
-
-                    <button type="submit" name="update_profile" class="w-full bg-amber-500 hover:bg-amber-600 text-white px-6 py-3 rounded-full transition duration-300 mt-4 transform hover:scale-105">
-                        Update Profile <i class="fas fa-save ml-2"></i>
-                    </button>
-                </form>
-            </div>
-
-            {# Account Information Update Form (Username & Email) #}
-            <div class="mb-8 p-6 border border-gray-200 rounded-lg animate-fade-in-up" style="animation-delay: 0.3s;">
-                <h3 class="text-xl font-semibold text-gray-800 mb-4">Update Account Details</h3>
-                <form method="post" action="{% url 'profile_edit' %}">
-                    {% csrf_token %}
-                    {# user_account_form is the renamed UserProfileUpdateForm from forms.py #}
-                    <div class="mb-4">
-                        {{ user_account_form.username.label_tag }}
-                        {{ user_account_form.username|add_class:'w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500' }}
-                        {% if user_account_form.username.errors %}<p class="text-red-500 text-xs italic mt-1">{{ user_account_form.username.errors }}</p>{% endif %}
-                    </div>
-                    <div class="mb-4">
-                        {{ user_account_form.email.label_tag }}
-                        {{ user_account_form.email|add_class:'w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500' }}
-                        {% if user_account_form.email.errors %}<p class="text-red-500 text-xs italic mt-1">{{ user_account_form.email.errors }}</p>{% endif %}
-                    </div>
-                    <button type="submit" name="update_account" class="w-full bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-full transition duration-300 mt-4 transform hover:scale-105">
-                        Update Account <i class="fas fa-user-edit ml-2"></i>
-                    </button>
-                </form>
-            </div>
-
-            {# Password Change Form #}
-            <div class="mb-8 p-6 border border-gray-200 rounded-lg animate-fade-in-up" style="animation-delay: 0.4s;">
-                <h3 class="text-xl font-semibold text-gray-800 mb-4">Change Password</h3>
-                <form method="post" action="{% url 'profile_edit' %}">
-                    {% csrf_token %}
-                    <div class="mb-4">
-                        <label for="{{ password_form.old_password.id_for_label }}" class="block text-gray-700 text-sm font-medium mb-2 text-left">Current Password</label>
-                        {{ password_form.old_password|add_class:'w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500' }}
-                        {% for error in password_form.old_password.errors %}
-                            <p class="text-red-500 text-xs italic text-left">{{ error }}</p>
-                        {% endfor %}
-                    </div>
-                    <div class="mb-4">
-                        <label for="{{ password_form.new_password1.id_for_label }}" class="block text-gray-700 text-sm font-medium mb-2 text-left">New Password</label>
-                        {{ password_form.new_password1|add_class:'w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500' }}
-                        {% if password_form.new_password1.help_text %}
-                            <p class="text-xs text-gray-500 mt-1 text-left">{{ password_form.new_password1.help_text }}</p>
-                        {% endif %}
-                        {% for error in password_form.new_password1.errors %}
-                            <p class="text-red-500 text-xs italic text-left">{{ error }}</p>
-                        {% endfor %}
-                    </div>
-                    <div class="mb-4">
-                        <label for="{{ password_form.new_password2.id_for_label }}" class="block text-gray-700 text-sm font-medium mb-2 text-left">Confirm New Password</label>
-                        {{ password_form.new_password2|add_class:'w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500' }}
-                        {% for error in password_form.new_password2.errors %}
-                            <p class="text-red-500 text-xs italic text-left">{{ error }}</p>
-                        {% endfor %}
-                    </div>
-                    <button type="submit" name="change_password" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-3 rounded-full transition duration-300 mt-4 transform hover:scale-105">
-                        Change Password <i class="fas fa-key ml-2"></i>
-                    </button>
-                </form>
-            </div>
-
-            {# Delete Account Section #}
-            <div class="p-6 border border-red-200 rounded-lg bg-red-50 animate-fade-in-up" style="animation-delay: 0.5s;" id="delete-account-section">
-                <h3 class="text-xl font-semibold text-red-800 mb-4">Delete Account</h3>
-                <p class="text-red-700 mb-6">
-                    Deleting your account is a permanent action and cannot be undone. All your data, including enrolled courses, reviews, and discussion posts, will be removed.
-                </p>
-                {# Button to trigger custom confirmation modal #}
-                <button type="button" id="open-delete-modal" class="w-full bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-full transition duration-300 transform hover:scale-105">
-                    Delete My Account <i class="fas fa-exclamation-triangle ml-2"></i>
-                </button>
-            </div>
-
-            <div class="text-center mt-8 animate-fade-in-up" style="animation-delay: 0.6s;">
-                <a href="{% url 'dashboard' %}" class="text-amber-600 hover:underline">Back to Dashboard</a>
-                <span class="mx-2 text-gray-400">|</span>
-                <a href="{% url 'request_report' %}" class="text-blue-600 hover:underline">Request a Report</a>
+                {% endif %}
             </div>
         </div>
-    </div>
-</section>
+        <div class="rs-bg-surface-container-high h-[1px] w-full"></div>
+    </header>
 
-{# Custom Delete Confirmation Modal #}
-<div id="delete-confirm-modal" class="fixed inset-0 bg-gray-800 bg-opacity-75 flex items-center justify-center z-[1001] hidden">
-    <div class="bg-white p-8 rounded-lg shadow-xl max-w-md w-full mx-4 transform transition-transform duration-300 scale-95 opacity-0" id="modal-content">
-        <h3 class="text-2xl font-bold text-red-700 mb-4 text-center">Confirm Account Deletion</h3>
-        <p class="text-gray-700 mb-6 text-center">
-            Are you absolutely sure you want to delete your account? This action is irreversible. All your data will be permanently removed.
-        </p>
-        <form method="post" action="{% url 'delete_account' %}" class="flex justify-center space-x-4">
-            {% csrf_token %}
-            <button type="button" id="cancel-delete" class="bg-gray-300 hover:bg-gray-400 text-gray-800 px-6 py-3 rounded-full transition duration-300">
-                Cancel
-            </button>
-            <button type="submit" class="bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-full transition duration-300">
-                Yes, Delete My Account
-            </button>
-        </form>
+    <div class="max-w-screen-2xl mx-auto flex min-h-screen">
+        {# Side Navigation #}
+        {# Side Navigation #}
+        <aside class="hidden md:flex flex-col h-full p-6 gap-2 h-screen w-72 rs-bg-surface dark:bg-[#1f1b14]">
+            <div class="mb-10 px-3">
+                <div class="text-xl rs-headline rs-text-primary mb-1">Breath & Balance</div>
+                <div class="text-sm rs-text-secondary font-['Manrope'] tracking-wide">Manage your sanctuary</div>
+            </div>
+            <nav class="space-y-1">
+                <a href="#profile-details" class="rs-nav-item active flex items-center gap-3 rounded-lg p-3 font-semibold">
+                    <i class="fas fa-user"></i>
+                    Profile Details
+                </a>
+                <a href="#account-info" class="rs-nav-item flex items-center gap-3 rs-text-secondary p-3 rounded-lg">
+                    <i class="fas fa-id-badge"></i>
+                    Account Info
+                </a>
+                <a href="#security" class="rs-nav-item flex items-center gap-3 rs-text-secondary p-3 rounded-lg">
+                    <i class="fas fa-lock"></i>
+                    Security
+                </a>
+                <a href="#notifications" class="rs-nav-item flex items-center gap-3 rs-text-secondary p-3 rounded-lg">
+                    <i class="fas fa-bell"></i>
+                    Notifications
+                </a>
+                <div class="pt-8">
+                    <a href="#danger-zone" class="rs-nav-item flex items-center gap-3 rs-text-secondary p-3 rounded-lg">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        Danger Zone
+                    </a>
+                </div>
+            </nav>
+            <div class="mt-auto p-4 rs-bg-surface-container-low rounded-xl">
+                <a href="{% url 'booking' %}" class="block w-full py-3 rs-btn-primary rounded-lg font-bold text-center">
+                    Book a Class
+                </a>
+            </div>
+        </aside>
+
+        {# Main Canvas #}
+        <main class="flex-1 rs-bg-surface-container-low min-h-screen">
+            {# Back to Dashboard #}
+            <div class="px-8 md:px-12 pt-8">
+                <a href="{% url 'dashboard' %}" class="inline-flex items-center gap-2 rs-text-on-surface-variant hover:rs-text-primary font-medium transition-colors group">
+                    <i class="fas fa-arrow-left transition-transform group-hover:-translate-x-1"></i>
+                    <span class="text-sm uppercase tracking-widest">Back to Dashboard</span>
+                </a>
+            </div>
+            {# Personalized Header Section #}
+            <section class="p-8 md:p-12 rs-bg-surface">
+                <div class="flex flex-col md:flex-row items-center gap-8 md:gap-12">
+                    <div class="relative group">
+                        <div class="w-32 h-32 md:w-40 md:h-40 rounded-full overflow-hidden rs-avatar-ring">
+                            {% if user_profile.profile_picture %}
+                            <img src="{{ user_profile.profile_picture.url }}" alt="Yoga practitioner avatar" class="w-full h-full object-cover">
+                            {% else %}
+                            <div class="w-full h-full rs-bg-surface-container flex items-center justify-center">
+                                <i class="fas fa-user text-5xl rs-text-primary/50"></i>
+                            </div>
+                            {% endif %}
+                        </div>
+                        <button type="button" onclick="document.getElementById('id_profile_picture').click()" class="absolute bottom-2 right-2 rs-bg-primary-container rs-text-on-primary-container p-2 rounded-full shadow-lg hover:scale-105 transition-transform">
+                            <i class="fas fa-edit text-sm"></i>
+                        </button>
+                    </div>
+                    <div class="text-center md:text-left">
+                        <h1 class="text-4xl md:text-5xl rs-headline font-bold rs-text-on-surface mb-2 leading-relaxed">Welcome home, {{ user.username }}</h1>
+                        <p class="rs-text-on-surface-variant font-body tracking-wide">Take a moment to align your digital sanctuary with your journey.</p>
+                    </div>
+                </div>
+            </section>
+
+            {# Display Messages #}
+            {% if messages %}
+            <div class="p-8 md:px-12">
+                {% for message in messages %}
+                <div class="p-4 rounded-lg mb-4 text-sm {% if message.tags == 'success' %}bg-green-100 text-green-800{% elif message.tags == 'error' %}bg-red-100 text-red-800{% elif message.tags == 'info' %}bg-blue-100 text-blue-800{% elif message.tags == 'warning' %}bg-amber-100 text-amber-800{% endif %}">
+                    {{ message }}
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+
+            {# Content Area #}
+            <div class="p-8 md:p-12 space-y-12">
+                {# Profile Details Section #}
+                <section id="profile-details" class="rs-bg-surface-container-lowest p-8 md:p-10 rounded-xl shadow-sm">
+                    <div class="max-w-3xl">
+                        <h2 class="text-2xl rs-headline rs-text-on-surface mb-8 flex items-center gap-3">
+                            <span class="rs-section-line"></span>
+                            Profile Details
+                        </h2>
+                        <form method="post" action="{% url 'profile_edit' %}" enctype="multipart/form-data">
+                            {% csrf_token %}
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                                <div class="space-y-2">
+                                    <label class="text-xs font-bold rs-text-on-surface-variant uppercase tracking-widest ml-1" for="{{ user_profile_form.bio.id_for_label }}">Biography</label>
+                                    <textarea name="{{ user_profile_form.bio.html_name }}" id="{{ user_profile_form.bio.id_for_label }}"
+                                              class="w-full rs-input-field px-4 py-3 font-body transition-all md:col-span-2"
+                                              rows="4"
+                                              placeholder="Tell us about your practice...">{{ user_profile_form.bio.value|default_if_none:'' }}</textarea>
+                                    {% if user_profile_form.bio.errors %}
+                                    <p class="text-red-500 text-xs">{{ user_profile_form.bio.errors.0 }}</p>
+                                    {% endif %}
+                                </div>
+                                <div class="space-y-2">
+                                    <label class="text-xs font-bold rs-text-on-surface-variant uppercase tracking-widest ml-1" for="id_profile_picture">Profile Picture</label>
+                                    <input type="file" name="{{ user_profile_form.profile_picture.html_name }}" id="id_profile_picture"
+                                           class="w-full rs-input-field px-4 py-3 font-body transition-all"
+                                           accept="image/*">
+                                    {% if user_profile_form.profile_picture.errors %}
+                                    <p class="text-red-500 text-xs">{{ user_profile_form.profile_picture.errors.0 }}</p>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="mt-8">
+                                <button type="submit" name="update_profile" class="rs-btn-primary px-8 py-3 rounded-lg font-semibold">
+                                    Update Profile
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </section>
+
+                {# Account Info Section #}
+                <section id="account-info" class="rs-bg-surface-container-high p-8 md:p-10 rounded-xl">
+                    <div class="max-w-3xl">
+                        <h2 class="text-2xl rs-headline rs-text-on-surface mb-8 flex items-center gap-3">
+                            <span class="rs-section-line rs-bg-primary"></span>
+                            Account Information
+                        </h2>
+                        <form method="post" action="{% url 'profile_edit' %}">
+                            {% csrf_token %}
+                            <div class="space-y-8">
+                                <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 p-4 rs-bg-surface-container-lowest/50 rounded-lg">
+                                    <div class="flex-1">
+                                        <p class="text-xs font-bold rs-text-on-surface-variant uppercase tracking-widest">Username</p>
+                                        <input type="text" name="{{ user_account_form.username.html_name }}" id="{{ user_account_form.username.id_for_label }}"
+                                               class="w-full rs-input-field px-4 py-3 font-body transition-all mt-2"
+                                               value="{{ user_account_form.username.value|default_if_none:'' }}">
+                                        {% if user_account_form.username.errors %}
+                                        <p class="text-red-500 text-xs mt-1">{{ user_account_form.username.errors.0 }}</p>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 p-4 rs-bg-surface-container-lowest/50 rounded-lg">
+                                    <div class="flex-1">
+                                        <p class="text-xs font-bold rs-text-on-surface-variant uppercase tracking-widest">Email Address</p>
+                                        <input type="email" name="{{ user_account_form.email.html_name }}" id="{{ user_account_form.email.id_for_label }}"
+                                               class="w-full rs-input-field px-4 py-3 font-body transition-all mt-2"
+                                               value="{{ user_account_form.email.value|default_if_none:'' }}">
+                                        {% if user_account_form.email.errors %}
+                                        <p class="text-red-500 text-xs mt-1">{{ user_account_form.email.errors.0 }}</p>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="mt-8">
+                                <button type="submit" name="update_account" class="rs-btn-primary px-8 py-3 rounded-lg font-semibold">
+                                    Update Account
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </section>
+
+                {# Security / Password Change Section #}
+                <section id="security" class="rs-bg-surface-container-lowest p-8 md:p-10 rounded-xl shadow-sm">
+                    <div class="max-w-3xl">
+                        <h2 class="text-2xl rs-headline rs-text-on-surface mb-8 flex items-center gap-3">
+                            <span class="rs-section-line"></span>
+                            Security
+                        </h2>
+                        <form method="post" action="{% url 'profile_edit' %}">
+                            {% csrf_token %}
+                            <div class="space-y-6">
+                                <div class="space-y-2">
+                                    <label class="text-xs font-bold rs-text-on-surface-variant uppercase tracking-widest ml-1" for="{{ password_form.old_password.id_for_label }}">Current Password</label>
+                                    <input type="password" name="{{ password_form.old_password.html_name }}" id="{{ password_form.old_password.id_for_label }}"
+                                           class="w-full rs-input-field px-4 py-3 font-body transition-all"
+                                           placeholder="Enter your current password">
+                                    {% for error in password_form.old_password.errors %}
+                                    <p class="text-red-500 text-xs">{{ error }}</p>
+                                    {% endfor %}
+                                </div>
+                                <div class="space-y-2">
+                                    <label class="text-xs font-bold rs-text-on-surface-variant uppercase tracking-widest ml-1" for="{{ password_form.new_password1.id_for_label }}">New Password</label>
+                                    <input type="password" name="{{ password_form.new_password1.html_name }}" id="{{ password_form.new_password1.id_for_label }}"
+                                           class="w-full rs-input-field px-4 py-3 font-body transition-all"
+                                           placeholder="Enter your new password">
+                                    {% if password_form.new_password1.help_text %}
+                                    <p class="text-xs rs-text-on-surface-variant mt-1">{{ password_form.new_password1.help_text|safe }}</p>
+                                    {% endif %}
+                                    {% for error in password_form.new_password1.errors %}
+                                    <p class="text-red-500 text-xs">{{ error }}</p>
+                                    {% endfor %}
+                                </div>
+                                <div class="space-y-2">
+                                    <label class="text-xs font-bold rs-text-on-surface-variant uppercase tracking-widest ml-1" for="{{ password_form.new_password2.id_for_label }}">Confirm New Password</label>
+                                    <input type="password" name="{{ password_form.new_password2.html_name }}" id="{{ password_form.new_password2.id_for_label }}"
+                                           class="w-full rs-input-field px-4 py-3 font-body transition-all"
+                                           placeholder="Confirm your new password">
+                                    {% for error in password_form.new_password2.errors %}
+                                    <p class="text-red-500 text-xs">{{ error }}</p>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                            <div class="mt-8">
+                                <button type="submit" name="change_password" class="rs-btn-primary px-8 py-3 rounded-lg font-semibold">
+                                    Change Password
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </section>
+
+                {# Notifications Toggle Section #}
+                <section id="notifications" class="rs-bg-surface-container-lowest p-8 md:p-10 rounded-xl shadow-sm">
+                    <div class="max-w-3xl">
+                        <h2 class="text-2xl rs-headline rs-text-on-surface mb-8 flex items-center gap-3">
+                            <span class="rs-section-line"></span>
+                            Sanctuary Alerts
+                        </h2>
+                        <div class="space-y-6">
+                            <label class="flex items-center justify-between cursor-pointer group">
+                                <span class="rs-text-on-surface font-medium">Class Reminders & Updates</span>
+                                <div class="rs-toggle {% if user_profile.receive_email_notifications %}active{% endif %}" onclick="this.classList.toggle('active')"></div>
+                            </label>
+                            <label class="flex items-center justify-between cursor-pointer group">
+                                <span class="rs-text-on-surface font-medium">Weekly Meditative Insights</span>
+                                <div class="rs-toggle {% if user_profile.receive_app_notifications %}active{% endif %}" onclick="this.classList.toggle('active')"></div>
+                            </label>
+                        </div>
+                    </div>
+                </section>
+
+                {# Danger Zone Section #}
+                <section id="danger-zone" class="rs-bg-error-container/20 p-8 md:p-10 rounded-xl rs-border-error border-l-4">
+                    <div class="max-w-3xl">
+                        <h2 class="text-xl rs-headline rs-text-on-error-container mb-4">Departing the Sanctuary</h2>
+                        <p class="rs-text-on-surface-variant font-body mb-8">Deleting your account will permanently remove your class history, practice streaks, and personalized teacher notes. This action is intentional and irreversible.</p>
+                        <button type="button" id="open-delete-modal" class="rs-btn-danger px-8 py-3 rounded-lg font-bold">
+                            Request Account Deletion
+                        </button>
+                    </div>
+                </section>
+
+                {# Global Action Bar #}
+                <div class="flex justify-end gap-4 pt-8 rs-border-outline-variant border-t">
+                    <a href="{% url 'dashboard' %}" class="rs-btn-cancel px-8 py-3 font-semibold rounded-lg">Cancel Changes</a>
+                    <a href="{% url 'request_report' %}" class="rs-btn-secondary px-8 py-3 font-semibold rounded-lg">Request a Report</a>
+                </div>
+            </div>
+
+            {# Footer Decorative Element #}
+            <footer class="mt-12 py-12 px-8 rs-bg-surface-dim text-center">
+                <p class="rs-headline italic rs-text-on-surface-variant opacity-60">"The rhythm of the body, the melody of the mind, and the harmony of the soul create the symphony of life."</p>
+                <div class="mt-8 text-xs rs-text-on-surface-variant font-body uppercase tracking-[0.2em]">Yoga Kailasa &copy; {% now "Y" %}</div>
+            </footer>
+        </main>
+    </div>
+
+    {# Delete Confirmation Modal #}
+    <div id="delete-confirm-modal" class="fixed inset-0 rs-modal-overlay flex items-center justify-center z-[1001] hidden">
+        <div class="rs-bg-surface-container-lowest p-8 rounded-xl shadow-xl max-w-md w-full mx-4 rs-modal-content scale-95 opacity-0" id="modal-content">
+            <h3 class="text-2xl rs-headline rs-text-error mb-4 text-center">Confirm Account Deletion</h3>
+            <p class="rs-text-on-surface-variant mb-6 text-center">
+                Are you absolutely sure you want to delete your account? This action is irreversible. All your data will be permanently removed.
+            </p>
+            <form method="post" action="{% url 'delete_account' %}" class="flex justify-center space-x-4">
+                {% csrf_token %}
+                <button type="button" id="cancel-delete" class="rs-bg-surface-container-high rs-text-on-surface px-6 py-3 rounded-lg font-semibold transition duration-300">
+                    Cancel
+                </button>
+                <button type="submit" class="rs-bg-error-container rs-text-error px-6 py-3 rounded-lg font-bold transition duration-300 hover:bg-red-200">
+                    Yes, Delete My Account
+                </button>
+            </form>
+        </div>
     </div>
 </div>
 {% endblock %}
@@ -176,43 +474,56 @@
 {% block extra_js %}
 {{ block.super }}
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        /* Custom Delete Confirmation Modal Logic */
-        const openModalBtn = document.getElementById('open-delete-modal');
-        const deleteModal = document.getElementById('delete-confirm-modal');
-        const modalContent = document.getElementById('modal-content');
-        const cancelDeleteBtn = document.getElementById('cancel-delete');
+document.addEventListener('DOMContentLoaded', function() {
+    /* Custom Delete Confirmation Modal Logic */
+    const openModalBtn = document.getElementById('open-delete-modal');
+    const deleteModal = document.getElementById('delete-confirm-modal');
+    const modalContent = document.getElementById('modal-content');
+    const cancelDeleteBtn = document.getElementById('cancel-delete');
 
-        if (openModalBtn && deleteModal && modalContent && cancelDeleteBtn) {
-            openModalBtn.addEventListener('click', function() {
-                deleteModal.classList.remove('hidden');
-                setTimeout(() => {
-                    modalContent.classList.remove('scale-95', 'opacity-0');
-                    modalContent.classList.add('scale-100', 'opacity-100');
-                }, 10); // Small delay to ensure hidden is removed before transition
-            });
+    if (openModalBtn && deleteModal && modalContent && cancelDeleteBtn) {
+        openModalBtn.addEventListener('click', function() {
+            deleteModal.classList.remove('hidden');
+            setTimeout(() => {
+                modalContent.classList.remove('scale-95', 'opacity-0');
+                modalContent.classList.add('scale-100', 'opacity-100');
+            }, 10);
+        });
 
-            cancelDeleteBtn.addEventListener('click', function() {
+        cancelDeleteBtn.addEventListener('click', function() {
+            modalContent.classList.remove('scale-100', 'opacity-100');
+            modalContent.classList.add('scale-95', 'opacity-0');
+            modalContent.addEventListener('transitionend', function handler() {
+                deleteModal.classList.add('hidden');
+                modalContent.removeEventListener('transitionend', handler);
+            }, { once: true });
+        });
+
+        deleteModal.addEventListener('click', function(event) {
+            if (event.target === deleteModal) {
                 modalContent.classList.remove('scale-100', 'opacity-100');
                 modalContent.classList.add('scale-95', 'opacity-0');
                 modalContent.addEventListener('transitionend', function handler() {
                     deleteModal.classList.add('hidden');
                     modalContent.removeEventListener('transitionend', handler);
                 }, { once: true });
-            });
+            }
+        });
+    }
 
-            // Close modal if clicked outside of modal content
-            deleteModal.addEventListener('click', function(event) {
-                if (event.target === deleteModal) {
-                    modalContent.classList.remove('scale-100', 'opacity-100');
-                    modalContent.classList.add('scale-95', 'opacity-0');
-                    modalContent.addEventListener('transitionend', function handler() {
-                        deleteModal.classList.add('hidden');
-                        modalContent.removeEventListener('transitionend', handler);
-                    }, { once: true });
-                }
-            });
-        }
+    /* Smooth scroll for sidebar navigation */
+    document.querySelectorAll('.rs-nav-item[href^="#"]').forEach(anchor => {
+        anchor.addEventListener('click', function(e) {
+            e.preventDefault();
+            const target = document.querySelector(this.getAttribute('href'));
+            if (target) {
+                target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                // Update active state
+                document.querySelectorAll('.rs-nav-item').forEach(item => item.classList.remove('active'));
+                this.classList.add('active');
+            }
+        });
     });
+});
 </script>
 {% endblock %}

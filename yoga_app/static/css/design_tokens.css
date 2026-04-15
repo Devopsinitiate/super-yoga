@@ -1,0 +1,207 @@
+/*
+ * Yoga Kailasa — Shared Design Tokens
+ * Golden Ratio scale: base 1rem, φ = 1.618
+ * Spacing scale: 0.382rem · 0.618rem · 1rem · 1.618rem · 2.618rem · 4.236rem · 6.854rem
+ * Typography scale: 0.618rem · 1rem · 1.618rem · 2.618rem · 4.236rem · 6.854rem
+ *
+ * Import in base.html once — replaces inline <style> blocks in every template.
+ */
+
+/* ─── Colour Tokens ─────────────────────────────────────────────────────────── */
+:root {
+  --rs-surface:                  #fff8f3;
+  --rs-surface-container:        #f7ece1;
+  --rs-surface-container-low:    #fdf2e7;
+  --rs-surface-container-lowest: #ffffff;
+  --rs-surface-container-high:   #f1e7db;
+  --rs-surface-container-highest:#ebe1d6;
+  --rs-surface-dim:              #e2d8cd;
+
+  --rs-on-surface:               #1f1b14;
+  --rs-on-surface-variant:       #534434;
+  --rs-primary:                  #855300;
+  --rs-secondary:                #a73a00;
+  --rs-outline:                  #867461;
+  --rs-outline-variant:          #d8c3ad;
+  --rs-primary-container:        #f59e0b;
+  --rs-on-primary:               #ffffff;
+  --rs-on-primary-container:     #613b00;
+  --rs-on-secondary-container:   #571a00;
+  --rs-secondary-fixed-bg:       #ffdbce;
+  --rs-on-secondary-fixed:       #370e00;
+  --rs-tertiary-container-bg:    #f79a6c;
+  --rs-on-tertiary-container:    #72300a;
+  --rs-error:                    #ba1a1a;
+  --rs-error-container-bg:       #ffdad6;
+  --rs-on-error-container:       #93000a;
+
+  /* ─── Golden Ratio Spacing ─────────────────────────────────────────────────── */
+  --space-xs:   0.382rem;   /* φ⁻² */
+  --space-sm:   0.618rem;   /* φ⁻¹ */
+  --space-md:   1rem;       /* base */
+  --space-lg:   1.618rem;   /* φ¹  */
+  --space-xl:   2.618rem;   /* φ²  */
+  --space-2xl:  4.236rem;   /* φ³  */
+  --space-3xl:  6.854rem;   /* φ⁴  */
+
+  /* ─── Golden Ratio Typography ──────────────────────────────────────────────── */
+  --text-xs:    0.618rem;
+  --text-sm:    1rem;
+  --text-md:    1.618rem;
+  --text-lg:    2.618rem;
+  --text-xl:    4.236rem;
+  --text-2xl:   6.854rem;
+
+  /* ─── Border Radius ─────────────────────────────────────────────────────────── */
+  --radius-sm:  0.382rem;
+  --radius-md:  0.618rem;
+  --radius-lg:  1rem;
+  --radius-xl:  1.618rem;
+
+  /* ─── Transitions ───────────────────────────────────────────────────────────── */
+  --transition-fast:   0.2s ease;
+  --transition-base:   0.3s ease;
+  --transition-slow:   0.5s ease;
+}
+
+/* ─── Utility Classes (mirrors Tailwind-style usage in templates) ────────────── */
+
+/* Backgrounds */
+.rs-surface                  { background-color: var(--rs-surface); }
+.rs-surface-container        { background-color: var(--rs-surface-container); }
+.rs-surface-container-low    { background-color: var(--rs-surface-container-low); }
+.rs-surface-container-lowest { background-color: var(--rs-surface-container-lowest); }
+.rs-surface-container-high   { background-color: var(--rs-surface-container-high); }
+.rs-surface-container-highest{ background-color: var(--rs-surface-container-highest); }
+.rs-surface-dim              { background-color: var(--rs-surface-dim); }
+
+/* Text colours */
+.rs-on-surface         { color: var(--rs-on-surface); }
+.rs-on-surface-variant { color: var(--rs-on-surface-variant); }
+.rs-primary            { color: var(--rs-primary); }
+.rs-secondary          { color: var(--rs-secondary); }
+.rs-outline            { color: var(--rs-outline); }
+.rs-outline-variant    { color: var(--rs-outline-variant); }
+.rs-primary-container  { color: var(--rs-primary-container); }
+.rs-on-primary         { color: var(--rs-on-primary); }
+.rs-on-primary-container { color: var(--rs-on-primary-container); }
+.rs-on-secondary-container { color: var(--rs-on-secondary-container); }
+.rs-on-tertiary-container  { color: var(--rs-on-tertiary-container); }
+
+/* Typography */
+.rs-headline { font-family: 'Noto Serif', serif; line-height: 1.4; }
+
+/* Glass morphism */
+.rs-glass {
+  background-color: rgba(255, 248, 243, 0.8);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+/* Buttons */
+.rs-btn-primary {
+  background: linear-gradient(135deg, var(--rs-primary) 0%, var(--rs-primary-container) 100%);
+  color: var(--rs-on-primary);
+  transition: all var(--transition-base);
+}
+.rs-btn-primary:hover  { opacity: 0.92; transform: scale(1.02); }
+.rs-btn-primary:active { transform: scale(0.98); }
+
+.rs-btn-secondary {
+  background-color: var(--rs-surface-container-high);
+  color: var(--rs-primary);
+  transition: all var(--transition-base);
+}
+.rs-btn-secondary:hover { background-color: var(--rs-surface-container-highest); }
+
+.rs-btn-danger {
+  background-color: var(--rs-surface-container-lowest);
+  color: var(--rs-error);
+  border: 1px solid rgba(186, 26, 26, 0.2);
+  transition: all var(--transition-base);
+}
+.rs-btn-danger:hover { background-color: rgba(255, 218, 214, 0.5); }
+
+/* CKEditor rendered content */
+.rs-lesson-content h1,
+.rs-lesson-content h2,
+.rs-lesson-content h3 {
+  font-family: 'Noto Serif', serif;
+  color: var(--rs-primary);
+  margin-top: var(--space-lg);
+  margin-bottom: var(--space-sm);
+}
+.rs-lesson-content p {
+  margin-bottom: var(--space-md);
+  line-height: 1.7;
+  color: var(--rs-on-surface-variant);
+}
+.rs-lesson-content ul,
+.rs-lesson-content ol {
+  margin-left: var(--space-lg);
+  margin-bottom: var(--space-md);
+}
+.rs-lesson-content img {
+  border-radius: var(--radius-xl);
+  margin: var(--space-md) 0;
+  max-width: 100%;
+  height: auto;
+}
+.rs-lesson-content blockquote {
+  border-left: 3px solid var(--rs-primary);
+  padding-left: var(--space-md);
+  margin: var(--space-lg) 0;
+  font-style: italic;
+  color: var(--rs-on-surface-variant);
+}
+.rs-lesson-content a {
+  color: var(--rs-primary);
+  text-decoration: underline;
+}
+.rs-lesson-content a:hover { color: var(--rs-secondary); }
+
+/* Video embed container */
+.video-embed-container {
+  position: relative;
+  width: 100%;
+  padding-bottom: 56.25%; /* 16:9 — golden ratio approximation */
+  height: 0;
+  overflow: hidden;
+  border-radius: var(--radius-xl);
+}
+.video-embed-container iframe {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  border: 0;
+}
+
+/* Progress bar */
+.rs-progress-bg   { background-color: rgba(216, 195, 173, 0.3); }
+.rs-progress-fill { background-color: var(--rs-primary); }
+
+/* Input fields */
+.rs-input {
+  background-color: var(--rs-surface-container-low);
+  border: none;
+  border-bottom: 2px solid rgba(216, 195, 173, 0.2);
+  transition: all var(--transition-base);
+}
+.rs-input:focus {
+  border-bottom-color: var(--rs-primary);
+  outline: none;
+  background-color: var(--rs-surface-container-lowest);
+}
+.rs-input::placeholder { color: rgba(134, 116, 97, 0.6); }
+
+/* Scrollbar */
+.rs-scrollbar::-webkit-scrollbar       { width: 4px; }
+.rs-scrollbar::-webkit-scrollbar-track { background: transparent; }
+.rs-scrollbar::-webkit-scrollbar-thumb { background: var(--rs-outline-variant); border-radius: 2px; }
+
+/* Line clamp utilities */
+.line-clamp-1 { display: -webkit-box; -webkit-line-clamp: 1; -webkit-box-orient: vertical; overflow: hidden; }
+.line-clamp-2 { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.line-clamp-3 { display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }

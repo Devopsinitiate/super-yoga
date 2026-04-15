@@ -1,0 +1,4 @@
+# file: C:\Users\Orunmila1\Documents\Projects\yoga_kailasa_project\yoga_app\api\viewsets.py
+# hypothesis_version: 6.151.12
+
+[0.0, 100, '-booked_at', '-created_at', '-is_popular', '-published_date', '-submitted_at', 'author', 'author__username', 'breathing_techniques', 'category', 'category_slug', 'content', 'course_id', 'course_title', 'courses', 'create', 'created_at', 'description', 'destroy', 'difficulty', 'duration_filter', 'excerpt', 'free', 'get', 'global', 'id', 'instructor_filter', 'instructor_name', 'is_popular', 'last_viewed_lesson', 'liked', 'likes', 'likes_count', 'message', 'modules__lessons', 'name', 'page_size', 'paid', 'partial_update', 'poses', 'post', 'price', 'price_filter', 'published_date', 'q', 'request', 'retrieve', 'reviews', 'sanskrit_name', 'sender', 'suggestions', 'tag_slug', 'tags', 'techniques', 'title', 'update', 'user_profile', 'yoga_poses']

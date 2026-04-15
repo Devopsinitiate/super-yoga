@@ -1,0 +1,197 @@
+{% extends 'yoga_app/base.html' %}
+{% load static %}
+
+{% block title %}Booking Management — Yoga Kailasa{% endblock %}
+
+{% block extra_css %}
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif:ital,wght@0,400;0,700;1,400&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+    body { font-family:'Manrope',sans-serif; background:#fff8f3; }
+    .rs-headline { font-family:'Noto Serif',serif; line-height:1.4; }
+    .status-badge { display:inline-flex; align-items:center; gap:.3rem; padding:.2rem .75rem; border-radius:999px; font-size:.7rem; font-weight:700; text-transform:uppercase; letter-spacing:.05em; }
+    .status-pending  { background:#fef3c7; color:#92400e; }
+    .status-confirmed { background:#d1fae5; color:#065f46; }
+    .status-cancelled { background:#fee2e2; color:#991b1b; }
+    .status-completed { background:#ede9fe; color:#4c1d95; }
+    .teacher-page > header, .teacher-page > #mobile-menu, .teacher-page > #mobile-menu-overlay, .teacher-page > #backToTopBtn { display:none !important; }
+    .teacher-page > main { padding:0 !important; }
+    .row-hover:hover { background:#fdf2e7; }
+    select.inline-status { border:none; background:transparent; font-size:.75rem; font-weight:700; cursor:pointer; outline:none; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="teacher-page min-h-screen" style="background:#fff8f3;">
+
+    {# Top nav #}
+    <nav class="fixed top-0 w-full z-50 shadow-sm" style="background:rgba(255,248,243,0.92);backdrop-filter:blur(20px);">
+        <div class="flex justify-between items-center px-6 md:px-10 py-4 max-w-7xl mx-auto">
+            <div class="flex items-center gap-6">
+                <a href="{% url 'home' %}" class="rs-headline text-xl font-bold" style="color:#855300;">Yoga Kailasa</a>
+                <span class="text-xs uppercase tracking-widest font-semibold px-3 py-1 rounded-full" style="background:#f1e7db;color:#534434;">Staff Portal</span>
+            </div>
+            <div class="flex items-center gap-4 text-sm" style="color:#534434;">
+                <a href="{% url 'dashboard' %}" class="hover:underline">My Dashboard</a>
+                <a href="{% url 'home' %}" class="hover:underline">← Home</a>
+            </div>
+        </div>
+    </nav>
+
+    <main class="pt-24 pb-20 px-6 md:px-10 max-w-7xl mx-auto">
+
+        {# Header #}
+        <div class="mb-8 flex flex-col md:flex-row md:items-end justify-between gap-4">
+            <div>
+                <p class="text-xs uppercase tracking-widest font-semibold mb-1" style="color:#867461;">Staff Portal</p>
+                <h1 class="rs-headline text-4xl font-bold" style="color:#855300;">Booking Management</h1>
+            </div>
+            <a href="{% url 'booking' %}" target="_blank"
+               class="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-semibold text-white"
+               style="background:linear-gradient(135deg,#855300,#f59e0b);">
+                <i class="fas fa-external-link-alt text-xs"></i> View Booking Page
+            </a>
+        </div>
+
+        {# Stats row #}
+        <div class="grid grid-cols-2 md:grid-cols-5 gap-4 mb-8">
+            <div class="p-4 rounded-xl text-center" style="background:#fdf2e7;">
+                <p class="rs-headline text-3xl font-bold" style="color:#855300;">{{ stats.total }}</p>
+                <p class="text-xs uppercase tracking-widest mt-1" style="color:#867461;">Total</p>
+            </div>
+            <div class="p-4 rounded-xl text-center" style="background:#fef3c7;">
+                <p class="rs-headline text-3xl font-bold" style="color:#92400e;">{{ stats.pending }}</p>
+                <p class="text-xs uppercase tracking-widest mt-1" style="color:#92400e;">Pending</p>
+            </div>
+            <div class="p-4 rounded-xl text-center" style="background:#d1fae5;">
+                <p class="rs-headline text-3xl font-bold" style="color:#065f46;">{{ stats.confirmed }}</p>
+                <p class="text-xs uppercase tracking-widest mt-1" style="color:#065f46;">Confirmed</p>
+            </div>
+            <div class="p-4 rounded-xl text-center" style="background:#fdf2e7;">
+                <p class="rs-headline text-3xl font-bold" style="color:#855300;">{{ stats.today }}</p>
+                <p class="text-xs uppercase tracking-widest mt-1" style="color:#867461;">Today</p>
+            </div>
+            <div class="p-4 rounded-xl text-center" style="background:#fdf2e7;">
+                <p class="rs-headline text-3xl font-bold" style="color:#855300;">{{ stats.upcoming }}</p>
+                <p class="text-xs uppercase tracking-widest mt-1" style="color:#867461;">Upcoming</p>
+            </div>
+        </div>
+
+        {# Filters #}
+        <form method="GET" action="{% url 'teacher_dashboard' %}"
+              class="flex flex-wrap gap-3 mb-6 p-4 rounded-xl" style="background:#fdf2e7;">
+            <div class="flex-1 min-w-[180px] relative">
+                <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-xs" style="color:#867461;"></i>
+                <input type="search" name="q" value="{{ search }}" placeholder="Search name, email, phone..."
+                       class="w-full pl-8 pr-3 py-2 rounded-lg border-none outline-none text-sm"
+                       style="background:#ffffff;color:#1f1b14;">
+            </div>
+            <select name="status" class="px-3 py-2 rounded-lg border-none outline-none text-sm" style="background:#f1e7db;color:#534434;">
+                <option value="">All Statuses</option>
+                {% for val, label in status_choices %}
+                <option value="{{ val }}" {% if status_filter == val %}selected{% endif %}>{{ label }}</option>
+                {% endfor %}
+            </select>
+            <input type="date" name="date" value="{{ date_filter }}"
+                   class="px-3 py-2 rounded-lg border-none outline-none text-sm" style="background:#f1e7db;color:#534434;">
+            <button type="submit" class="px-5 py-2 rounded-lg text-sm font-semibold text-white" style="background:#855300;">Filter</button>
+            {% if search or status_filter or date_filter %}
+            <a href="{% url 'teacher_dashboard' %}" class="px-5 py-2 rounded-lg text-sm font-semibold" style="background:#ebe1d6;color:#534434;">Clear</a>
+            {% endif %}
+        </form>
+
+        {# Bookings table #}
+        <div class="rounded-2xl overflow-hidden" style="background:#ffffff;box-shadow:0 4px 24px rgba(133,83,0,0.06);">
+            {% if bookings %}
+            <div class="overflow-x-auto">
+                <table class="w-full text-sm">
+                    <thead>
+                        <tr style="background:#f1e7db;color:#534434;">
+                            <th class="text-left px-5 py-3 text-xs uppercase tracking-widest font-semibold">#</th>
+                            <th class="text-left px-5 py-3 text-xs uppercase tracking-widest font-semibold">Student</th>
+                            <th class="text-left px-5 py-3 text-xs uppercase tracking-widest font-semibold">Date & Time</th>
+                            <th class="text-left px-5 py-3 text-xs uppercase tracking-widest font-semibold">Contact</th>
+                            <th class="text-left px-5 py-3 text-xs uppercase tracking-widest font-semibold">Status</th>
+                            <th class="text-left px-5 py-3 text-xs uppercase tracking-widest font-semibold">Booked</th>
+                            <th class="px-5 py-3"></th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y" style="divide-color:rgba(216,195,173,0.2);">
+                        {% for booking in bookings %}
+                        <tr class="row-hover transition-colors" id="row-{{ booking.id }}">
+                            <td class="px-5 py-4 font-mono text-xs" style="color:#867461;">#{{ booking.id }}</td>
+                            <td class="px-5 py-4">
+                                <p class="font-semibold" style="color:#1f1b14;">{{ booking.full_name }}</p>
+                                {% if booking.user %}
+                                <p class="text-xs" style="color:#867461;">@{{ booking.user.username }}</p>
+                                {% endif %}
+                            </td>
+                            <td class="px-5 py-4">
+                                <p class="font-semibold" style="color:#1f1b14;">{{ booking.preferred_date|date:"M j, Y" }}</p>
+                                <p class="text-xs" style="color:#867461;">{{ booking.preferred_time }}</p>
+                            </td>
+                            <td class="px-5 py-4">
+                                <p style="color:#534434;">{{ booking.email }}</p>
+                                {% if booking.phone_number %}
+                                <p class="text-xs" style="color:#867461;">{{ booking.phone_number }}</p>
+                                {% endif %}
+                            </td>
+                            <td class="px-5 py-4">
+                                {# Inline status selector #}
+                                <select class="inline-status status-badge status-{{ booking.status }}"
+                                        data-booking-id="{{ booking.id }}"
+                                        onchange="updateStatus(this)">
+                                    {% for val, label in status_choices %}
+                                    <option value="{{ val }}" {% if booking.status == val %}selected{% endif %}>{{ label }}</option>
+                                    {% endfor %}
+                                </select>
+                            </td>
+                            <td class="px-5 py-4 text-xs" style="color:#867461;">{{ booking.booked_at|date:"M j" }}</td>
+                            <td class="px-5 py-4">
+                                <a href="{% url 'teacher_booking_detail' booking.id %}"
+                                   class="text-xs font-semibold hover:underline" style="color:#855300;">
+                                    View →
+                                </a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="text-center py-16">
+                <i class="fas fa-calendar-times text-5xl mb-4" style="color:#d8c3ad;"></i>
+                <p class="rs-headline text-xl mb-2" style="color:#855300;">No bookings found</p>
+                <p class="text-sm" style="color:#534434;">Try adjusting your filters.</p>
+            </div>
+            {% endif %}
+        </div>
+
+    </main>
+</div>
+
+<script>
+const csrfToken = document.cookie.split(';').map(c => c.trim()).find(c => c.startsWith('csrftoken='))?.split('=')[1] || '';
+
+async function updateStatus(select) {
+    const bookingId = select.dataset.bookingId;
+    const newStatus = select.value;
+
+    // Optimistic UI — update badge colour immediately
+    select.className = `inline-status status-badge status-${newStatus}`;
+
+    try {
+        const resp = await fetch(`/teacher/bookings/${bookingId}/status/`, {
+            method: 'POST',
+            headers: { 'X-CSRFToken': csrfToken, 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: `status=${newStatus}`,
+        });
+        const data = await resp.json();
+        if (!data.success) {
+            alert('Failed to update status. Please refresh and try again.');
+        }
+    } catch (e) {
+        alert('Network error. Please refresh and try again.');
+    }
+}
+</script>
+{% endblock %}

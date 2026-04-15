@@ -1,0 +1,4 @@
+# file: C:\Users\Orunmila1\Documents\Projects\yoga_kailasa_project\yoga_app\migrations\0008_usercoursecompletion.py
+# hypothesis_version: 6.151.12
+
+['ID', 'UserCourseCompletion', 'completed_at', 'course', 'id', 'unique_together', 'user', 'verbose_name', 'verbose_name_plural', 'yoga_app', 'yoga_app.course']

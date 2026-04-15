@@ -1,0 +1,4 @@
+# file: C:\Users\Orunmila1\Documents\Projects\yoga_kailasa_project\yoga_app\tasks.py
+# hypothesis_version: 6.151.12
+
+[120, '%A, %B %d, %Y', '%B %d, %Y', 'SITE_URL', 'amount_paid', 'application/pdf', 'author', 'author_name', 'booking_id', 'category', 'category_name', 'completed_date', 'course_duration', 'course_title', 'courses_url', 'dashboard_url', 'email', 'excerpt', 'featured_image_url', 'full_name', 'instructor_name', 'is_free', 'message', 'post_title', 'post_url', 'preferred_date', 'preferred_time', 'published_date', 'username']

@@ -4,45 +4,195 @@
 
 {% block title %}Login - Yoga Kailasa{% endblock %}
 
+{% block extra_css %}
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif:wght@400;700&family=Manrope:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+    .login-page {
+        font-family: 'Manrope', sans-serif;
+        background-color: #fff8f3;
+        color: #1f1b14;
+    }
+    .login-page .rs-headline {
+        font-family: 'Noto Serif', serif;
+        line-height: 1.4;
+    }
+    .login-page .rs-glass {
+        background-color: rgba(255, 255, 255, 0.8);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+    }
+    .login-page .rs-btn-primary {
+        background: linear-gradient(135deg, #855300 0%, #f59e0b 100%);
+        color: #ffffff;
+        transition: all 0.3s ease;
+    }
+    .login-page .rs-btn-primary:hover {
+        opacity: 0.92;
+        transform: scale(1.02);
+    }
+    .login-page .rs-btn-primary:active {
+        transform: scale(0.98);
+    }
+    .login-page .rs-text-primary { color: #855300; }
+    .login-page .rs-text-secondary { color: #a73a00; }
+    .login-page .rs-text-on-surface { color: #1f1b14; }
+    .login-page .rs-text-on-surface-variant { color: #534434; }
+    .login-page .rs-text-outline { color: #867461; }
+    .login-page .rs-text-outline-variant { color: #d8c3ad; }
+    .login-page .rs-bg-surface-container-low { background-color: #fdf2e7; }
+    .login-page .rs-bg-surface-container-lowest { background-color: #ffffff; }
+    .login-page .rs-bg-surface-container-high { background-color: #f1e7db; }
+    .login-page .rs-bg-surface-container-highest { background-color: #ebe1d6; }
+    .login-page .rs-bg-primary-container { background-color: #f59e0b; }
+    .login-page .rs-bg-tertiary-container { background-color: #f79a6c; }
+    .login-page .rs-border-outline-variant { border-color: rgba(216, 195, 173, 0.2); }
+    .login-page .rs-input-field {
+        background-color: #fdf2e7;
+        border: none;
+        border-bottom: 2px solid rgba(216, 195, 173, 0.3);
+        transition: all 0.3s ease;
+    }
+    .login-page .rs-input-field:focus {
+        outline: none;
+        border-bottom-color: #855300;
+        background-color: #ffffff;
+    }
+    .login-page .rs-divider-line {
+        border-top: 1px solid rgba(216, 195, 173, 0.3);
+    }
+    
+    /* Hide base.html elements */
+    .login-page > header,
+    .login-page > #mobile-menu,
+    .login-page > #mobile-menu-overlay,
+    .login-page > #backToTopBtn,
+    .login-page > #toast-container,
+    .login-page > #global-ajax-spinner {
+        display: none !important;
+    }
+    .login-page > main {
+        padding: 0 !important;
+    }
+    .login-page body {
+        overflow: hidden;
+    }
+</style>
+{% endblock %}
+
 {% block content %}
-<section class="py-16 bg-gradient-to-r from-amber-100 to-amber-50 min-h-screen flex items-center justify-center">
-    <div class="bg-white p-8 rounded-lg shadow-xl text-center max-w-md w-full">
-        <h2 class="text-2xl font-bold text-gray-800 mb-6">Login to Your Account</h2>
-
-        <form method="post" action="{% url 'login' %}">
-            {% csrf_token %}
-            {% if form.errors %}
-                <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4" role="alert">
-                    <p class="font-bold">Error!</p>
-                    <ul>
-                        {% for field in form %}
-                            {% if field.errors %}
-                                {% for error in field.errors %}<li>{{ field.label }}: {{ error }}</li>{% endfor %}
-                            {% endif %}
-                        {% endfor %}
-                        {% if form.non_field_errors %}
-                            {% for error in form.non_field_errors %}<li>{{ error }}</li>{% endfor %}
-                        {% endif %}
-                    </ul>
-                </div>
-            {% endif %}
-
-            <div class="mb-4">
-                <label for="{{ form.username.id_for_label }}" class="block text-gray-700 text-sm font-medium mb-2 text-left">Username or Email</label>
-                {{ form.username }}
-            </div>
-            <div class="mb-6">
-                <label for="{{ form.password.id_for_label }}" class="block text-gray-700 text-sm font-medium mb-2 text-left">Password</label>
-                {{ form.password }}
-            </div>
-            <button type="submit" class="w-full bg-amber-500 hover:bg-amber-600 text-white font-medium py-3 px-4 rounded-lg transition duration-300">
-                Log In
-            </button>
-        </form>
-
-        <p class="mt-6 text-gray-600 text-sm">Don't have an account? <a href="{% url 'register' %}" class="text-amber-500 hover:text-amber-600 font-semibold">Register here</a></p>
-        <p class="mt-2 text-gray-600 text-sm">Forgot your password? <a href="{% url 'password_reset' %}" class="text-blue-500 hover:text-blue-600 font-semibold">Reset it</a></p>
+<div class="login-page min-h-screen flex items-center justify-center relative overflow-hidden" style="background-image: linear-gradient(rgba(255, 248, 243, 0.85), rgba(255, 248, 243, 0.85)), url('{% static 'yoga_app/images/hero_image.jpg' %}'); background-size: cover; background-position: center;">
+    {# Background decorative asymmetry #}
+    <div class="absolute -top-24 -left-24 w-96 h-96 rs-bg-primary-container/10 rounded-full blur-3xl"></div>
+    <div class="absolute -bottom-24 -right-24 w-96 h-96 rs-bg-tertiary-container/10 rounded-full blur-3xl"></div>
+    
+    <div class="w-full max-w-md px-6 py-12 relative z-10">
+        {# Brand Anchor #}
+        <div class="text-center mb-12">
+            <a href="{% url 'home' %}" class="inline-block">
+                <img src="{% static 'yoga_app/images/logo.jpg' %}" alt="Yoga Kailasa Logo" class="w-16 h-16 rounded-full object-cover mx-auto mb-4 shadow-lg">
+            </a>
+            <h1 class="rs-headline font-bold text-4xl rs-text-primary tracking-tight mb-2">Yoga Kailasa</h1>
+            <p class="font-body rs-text-secondary text-sm tracking-widest uppercase">The Radiant Sanctuary</p>
+        </div>
         
+        {# Login Card (Organic Tonal Layering) #}
+        <div class="rs-glass p-8 md:p-10 rounded-xl shadow-2xl shadow-[#1f1b14]/5 rs-border-outline-variant border">
+            <div class="mb-8">
+                <h2 class="rs-headline text-2xl font-bold rs-text-on-surface mb-2">Welcome Back</h2>
+                <p class="rs-text-on-surface-variant text-sm">Find your breath and return to your practice.</p>
+            </div>
+            
+            {# Display Messages #}
+            {% if messages %}
+            <div class="mb-6">
+                {% for message in messages %}
+                <div class="p-3 rounded-md mb-2 text-sm {% if message.tags == 'success' %}bg-green-100 text-green-800{% elif message.tags == 'error' %}bg-red-100 text-red-800{% elif message.tags == 'info' %}bg-blue-100 text-blue-800{% elif message.tags == 'warning' %}bg-amber-100 text-amber-800{% endif %}">
+                    {{ message }}
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+            
+            <form method="post" action="{% url 'login' %}" class="space-y-6">
+                {% csrf_token %}
+                
+                {# Display form errors #}
+                {% if form.errors %}
+                <div class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg" role="alert">
+                    {% for field in form %}
+                        {% for error in field.errors %}
+                        <p class="text-sm">{{ field.label }}: {{ error }}</p>
+                        {% endfor %}
+                    {% endfor %}
+                    {% for error in form.non_field_errors %}
+                    <p class="text-sm">{{ error }}</p>
+                    {% endfor %}
+                </div>
+                {% endif %}
+                
+                {# Username/Email Field #}
+                <div class="space-y-1.5">
+                    <label class="block text-xs font-semibold rs-text-on-surface-variant uppercase tracking-wider ml-1" for="{{ form.username.id_for_label }}">{{ form.username.label }}</label>
+                    <input type="text" name="{{ form.username.html_name }}" id="{{ form.username.id_for_label }}"
+                           class="w-full rs-input-field px-4 py-3 rounded-t-lg rs-text-on-surface placeholder:rs-text-outline transition-all duration-300"
+                           placeholder="Username or email"
+                           value="{{ form.username.value|default_if_none:'' }}"
+                           {% if form.username.field.required %}required{% endif %}
+                           autocomplete="username">
+                </div>
+                
+                {# Password Field #}
+                <div class="space-y-1.5">
+                    <div class="flex justify-between items-center">
+                        <label class="block text-xs font-semibold rs-text-on-surface-variant uppercase tracking-wider ml-1" for="{{ form.password.id_for_label }}">{{ form.password.label }}</label>
+                        <a href="{% url 'password_reset' %}" class="text-xs font-medium rs-text-secondary hover:rs-text-primary transition-colors">Forgot Password?</a>
+                    </div>
+                    <div class="relative">
+                        <input type="password" name="{{ form.password.html_name }}" id="{{ form.password.id_for_label }}"
+                               class="w-full rs-input-field px-4 py-3 pr-12 rounded-t-lg rs-text-on-surface placeholder:rs-text-outline transition-all duration-300"
+                               placeholder="••••••••"
+                               {% if form.password.field.required %}required{% endif %}
+                               autocomplete="current-password">
+                        <button type="button" class="absolute right-3 top-1/2 -translate-y-1/2 rs-text-outline hover:rs-text-primary transition-colors" onclick="togglePasswordVisibility()">
+                            <i class="fas fa-eye" id="togglePasswordIcon"></i>
+                        </button>
+                    </div>
+                </div>
+                
+                {# Primary Action #}
+                <button type="submit" class="w-full py-4 rs-btn-primary font-semibold rounded-lg shadow-lg shadow-[#855300]/20">
+                    Sign In to Sanctuary
+                </button>
+            </form>
+            
+            <div class="mt-10 text-center">
+                <p class="rs-text-on-surface-variant text-sm">
+                    New to Kailasa? 
+                    <a href="{% url 'register' %}" class="rs-text-secondary font-bold ml-1 hover:underline underline-offset-4 decoration-secondary/30">Create Account</a>
+                </p>
+            </div>
+        </div>
+        
+        {# Footer #}
+        <div class="mt-12 text-center">
+            <p class="font-label text-xs rs-text-outline tracking-widest uppercase">&copy; {% now "Y" %} Yoga Kailasa. Radiant Sanctuary.</p>
+        </div>
     </div>
-</section>
+</div>
+
+<script>
+function togglePasswordVisibility() {
+    const passwordInput = document.getElementById('{{ form.password.id_for_label }}');
+    const toggleIcon = document.getElementById('togglePasswordIcon');
+    if (passwordInput.type === 'password') {
+        passwordInput.type = 'text';
+        toggleIcon.classList.remove('fa-eye');
+        toggleIcon.classList.add('fa-eye-slash');
+    } else {
+        passwordInput.type = 'password';
+        toggleIcon.classList.remove('fa-eye-slash');
+        toggleIcon.classList.add('fa-eye');
+    }
+}
+</script>
 {% endblock %}

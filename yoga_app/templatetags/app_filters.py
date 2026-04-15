@@ -57,3 +57,54 @@ def multiply(value, arg):
         return float(value) * float(arg)
     except (ValueError, TypeError):
         return '' # Return empty string or handle error as preferred
+
+@register.filter
+def read_time(value):
+    """
+    Estimates reading time in minutes for a given HTML/text string.
+    Based on an average reading speed of 200 words per minute.
+    """
+    import re
+    if not value:
+        return 1
+    text = re.sub(r'<[^>]+>', '', str(value))
+    word_count = len(text.split())
+    minutes = max(1, round(word_count / 200))
+    return minutes
+
+
+@register.filter
+def embed_url(value):
+    """
+    Converts a YouTube URL to an embed URL.
+    Handles watch, short (youtu.be), Shorts, and existing embed URLs.
+    """
+    import re
+    import html as _html
+
+    if not value:
+        return ''
+
+    value = _html.unescape(str(value).strip())
+
+    # Already an embed URL (regular or nocookie) — return clean version
+    match = re.search(r'(?:youtube\.com|youtube-nocookie\.com)/embed/([a-zA-Z0-9_-]+)', value)
+    if match:
+        return f'https://www.youtube-nocookie.com/embed/{match.group(1)}'
+
+    # YouTube Shorts: youtube.com/shorts/VIDEO_ID
+    match = re.search(r'youtube\.com/shorts/([a-zA-Z0-9_-]+)', value)
+    if match:
+        return f'https://www.youtube-nocookie.com/embed/{match.group(1)}'
+
+    # Standard watch URL: ?v=VIDEO_ID
+    match = re.search(r'[?&]v=([a-zA-Z0-9_-]+)', value)
+    if match:
+        return f'https://www.youtube-nocookie.com/embed/{match.group(1)}'
+
+    # Short URL: youtu.be/VIDEO_ID
+    match = re.search(r'youtu\.be/([a-zA-Z0-9_-]+)', value)
+    if match:
+        return f'https://www.youtube-nocookie.com/embed/{match.group(1)}'
+
+    return value

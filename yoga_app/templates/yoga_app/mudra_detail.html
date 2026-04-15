@@ -1,0 +1,176 @@
+{% extends 'yoga_app/base.html' %}
+{% load static %}
+{% load app_filters %}
+
+{% block title %}{{ mudra.name }} — Sacred Mudras | Yoga Kailasa{% endblock %}
+{% block meta_description %}{{ mudra.description|truncatechars:160 }}{% endblock %}
+
+{% block extra_css %}
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif:ital,wght@0,400;0,700;1,400&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+    body { font-family:'Manrope',sans-serif; background:#fff8f3; }
+    .rs-headline { font-family:'Noto Serif',serif; line-height:1.4; }
+    .rs-glass { background:rgba(255,248,243,0.85); backdrop-filter:blur(20px); }
+    .rs-btn-primary { background:linear-gradient(135deg,#855300 0%,#f59e0b 100%); color:#fff; transition:all .3s; }
+    .rs-btn-secondary { background-color:#f1e7db; color:#855300; transition:all .3s; }
+    .rs-btn-secondary:hover { background-color:#ebe1d6; }
+    .step-number { width:2rem; height:2rem; border-radius:50%; background:linear-gradient(135deg,#855300,#f59e0b); color:#fff; display:flex; align-items:center; justify-content:center; font-weight:700; font-size:.85rem; flex-shrink:0; }
+    .detail-page > header, .detail-page > #mobile-menu, .detail-page > #mobile-menu-overlay, .detail-page > #backToTopBtn { display:none !important; }
+    .detail-page > main { padding:0 !important; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="detail-page min-h-screen" style="background:#fff8f3;">
+
+    <nav class="fixed top-0 w-full z-50 rs-glass shadow-sm">
+        <div class="flex justify-between items-center px-6 md:px-10 py-4 max-w-7xl mx-auto">
+            <a href="{% url 'home' %}" class="rs-headline text-xl font-bold" style="color:#855300;">Yoga Kailasa</a>
+            <a href="{% url 'mudras' %}" class="text-sm font-medium" style="color:#534434;">← Back to Mudras</a>
+        </div>
+    </nav>
+
+    <main class="pt-24 pb-20">
+        <div class="max-w-5xl mx-auto px-6 md:px-12">
+
+            {# Hero #}
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-12 mb-16 items-center">
+                <div class="space-y-4">
+                    <p class="text-xs uppercase tracking-widest font-semibold" style="color:#867461;">{{ mudra.get_difficulty_display }} · {{ mudra.get_associated_chakra_display }}</p>
+                    <h1 class="rs-headline text-5xl font-bold" style="color:#1f1b14;">{{ mudra.name }}</h1>
+                    {% if mudra.sanskrit_name %}
+                    <p class="rs-headline text-2xl italic" style="color:#867461;">{{ mudra.sanskrit_name }}</p>
+                    {% endif %}
+                    {% if mudra.duration %}
+                    <p class="text-sm" style="color:#534434;"><i class="fas fa-clock mr-2" style="color:#f59e0b;"></i>Hold for {{ mudra.duration }}</p>
+                    {% endif %}
+                    <p class="text-lg leading-relaxed" style="color:#534434;">{{ mudra.description }}</p>
+                </div>
+                <div class="aspect-square rounded-2xl overflow-hidden" style="background:#f1e7db;">
+                    {% if mudra.image_url %}
+                    <img src="{{ mudra.image_url }}" alt="{{ mudra.name }}" class="w-full h-full object-cover">
+                    {% else %}
+                    <div class="w-full h-full flex items-center justify-center">
+                        <i class="fas fa-hand-paper text-8xl" style="color:#d8c3ad;"></i>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            {# Instructions #}
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
+                <div class="p-8 rounded-2xl" style="background:#fdf2e7;">
+                    <h2 class="rs-headline text-2xl font-bold mb-6" style="color:#855300;">How to Practice</h2>
+                    <div class="space-y-4">
+                        {% for step in mudra.instructions|split_lines %}
+                        <div class="flex gap-4 items-start">
+                            <div class="step-number">{{ forloop.counter }}</div>
+                            <p class="text-sm leading-relaxed pt-1" style="color:#534434;">{{ step }}</p>
+                        </div>
+                        {% empty %}
+                        <p style="color:#534434;">{{ mudra.instructions }}</p>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                {% if mudra.benefits %}
+                <div class="p-8 rounded-2xl" style="background:#f1e7db;">
+                    <h2 class="rs-headline text-2xl font-bold mb-6" style="color:#855300;">Benefits</h2>
+                    <div class="space-y-3">
+                        {% for benefit in mudra.benefits|split_lines %}
+                        <div class="flex gap-3 items-start">
+                            <i class="fas fa-leaf mt-1 text-sm" style="color:#f59e0b;"></i>
+                            <p class="text-sm leading-relaxed" style="color:#534434;">{{ benefit }}</p>
+                        </div>
+                        {% empty %}
+                        <p style="color:#534434;">{{ mudra.benefits }}</p>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+
+            {# Video #}
+            {% if mudra.video_url %}
+            <div class="mb-12">
+                <h2 class="rs-headline text-2xl font-bold mb-6" style="color:#855300;">Video Guide</h2>
+                <div class="aspect-video rounded-2xl overflow-hidden relative" style="background:#f1e7db;" id="video-wrapper">
+                    {# Fallback shown until iframe loads successfully #}
+                    <div id="video-fallback" class="absolute inset-0 flex flex-col items-center justify-center gap-4 p-8 text-center" style="display:none!important;">
+                        <i class="fas fa-play-circle text-6xl" style="color:#d8c3ad;"></i>
+                        <p class="rs-headline text-xl font-bold" style="color:#855300;">Video Guide</p>
+                        <p class="text-sm" style="color:#534434;">This video cannot be embedded directly. Watch it on YouTube instead.</p>
+                        <a href="{{ mudra.video_url }}" target="_blank" rel="noopener noreferrer"
+                           class="inline-flex items-center gap-2 px-6 py-3 rounded-xl font-semibold text-sm text-white"
+                           style="background:linear-gradient(135deg,#855300,#f59e0b);">
+                            <i class="fab fa-youtube"></i> Watch on YouTube
+                        </a>
+                    </div>
+                    <iframe id="video-iframe"
+                            src="{{ mudra.video_url|embed_url }}"
+                            class="w-full h-full"
+                            frameborder="0"
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                            allowfullscreen
+                            referrerpolicy="strict-origin-when-cross-origin"></iframe>
+                </div>
+            </div>
+            <script>
+            (function() {
+                var iframe = document.getElementById('video-iframe');
+                var fallback = document.getElementById('video-fallback');
+                if (!iframe || !fallback) return;
+
+                // YouTube Error 153 and other embed-disabled errors fire a message event
+                window.addEventListener('message', function(e) {
+                    try {
+                        var data = typeof e.data === 'string' ? JSON.parse(e.data) : e.data;
+                        // YouTube player sends error codes via postMessage
+                        if (data && data.event === 'onError' && (data.info === 153 || data.info === 150 || data.info === 101)) {
+                            iframe.style.display = 'none';
+                            fallback.style.display = 'flex';
+                        }
+                    } catch(err) {}
+                });
+
+                // Also catch load errors — if the iframe src fails to load at all
+                iframe.addEventListener('load', function() {
+                    try {
+                        // If the iframe loaded chrome-error:// or about:blank it failed
+                        var src = iframe.src || '';
+                        if (!src || src === 'about:blank') {
+                            iframe.style.display = 'none';
+                            fallback.style.display = 'flex';
+                        }
+                    } catch(err) {
+                        // Cross-origin access blocked — iframe loaded something, probably fine
+                    }
+                });
+
+                iframe.addEventListener('error', function() {
+                    iframe.style.display = 'none';
+                    fallback.style.display = 'flex';
+                });
+            })();
+            </script>
+            {% endif %}
+
+            {# Related #}
+            {% if related_mudras %}
+            <div>
+                <h2 class="rs-headline text-2xl font-bold mb-8" style="color:#855300;">Related Mudras</h2>
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    {% for m in related_mudras %}
+                    <a href="{% url 'mudra_detail' m.id %}" class="block p-4 rounded-xl transition-all hover:-translate-y-1" style="background:#fdf2e7;">
+                        <p class="rs-headline font-bold text-sm mb-1" style="color:#1f1b14;">{{ m.name }}</p>
+                        {% if m.sanskrit_name %}<p class="text-xs italic" style="color:#867461;">{{ m.sanskrit_name }}</p>{% endif %}
+                    </a>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+
+        </div>
+    </main>
+</div>
+{% endblock %}

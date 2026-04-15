@@ -16,7 +16,7 @@ from .models import (
     DiscussionPost,
     Lesson,
     LessonComment,
-    BlogPostCategory, BlogPost, BlogComment # NEW: Import Blog models
+    BlogPostCategory, BlogPost, BlogComment, Tag,
 )
 
 # Common Tailwind CSS classes for form inputs
@@ -67,7 +67,7 @@ class UserRegisterForm(UserCreationForm):
 class UserLoginForm(AuthenticationForm):
     """
     Custom form for user login. Extends Django's AuthenticationForm.
-    Primarily used for rendering with custom styling and allowing email/username login.
+    Allows inactive users through (verification handled by view).
     """
     username = forms.CharField(
         label="Username or Email",
@@ -77,13 +77,14 @@ class UserLoginForm(AuthenticationForm):
         label="Password",
         widget=forms.PasswordInput(attrs={'class': TAILWIND_INPUT_CLASSES, 'placeholder': 'Enter your password'})
     )
-    
-    # Override the clean method to allow login by email or username
-    def clean(self):
-        # Call the parent's clean method first to get initial validation errors
-        # and populate self.cleaned_data
-        super().clean() 
 
+    def confirm_login_allowed(self, user):
+        # Allow inactive users through - CustomLoginView handles verification check
+        pass
+    
+    def clean(self):
+        # Skip parent's clean() which uses authenticate() that blocks inactive users
+        # Do our own authentication logic
         username_or_email = self.cleaned_data.get('username')
         password = self.cleaned_data.get('password')
 
@@ -97,18 +98,22 @@ class UserLoginForm(AuthenticationForm):
                     user_obj = User.objects.get(email=username_or_email)
                     self.user_cache = authenticate(self.request, username=user_obj.username, password=password)
                 except User.DoesNotExist:
-                    pass # User not found by email, authentication remains None
+                    pass
+
+            # If still None, try direct authentication for inactive users
+            if self.user_cache is None:
+                try:
+                    user_obj = User.objects.get(username=username_or_email)
+                    if user_obj.check_password(password):
+                        self.user_cache = user_obj
+                except User.DoesNotExist:
+                    pass
 
             if self.user_cache is None:
                 raise forms.ValidationError(
                     self.error_messages['invalid_login'],
                     code='invalid_login',
                     params={'username': self.username_field.verbose_name},
-                )
-            elif not self.user_cache.is_active:
-                raise forms.ValidationError(
-                    self.error_messages['inactive'],
-                    code='inactive',
                 )
         return self.cleaned_data
 
@@ -180,6 +185,11 @@ class BookingForm(forms.ModelForm):
         widget=forms.Select(attrs={'class': TAILWIND_INPUT_CLASSES}),
         label="Preferred Time"
     )
+    phone_number = forms.CharField(
+        required=False,
+        label="Phone Number",
+        widget=forms.TextInput(attrs={'class': TAILWIND_INPUT_CLASSES, 'placeholder': 'Enter your phone number'})
+    )
     message = forms.CharField(
         widget=forms.Textarea(attrs={'class': TAILWIND_INPUT_CLASSES + ' rows-4', 'placeholder': 'Any specific requests or questions?'}),
         required=False,
@@ -188,7 +198,7 @@ class BookingForm(forms.ModelForm):
 
     class Meta:
         model = Booking
-        fields = ['full_name', 'email', 'preferred_date', 'preferred_time', 'message']
+        fields = ['full_name', 'email', 'phone_number', 'preferred_date', 'preferred_time', 'message']
         widgets = {
             'full_name': forms.TextInput(attrs={'class': TAILWIND_INPUT_CLASSES, 'placeholder': 'Enter your name'}),
             'email': forms.EmailInput(attrs={'class': TAILWIND_INPUT_CLASSES, 'placeholder': 'Enter your email'}),
@@ -353,3 +363,50 @@ class BlogCommentForm(forms.ModelForm):
         labels = {
             'content': 'Your Comment',
         }
+
+
+# Form for creating/editing a Blog Post (frontend editor)
+class BlogPostForm(forms.ModelForm):
+    """
+    Frontend blog post editor for authenticated users.
+    Submitted posts are saved as drafts (is_published=False) pending staff review.
+    Staff users can also toggle is_published directly.
+    """
+    title = forms.CharField(
+        widget=forms.TextInput(attrs={
+            'class': TAILWIND_INPUT_CLASSES,
+            'placeholder': 'Post title',
+        }),
+        label='Title',
+    )
+    excerpt = forms.CharField(
+        required=False,
+        widget=forms.Textarea(attrs={
+            'rows': 3,
+            'class': TAILWIND_INPUT_CLASSES,
+            'placeholder': 'Short summary shown in the blog listing (optional)',
+        }),
+        label='Excerpt',
+    )
+    category = forms.ModelChoiceField(
+        queryset=BlogPostCategory.objects.all().order_by('name'),
+        required=False,
+        empty_label='— Select a category —',
+        widget=forms.Select(attrs={'class': TAILWIND_INPUT_CLASSES}),
+        label='Category',
+    )
+    tags = forms.ModelMultipleChoiceField(
+        queryset=Tag.objects.all().order_by('name'),
+        required=False,
+        widget=forms.CheckboxSelectMultiple(),
+        label='Tags',
+    )
+    featured_image = forms.ImageField(
+        required=False,
+        label='Featured Image',
+        widget=forms.ClearableFileInput(attrs={'class': TAILWIND_INPUT_CLASSES}),
+    )
+
+    class Meta:
+        model = BlogPost
+        fields = ['title', 'excerpt', 'content', 'category', 'tags', 'featured_image']

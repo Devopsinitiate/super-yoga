@@ -1,122 +1,244 @@
 {% extends 'yoga_app/base.html' %}
 {% load static %}
+{% load app_filters %}
 
 {% block title %}{{ technique.name }} - Yoga Kailasa{% endblock %}
 
-{# NEW: Meta Description for SEO #}
 {% block meta_description %}Learn the {{ technique.name }} ({{ technique.sanskrit_name }}) breathing technique. Detailed instructions and video demonstration for mastering this pranayama.{% endblock %}
 
-{# NEW: Open Graph Tags for Social Sharing #}
 {% block og_title %}{{ technique.name }} - Breathing Technique{% endblock %}
 {% block og_description %}Learn the {{ technique.name }} ({{ technique.sanskrit_name }}) breathing technique. Detailed instructions and video demonstration for mastering this pranayama.{% endblock %}
 {% block og_image %}{% if technique.image_url %}{{ technique.image_url }}{% else %}{% static 'yoga_app/images/default_breathing_og_image.jpg' %}{% endif %}{% endblock %}
 
 {% block extra_css %}
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif:ital,wght@0,400;0,700;1,400&family=Manrope:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
-    /* CSS for the fade-in-up animation, specific to detail pages */
-    @keyframes fadeInUp {
-        from {
-            opacity: 0;
-            transform: translateY(20px);
-        }
-        to {
-            opacity: 1;
-            transform: translateY(0);
-        }
+    body { font-family: 'Manrope', sans-serif; }
+    .rs-headline { font-family: 'Noto Serif', serif; line-height: 1.4; }
+    
+    .rs-surface { background-color: #fff8f3; }
+    .rs-surface-container { background-color: #f7ece1; }
+    .rs-surface-container-low { background-color: #fdf2e7; }
+    .rs-surface-container-lowest { background-color: #ffffff; }
+    .rs-surface-container-high { background-color: #f1e7db; }
+    .rs-surface-container-highest { background-color: #ebe1d6; }
+    .rs-surface-dim { background-color: #e2d8cd; }
+    
+    .rs-on-surface { color: #1f1b14; }
+    .rs-on-surface-variant { color: #534434; }
+    .rs-primary { color: #855300; }
+    .rs-secondary { color: #a73a00; }
+    .rs-outline { color: #867461; }
+    .rs-outline-variant { color: #d8c3ad; }
+    .rs-primary-container { color: #f59e0b; }
+    .rs-on-primary { color: #ffffff; }
+    .rs-on-primary-container { color: #613b00; }
+    .rs-on-secondary-container { color: #571a00; }
+    .rs-secondary-fixed { background-color: #ffdbce; }
+    .rs-on-secondary-fixed { color: #370e00; }
+    
+    .rs-glass {
+        background-color: rgba(255, 248, 243, 0.8);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
     }
-    .animate-fade-in-up {
-        opacity: 0; /* Hidden by default */
-        animation: fadeInUp 0.6s ease-out forwards;
+    
+    .rs-btn-primary {
+        background: linear-gradient(135deg, #855300 0%, #f59e0b 100%);
+        color: #ffffff;
+        transition: all 0.3s ease;
     }
-    /* Ensure image styling is consistent */
-    .detail-image {
-        width: 100%;
-        height: auto;
-        max-height: 384px; /* max-h-96 equivalent */
-        object-fit: cover;
-        border-radius: 0.5rem; /* rounded-lg */
-        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* shadow-md */
+    .rs-btn-primary:hover {
+        opacity: 0.92;
+        transform: scale(1.02);
     }
-    /* Ensure video container aspect ratio */
-    .video-container {
-        position: relative;
-        padding-bottom: 56.25%; /* 16:9 aspect ratio */
-        height: 0;
-        overflow: hidden;
-        max-width: 100%;
-        background: #000;
-        border-radius: 0.5rem; /* rounded-lg */
-        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* shadow-md */
+    
+    .rs-btn-secondary {
+        background-color: #f1e7db;
+        color: #855300;
+        transition: all 0.3s ease;
     }
-    .video-container iframe {
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
+    .rs-btn-secondary:hover {
+        background-color: #ebe1d6;
+    }
+    
+    /* Hide base.html elements */
+    .breathing-detail-page > header,
+    .breathing-detail-page > #mobile-menu,
+    .breathing-detail-page > #mobile-menu-overlay,
+    .breathing-detail-page > #backToTopBtn {
+        display: none !important;
+    }
+    
+    /* CKEditor content styling */
+    .rs-lesson-content h1, .rs-lesson-content h2, .rs-lesson-content h3 {
+        font-family: 'Noto Serif', serif;
+        color: #855300;
+        margin-top: 1.5rem;
+        margin-bottom: 0.75rem;
+    }
+    .rs-lesson-content p {
+        margin-bottom: 1rem;
+        line-height: 1.7;
+        color: #534434;
+    }
+    .rs-lesson-content ul, .rs-lesson-content ol {
+        margin-left: 1.5rem;
+        margin-bottom: 1rem;
+    }
+    .rs-lesson-content img {
+        border-radius: 0.75rem;
+        margin: 1rem 0;
     }
 </style>
 {% endblock %}
 
 {% block content %}
-<section class="py-16 bg-gradient-to-r from-amber-100 to-amber-50 min-h-screen">
-    <div class="container mx-auto px-4 max-w-3xl">
-        <div class="bg-white p-8 rounded-xl shadow-lg animate-fade-in-up">
-            <div class="flex flex-col md:flex-row items-start md:space-x-8">
-                <div class="md:w-1/2 mb-6 md:mb-0 animate-fade-in-up" style="animation-delay: 0.2s;">
-                    {% if technique.image_url %}
-                        <img src="{{ technique.image_url }}" alt="{{ technique.name }}" class="detail-image">
-                    {% else %}
-                        <div class="w-full h-72 bg-gray-200 rounded-lg shadow-md flex items-center justify-center">
-                            <i class="fas fa-lungs text-6xl text-gray-400"></i>
-                        </div>
-                    {% endif %}
-                </div>
-                <div class="md:w-1/2 animate-fade-in-up" style="animation-delay: 0.3s;">
-                    <h2 class="text-3xl font-bold text-gray-800 mb-2">{{ technique.name }}</h2>
-                    {% if technique.sanskrit_name %}
-                        <p class="text-amber-600 text-lg mb-4">Sanskrit: {{ technique.sanskrit_name }}</p>
-                    {% endif %}
-
-                    <div class="flex items-center text-gray-600 text-sm mb-4">
-                        <i class="fas fa-clock text-amber-500 mr-2"></i>
-                        <span>Recommended Duration: {{ technique.duration }}</span>
-                    </div>
-
-                    <h3 class="text-xl font-bold text-gray-800 mb-2">Description:</h3>
-                    <div class="prose max-w-none text-gray-700 mb-4">
-                        <p>{{ technique.description|safe }}</p>
-                    </div>
-
-                    <h3 class="text-xl font-bold text-gray-800 mb-2">Instructions:</h3>
-                    <div class="prose max-w-none text-gray-700 mb-4">
-                        <p>{{ technique.instructions|safe }}</p>
-                    </div>
-                </div>
+<div class="breathing-detail-page rs-surface min-h-screen selection:bg-[#f59e0b]/30">
+    {# Top Navigation Bar #}
+    <nav class="fixed top-0 w-full z-50 rs-glass bg-gradient-to-b from-[#f1e7db]/50 to-transparent">
+        <div class="flex justify-between items-center px-6 md:px-8 py-6 max-w-7xl mx-auto">
+            <a href="{% url 'home' %}" class="text-2xl font-bold tracking-tight rs-primary rs-headline">
+                Yoga Kailasa
+            </a>
+            <div class="hidden md:flex items-center gap-10">
+                <a href="{% url 'breathing' %}" class="rs-primary font-medium transition-transform duration-200 scale-95">Practices</a>
+                <a href="{% url 'courses' %}" class="rs-on-surface-variant/60 hover:rs-secondary transition-colors duration-300">Courses</a>
+                <a href="{% url 'blog_list' %}" class="rs-on-surface-variant/60 hover:rs-secondary transition-colors duration-300">Community</a>
             </div>
-
-            {# NEW: Video Demonstration Section #}
-            {% if technique.video_url %}
-            <div class="mt-8 pt-8 border-t border-gray-200 animate-fade-in-up" style="animation-delay: 0.4s;">
-                <h3 class="text-2xl font-bold text-gray-800 mb-4 text-center">Video Demonstration</h3>
-                <div class="video-container">
-                    <iframe
-                        src="{{ technique.video_url }}"
-                        frameborder="0"
-                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                        allowfullscreen
-                    ></iframe>
-                </div>
-                <p class="text-center text-gray-600 text-sm mt-4">Note: Ensure the video URL is an embed link (e.g., from YouTube's "Share > Embed" option).</p>
-            </div>
-            {% endif %}
-
-            <div class="mt-6 text-center animate-fade-in-up" style="animation-delay: 0.5s;">
-                <a href="{% url 'breathing' %}" class="inline-block bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-full transition duration-300 transform hover:scale-105">
-                    Back to All Techniques <i class="fas fa-arrow-left ml-2"></i>
+            <div class="flex items-center gap-4">
+                {% if user.is_authenticated %}
+                <a href="{% url 'profile_edit' %}" class="rs-on-surface-variant hover:rs-primary transition-colors scale-95 p-2">
+                    <i class="fas fa-user-circle text-xl"></i>
                 </a>
+                {% else %}
+                <a href="{% url 'login' %}" class="rs-on-surface-variant hover:rs-primary font-medium transition-all">Sign In</a>
+                {% endif %}
             </div>
         </div>
-    </div>
-</section>
+    </nav>
+
+    <main class="pt-32 pb-20">
+        {# Back Navigation #}
+        <div class="max-w-5xl mx-auto px-6 mb-8">
+            <a href="{% url 'breathing' %}" class="flex items-center gap-2 group rs-secondary font-medium transition-all duration-300">
+                <i class="fas fa-arrow-left text-xl transition-transform group-hover:-translate-x-1"></i>
+                <span class="uppercase tracking-widest text-xs">Back to All Techniques</span>
+            </a>
+        </div>
+
+        {# Hero Section: Asymmetric & Meditative #}
+        <section class="max-w-7xl mx-auto px-6 mb-24 grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+            <div class="lg:col-span-7 relative">
+                <div class="aspect-[4/5] md:aspect-[16/10] overflow-hidden rounded-xl rs-surface-container-low">
+                    {% if technique.image_url %}
+                    <img src="{{ technique.image_url }}" alt="{{ technique.name }}" class="w-full h-full object-cover">
+                    {% else %}
+                    <div class="w-full h-full rs-surface-container flex items-center justify-center">
+                        <i class="fas fa-lungs text-8xl rs-primary/10"></i>
+                    </div>
+                    {% endif %}
+                </div>
+                {# Floating Detail Card #}
+                <div class="absolute -bottom-8 -right-4 lg:-right-8 rs-surface-container-lowest p-8 rounded-xl shadow-2xl shadow-[#1f1b14]/5 max-w-xs border border-[#d8c3ad]/10">
+                    {% if technique.duration %}
+                    <p class="rs-secondary font-semibold text-xs tracking-widest uppercase mb-2">Duration</p>
+                    <p class="text-3xl rs-headline rs-primary mb-4">{{ technique.duration }}</p>
+                    {% endif %}
+                    <p class="rs-on-surface-variant text-sm leading-relaxed">{{ technique.description|striptags|truncatechars:120 }}</p>
+                </div>
+            </div>
+            <div class="lg:col-span-5 pt-12 lg:pt-0">
+                <span class="rs-secondary font-medium tracking-[0.2em] uppercase text-sm mb-6 block">Pranayama Series</span>
+                <h1 class="text-5xl md:text-7xl rs-headline rs-on-surface leading-[1.1] mb-4">{{ technique.name }}</h1>
+                {% if technique.sanskrit_name %}
+                <p class="text-2xl rs-headline italic rs-primary/70 mb-8">{{ technique.sanskrit_name }}</p>
+                {% endif %}
+                <div class="h-px w-24 bg-[#f59e0b] mb-8"></div>
+                <div class="rs-on-surface-variant text-lg leading-relaxed mb-10 rs-lesson-content">
+                    {{ technique.description|safe }}
+                </div>
+                <div class="flex gap-4 flex-wrap">
+                    {% if technique.video_url %}
+                    <a href="#video-section" class="rs-btn-primary px-8 py-4 rounded-md font-semibold transition-transform active:scale-95">
+                        Watch Demonstration
+                    </a>
+                    {% endif %}
+                    <a href="#instructions-section" class="rs-btn-secondary px-8 py-4 rounded-md font-semibold">
+                        Read Instructions
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        {# Video Demonstration: Cinematic #}
+        {% if technique.video_url %}
+        <section id="video-section" class="rs-surface-container-low py-24 mb-24">
+            <div class="max-w-5xl mx-auto px-6">
+                <div class="text-center mb-12">
+                    <h2 class="text-3xl md:text-4xl rs-headline rs-on-surface mb-4">Master the Technique</h2>
+                    <p class="rs-on-surface-variant max-w-2xl mx-auto">Watch our lead instructor demonstrate the precise hand mudras and rhythmic pacing required for effective practice.</p>
+                </div>
+                <div class="relative group aspect-video rounded-xl overflow-hidden shadow-2xl">
+                    <iframe src="{{ technique.video_url|embed_url }}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen referrerpolicy="strict-origin-when-cross-origin" class="w-full h-full"></iframe>
+                </div>
+            </div>
+        </section>
+        {% endif %}
+
+        {# Instructions: Structured & Elegant #}
+        <section id="instructions-section" class="max-w-4xl mx-auto px-6 grid grid-cols-1 gap-16">
+            <div>
+                <h2 class="text-3xl rs-headline rs-on-surface mb-8 flex items-center gap-4">
+                    <span class="w-12 h-[1px] bg-[#d8c3ad]"></span>
+                    Step-by-Step Guide
+                </h2>
+                <div class="rs-lesson-content rs-on-surface-variant leading-relaxed space-y-8">
+                    {{ technique.instructions|safe }}
+                </div>
+            </div>
+
+            {# Benefits Bento Card #}
+            {% if technique.description %}
+            <div class="rs-surface-container-high rounded-xl p-10 md:p-14">
+                <h3 class="text-2xl rs-headline rs-secondary mb-10 text-center">Benefits of Practice</h3>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                    <div class="text-center p-4">
+                        <i class="fas fa-brain text-4xl rs-primary mb-4"></i>
+                        <h5 class="font-bold mb-2 rs-on-surface">Mental Clarity</h5>
+                        <p class="text-sm rs-on-surface-variant">Balances the left and right hemispheres of the brain for heightened focus.</p>
+                    </div>
+                    <div class="text-center p-4">
+                        <i class="fas fa-spa text-4xl rs-primary mb-4"></i>
+                        <h5 class="font-bold mb-2 rs-on-surface">Stress Reduction</h5>
+                        <p class="text-sm rs-on-surface-variant">Activates the parasympathetic nervous system, lowering cortisol levels.</p>
+                    </div>
+                    <div class="text-center p-4">
+                        <i class="fas fa-wind text-4xl rs-primary mb-4"></i>
+                        <h5 class="font-bold mb-2 rs-on-surface">Respiratory Health</h5>
+                        <p class="text-sm rs-on-surface-variant">Increases lung capacity and improves overall oxygenation of the blood.</p>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+        </section>
+    </main>
+
+    {# Footer #}
+    <footer class="w-full mt-20 rs-surface-dim">
+        <div class="flex flex-col md:flex-row justify-between items-center px-6 md:px-12 py-10 max-w-7xl mx-auto font-['Manrope'] text-sm tracking-wide">
+            <div class="rs-headline text-lg italic rs-primary mb-6 md:mb-0">
+                Yoga Kailasa.
+            </div>
+            <div class="rs-on-surface-variant/70 opacity-80 hover:opacity-100 transition-all mb-6 md:mb-0">
+                &copy; {% now "Y" %} Yoga Kailasa. The Radiant Sanctuary.
+            </div>
+            <div class="flex gap-8">
+                <a href="{% url 'contact' %}" class="rs-on-surface-variant/70 hover:rs-secondary transition-all">Support</a>
+                <a href="{% url 'privacy_policy' %}" class="rs-on-surface-variant/70 hover:rs-secondary transition-all">Privacy Policy</a>
+                <a href="{% url 'home' %}" class="rs-on-surface-variant/70 hover:rs-secondary transition-all">Terms of Service</a>
+            </div>
+        </div>
+    </footer>
+</div>
 {% endblock %}

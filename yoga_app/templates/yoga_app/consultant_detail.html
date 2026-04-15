@@ -1,136 +1,294 @@
 {% extends 'yoga_app/base.html' %}
 {% load static %}
 
-{% block title %}{{ consultant.name }} - Yoga Kailasa Consultant{% endblock %}
+{% block title %}{{ consultant.name }} - Yoga Kailasa{% endblock %}
 
 {% block meta_description %}Learn more about {{ consultant.name }}, our expert in {{ consultant.specialty }}. View their bio and contact information for personalized sessions.{% endblock %}
 
-{% block og_title %}{{ consultant.name }} - Yoga Kailasa Consultant{% endblock %}
+{% block og_title %}{{ consultant.name }} - Yoga Kailasa{% endblock %}
 {% block og_description %}Learn more about {{ consultant.name }}, our expert in {{ consultant.specialty }}. View their bio and contact information for personalized sessions.{% endblock %}
 {% block og_image %}{% if consultant.profile_picture_url %}{{ consultant.profile_picture_url }}{% else %}{% static 'yoga_app/images/default_consultant_og_image.jpg' %}{% endif %}{% endblock %}
 
-
 {% block extra_css %}
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif:ital,wght@0,400;0,700;1,400&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
-    /* CSS for the fade-in-up animation, specific to consultant_detail.html elements */
-    @keyframes fadeInUp {
-        from {
-            opacity: 0;
-            transform: translateY(20px);
-        }
-        to {
-            opacity: 1;
-            transform: translateY(0);
-        }
+    .consultant-detail-page {
+        font-family: 'Manrope', sans-serif;
+        background-color: #fff8f3;
+        color: #1f1b14;
+        min-height: 100vh;
     }
-    .animate-fade-in-up {
-        opacity: 0; /* Hidden by default */
-        animation: fadeInUp 0.6s ease-out forwards;
+    .consultant-detail-page .rs-headline {
+        font-family: 'Noto Serif', serif;
+        line-height: 1.4;
     }
-    /* Styling for CKEditor content within the consultant bio */
-    .consultant-bio-content h1, .consultant-bio-content h2, .consultant-bio-content h3, .consultant-bio-content h4, .consultant-bio-content h5, .consultant-bio-content h6 {
-        @apply text-gray-800 font-bold mt-6 mb-3;
+    .consultant-detail-page .rs-glass {
+        background-color: rgba(255, 248, 243, 0.8);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
     }
-    .consultant-bio-content h1 { @apply text-3xl; }
-    .consultant-bio-content h2 { @apply text-2xl; }
-    .consultant-bio-content h3 { @apply text-xl; }
-    .consultant-bio-content p {
-        @apply mb-4 leading-relaxed;
+    .consultant-detail-page .rs-btn-primary {
+        background: linear-gradient(135deg, #855300 0%, #f59e0b 100%);
+        color: #ffffff;
+        transition: all 0.3s ease;
     }
-    .consultant-bio-content ul, .consultant-bio-content ol {
-        @apply list-inside mb-4 pl-4;
+    .consultant-detail-page .rs-btn-primary:hover {
+        opacity: 0.92;
+        transform: scale(1.02);
     }
-    .consultant-bio-content ul { @apply list-disc; }
-    .consultant-bio-content ol { @apply list-decimal; }
-    .consultant-bio-content a {
-        @apply text-blue-600 hover:underline;
+    .consultant-detail-page .rs-btn-secondary {
+        background-color: #f1e7db;
+        color: #855300;
+        transition: all 0.3s ease;
     }
-    .consultant-bio-content img {
-        @apply max-w-full h-auto rounded-lg shadow-md my-6 mx-auto block;
+    .consultant-detail-page .rs-btn-secondary:hover {
+        background-color: #ebe1d6;
     }
-    .consultant-bio-content blockquote {
-        @apply border-l-4 border-amber-500 pl-4 py-2 my-4 italic text-gray-700;
+    .consultant-detail-page .rs-cta-card {
+        background-color: #855300;
+        color: #ffffff;
     }
-    .consultant-bio-content pre {
-        @apply bg-gray-100 p-4 rounded-md overflow-x-auto text-sm font-mono my-4;
+    .consultant-detail-page .rs-cta-card .rs-cta-button {
+        background-color: #ffffff;
+        color: #855300;
     }
-    .consultant-bio-content code {
-        @apply bg-gray-200 px-1 py-0.5 rounded text-sm font-mono;
+    .consultant-detail-page .rs-cta-card .rs-cta-button:hover {
+        background-color: #fdf2e7;
+    }
+    .consultant-detail-page .rs-cta-text-muted {
+        color: rgba(255, 255, 255, 0.8);
+    }
+    .consultant-detail-page .rs-text-primary { color: #855300; }
+    .consultant-detail-page .rs-text-secondary { color: #a73a00; }
+    .consultant-detail-page .rs-text-on-surface { color: #1f1b14; }
+    .consultant-detail-page .rs-text-on-surface-variant { color: #534434; }
+    .consultant-detail-page .rs-text-tertiary { color: #944a23; }
+    .consultant-detail-page .rs-bg-surface { background-color: #fff8f3; }
+    .consultant-detail-page .rs-bg-surface-container { background-color: #f7ece1; }
+    .consultant-detail-page .rs-bg-surface-container-low { background-color: #fdf2e7; }
+    .consultant-detail-page .rs-bg-surface-container-lowest { background-color: #ffffff; }
+    .consultant-detail-page .rs-bg-surface-container-high { background-color: #f1e7db; }
+    .consultant-detail-page .rs-bg-surface-dim { background-color: #e2d8cd; }
+    .consultant-detail-page .rs-bg-primary { background-color: #855300; }
+    .consultant-detail-page .rs-border-primary { border-color: rgba(133, 83, 0, 0.3); }
+    .consultant-detail-page .rs-border-subtle { border-color: rgba(216, 195, 173, 0.2); }
+    .consultant-detail-page .rs-overlay-glass {
+        background-color: rgba(255, 255, 255, 0.8);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+    }
+    .consultant-detail-page .rs-lesson-content h1,
+    .consultant-detail-page .rs-lesson-content h2,
+    .consultant-detail-page .rs-lesson-content h3 {
+        font-family: 'Noto Serif', serif;
+        color: #855300;
+        margin-top: 1.5rem;
+        margin-bottom: 0.75rem;
+    }
+    .consultant-detail-page .rs-lesson-content p {
+        margin-bottom: 1rem;
+        line-height: 1.7;
+        color: #534434;
+    }
+    .consultant-detail-page .rs-lesson-content ul,
+    .consultant-detail-page .rs-lesson-content ol {
+        margin-left: 1.5rem;
+        margin-bottom: 1rem;
+    }
+    .consultant-detail-page .rs-lesson-content img {
+        border-radius: 0.75rem;
+        margin: 1rem 0;
+    }
+    .consultant-detail-page .editorial-leading { line-height: 1.4; }
+    
+    /* Hide base.html elements */
+    .consultant-detail-page > header,
+    .consultant-detail-page > #mobile-menu,
+    .consultant-detail-page > #mobile-menu-overlay,
+    .consultant-detail-page > #backToTopBtn {
+        display: none !important;
     }
 </style>
 {% endblock %}
 
 {% block content %}
-<section class="py-16 bg-gradient-to-r from-amber-100 to-amber-50 min-h-screen">
-    <div class="container mx-auto px-4 max-w-4xl">
-        <div class="bg-white p-8 rounded-xl shadow-lg text-center">
-            {# Consultant Profile Picture #}
-            <div class="mb-8 animate-fade-in-up" style="animation-delay: 0.1s;">
-                {% if consultant.profile_picture_url %}
-                    <img src="{{ consultant.profile_picture_url }}" alt="{{ consultant.name }}" class="w-48 h-48 rounded-full object-cover mx-auto shadow-md border-4 border-amber-200">
+<div class="consultant-detail-page">
+    {# Top Navigation Bar #}
+    <nav class="fixed top-0 w-full z-50 rs-glass flex justify-between items-center px-6 md:px-8 py-4 max-w-full mx-auto">
+        <a href="{% url 'home' %}" class="text-2xl rs-headline tracking-tight rs-text-primary">Yoga Kailasa</a>
+        <div class="hidden md:flex gap-10 items-center">
+            <a href="{% url 'courses' %}" class="rs-text-on-surface-variant/60 font-medium hover:rs-text-primary transition-colors duration-300">Practice</a>
+            <a href="{% url 'consultant_list' %}" class="rs-text-primary border-b-2 rs-border-primary font-semibold hover:rs-text-primary transition-colors duration-300">Teachers</a>
+            <a href="{% url 'booking' %}" class="rs-text-on-surface-variant/60 font-medium hover:rs-text-primary transition-colors duration-300">Retreats</a>
+            <a href="{% url 'blog_list' %}" class="rs-text-on-surface-variant/60 font-medium hover:rs-text-primary transition-colors duration-300">Schedule</a>
+        </div>
+        <div class="flex items-center gap-6">
+            <div class="flex gap-4 items-center">
+                <a href="{% url 'all_notifications' %}" class="rs-text-on-surface-variant cursor-pointer hover:rs-text-primary transition-colors">
+                    <i class="fas fa-bell"></i>
+                </a>
+                {% if user.is_authenticated %}
+                <a href="{% url 'profile_edit' %}" class="rs-text-on-surface-variant cursor-pointer hover:rs-text-primary transition-colors">
+                    <i class="fas fa-user-circle"></i>
+                </a>
                 {% else %}
-                    <div class="w-48 h-48 rounded-full bg-gray-200 flex items-center justify-center mx-auto text-gray-400 text-8xl shadow-md border-4 border-amber-200">
-                        <i class="fas fa-user-circle"></i>
-                    </div>
+                <a href="{% url 'login' %}" class="rs-text-on-surface-variant hover:rs-text-primary font-medium transition-all">Sign In</a>
                 {% endif %}
             </div>
+            <a href="{% url 'booking' %}" class="rs-btn-primary px-6 py-2.5 rounded-lg font-semibold tracking-wide">
+                Book Now
+            </a>
+        </div>
+    </nav>
 
-            {# Consultant Name and Specialty #}
-            <h2 class="text-4xl font-bold text-gray-800 mb-2 animate-fade-in-up" style="animation-delay: 0.2s;">{{ consultant.name }}</h2>
-            <p class="text-amber-600 text-xl font-semibold mb-6 animate-fade-in-up" style="animation-delay: 0.3s;">{{ consultant.specialty }}</p>
-
-            {# Consultant Bio (Rich Text Content) #}
-            <div class="text-gray-700 leading-relaxed text-left consultant-bio-content prose max-w-none mx-auto mb-8 p-4 bg-gray-50 rounded-lg shadow-inner animate-fade-in-up" style="animation-delay: 0.4s;">
-                <h3 class="text-2xl font-bold text-gray-800 mb-4 border-b pb-2">About {{ consultant.name }}</h3>
-                {# Apply |safe filter here for the rich text bio #}
-                {{ consultant.bio|safe }}
-            </div>
-
-            {# Contact and Availability Info #}
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-left text-gray-700 mb-8 animate-fade-in-up" style="animation-delay: 0.5s;">
-                {% if consultant.contact_email %}
-                    <div class="flex items-center bg-white p-4 rounded-lg shadow-sm border border-gray-200">
-                        <i class="fas fa-envelope text-amber-500 mr-3 text-xl"></i>
-                        <span>Email: <a href="mailto:{{ consultant.contact_email }}" class="text-blue-600 hover:underline">{{ consultant.contact_email }}</a></span>
-                    </div>
-                {% endif %}
-                {% if consultant.phone_number %}
-                    <div class="flex items-center bg-white p-4 rounded-lg shadow-sm border border-gray-200">
-                        <i class="fas fa-phone-alt text-amber-500 mr-3 text-xl"></i>
-                        <span>Phone: <a href="tel:{{ consultant.phone_number }}" class="text-blue-600 hover:underline">{{ consultant.phone_number }}</a></span>
-                    </div>
-                {% endif %}
-                <div class="flex items-center bg-white p-4 rounded-lg shadow-sm border border-gray-200">
-                    {% if consultant.is_available %}
-                        <i class="fas fa-check-circle text-green-600 mr-3 text-xl"></i>
-                        <span class="font-semibold text-green-700">Currently Available for Sessions</span>
+    <main class="pt-24 pb-32">
+        {# Back to Consultants #}
+        <div class="max-w-7xl mx-auto px-6 md:px-8 mb-8">
+            <a href="{% url 'consultant_list' %}" class="inline-flex items-center gap-2 rs-text-secondary font-medium group transition-all duration-300">
+                <i class="fas fa-arrow-left transition-transform group-hover:-translate-x-1"></i>
+                <span class="text-sm uppercase tracking-widest">Back to All Teachers</span>
+            </a>
+        </div>
+        {# Hero Section: High-Impact Portrait #}
+        <section class="max-w-7xl mx-auto px-6 md:px-8 grid grid-cols-1 md:grid-cols-12 gap-12 items-center mb-24">
+            <div class="md:col-span-7 relative">
+                <div class="aspect-[4/5] overflow-hidden rounded-xl rs-bg-surface-container-high relative">
+                    {% if consultant.profile_picture_url %}
+                    <img src="{{ consultant.profile_picture_url }}" alt="{{ consultant.name }}" class="w-full h-full object-cover">
                     {% else %}
-                        <i class="fas fa-times-circle text-red-600 mr-3 text-xl"></i>
-                        <span class="font-semibold text-red-700">Currently Unavailable</span>
+                    <div class="w-full h-full rs-bg-surface-container flex items-center justify-center">
+                        <i class="fas fa-user-circle text-9xl rs-text-primary/20"></i>
+                    </div>
+                    {% endif %}
+                    {# Glass Overlay for Name #}
+                    <div class="absolute bottom-8 left-8 rs-overlay-glass p-8 rounded-xl shadow-2xl max-w-xs">
+                        <span class="rs-text-secondary font-bold tracking-widest uppercase text-xs mb-2 block">
+                            {% if consultant.is_available %}Master Practitioner{% else %}Practitioner{% endif %}
+                        </span>
+                        <h1 class="text-4xl rs-headline rs-text-on-surface editorial-leading mb-1">{{ consultant.name }}</h1>
+                        <p class="rs-text-on-surface-variant">{{ consultant.specialty }}</p>
+                    </div>
+                </div>
+            </div>
+            <div class="md:col-span-5 flex flex-col gap-8">
+                <div class="space-y-4">
+                    <h2 class="text-5xl rs-headline editorial-leading tracking-tight rs-text-on-surface">Guiding your journey inward.</h2>
+                    {% if consultant.bio %}
+                    <p class="text-lg rs-text-on-surface-variant editorial-leading font-light">{{ consultant.bio|striptags|truncatechars:200 }}</p>
                     {% endif %}
                 </div>
-                {% if consultant.icon_class %}
-                    <div class="flex items-center bg-white p-4 rounded-lg shadow-sm border border-gray-200">
-                        <i class="{{ consultant.icon_class }} text-amber-500 mr-3 text-xl"></i>
-                        <span>Special Icon: {{ consultant.icon_class }}</span>
+                <div class="flex flex-wrap gap-4">
+                    {% if consultant.specialty %}
+                    <div class="rs-bg-surface-container-low px-4 py-2 rounded-lg rs-text-primary font-medium text-sm">{{ consultant.specialty }}</div>
+                    {% endif %}
+                    {% if consultant.is_available %}
+                    <div class="rs-bg-surface-container-low px-4 py-2 rounded-lg rs-text-primary font-medium text-sm">
+                        <i class="fas fa-check-circle mr-1"></i> Available
                     </div>
-                {% endif %}
+                    {% endif %}
+                </div>
             </div>
+        </section>
 
-            {# Call to Action Button #}
-            <div class="mt-8 animate-fade-in-up" style="animation-delay: 0.6s;">
-                <a href="{% url 'booking' %}" class="inline-flex items-center bg-amber-500 hover:bg-amber-600 text-white font-bold py-4 px-8 rounded-full shadow-lg transition duration-300 transform hover:scale-105">
-                    <i class="fas fa-calendar-check mr-3"></i> Book a Session with {{ consultant.name }}
-                </a>
+        {# Bio Section: Asymmetric Editorial Layout #}
+        {% if consultant.bio %}
+        <section class="rs-bg-surface-container-low py-24 mb-24">
+            <div class="max-w-7xl mx-auto px-6 md:px-8 grid grid-cols-1 md:grid-cols-12 gap-16">
+                <div class="md:col-span-4">
+                    <h3 class="text-sm font-bold tracking-[0.2em] uppercase rs-text-tertiary mb-6">The Philosophy</h3>
+                    <div class="h-px w-12 rs-bg-primary mb-6"></div>
+                    <p class="rs-headline italic text-2xl rs-text-on-surface-variant editorial-leading">"Yoga is not about touching your toes, it is about what you learn on the way down."</p>
+                </div>
+                <div class="md:col-span-7 md:col-start-6 space-y-8">
+                    <div class="rs-text-on-surface editorial-leading space-y-6 text-lg rs-lesson-content">
+                        {{ consultant.bio|safe }}
+                    </div>
+                </div>
             </div>
+        </section>
+        {% endif %}
 
-            {# Back to Consultants List #}
-            <div class="mt-8 animate-fade-in-up" style="animation-delay: 0.7s;">
-                <a href="{% url 'consultant_list' %}" class="inline-flex items-center text-gray-600 hover:text-amber-600 transition duration-300">
-                    <i class="fas fa-arrow-left mr-2"></i> Back to All Consultants
-                </a>
+        {# Availability & Booking: Sophisticated Minimalist Cards #}
+        <section class="max-w-7xl mx-auto px-6 md:px-8 mb-24">
+            <div class="flex flex-col md:flex-row gap-12">
+                {# Contact & Info Card #}
+                <div class="flex-1 rs-bg-surface-container-high/40 rounded-xl p-10">
+                    <h3 class="text-2xl rs-headline mb-8 flex items-center gap-3">
+                        <i class="fas fa-calendar-alt rs-text-primary"></i>
+                        Contact Information
+                    </h3>
+                    <div class="space-y-6">
+                        {% if consultant.contact_email %}
+                        <div class="flex justify-between items-center pb-4 rs-border-subtle border-b">
+                            <span class="font-medium rs-text-on-surface-variant">Email</span>
+                            <a href="mailto:{{ consultant.contact_email }}" class="rs-text-on-surface font-semibold hover:rs-text-primary transition-colors">{{ consultant.contact_email }}</a>
+                        </div>
+                        {% endif %}
+                        {% if consultant.phone_number %}
+                        <div class="flex justify-between items-center pb-4 rs-border-subtle border-b">
+                            <span class="font-medium rs-text-on-surface-variant">Phone</span>
+                            <a href="tel:{{ consultant.phone_number }}" class="rs-text-on-surface font-semibold hover:rs-text-primary transition-colors">{{ consultant.phone_number }}</a>
+                        </div>
+                        {% endif %}
+                        <div class="flex justify-between items-center">
+                            <span class="font-medium rs-text-on-surface-variant">Availability</span>
+                            {% if consultant.is_available %}
+                            <span class="text-green-600 font-semibold"><i class="fas fa-check-circle mr-1"></i> Available</span>
+                            {% else %}
+                            <span class="text-red-600 font-semibold"><i class="fas fa-times-circle mr-1"></i> Unavailable</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                {# CTA Card #}
+                <div class="w-full md:w-[400px] rs-cta-card rounded-xl p-10 flex flex-col justify-between shadow-xl">
+                    <div>
+                        <h3 class="text-3xl rs-headline mb-4">Deepen Your Practice</h3>
+                        <p class="rs-cta-text-muted mb-8 editorial-leading">Reserve a private session for personalized alignment and meditative guidance tailored to your unique path.</p>
+                        <div class="space-y-4 mb-10">
+                            {% if consultant.contact_email %}
+                            <div class="flex items-center gap-4">
+                                <i class="fas fa-envelope"></i>
+                                <span class="text-sm font-medium">{{ consultant.contact_email }}</span>
+                            </div>
+                            {% endif %}
+                            {% if consultant.phone_number %}
+                            <div class="flex items-center gap-4">
+                                <i class="fas fa-phone"></i>
+                                <span class="text-sm font-medium">{{ consultant.phone_number }}</span>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <a href="{% url 'booking' %}" class="w-full rs-cta-button py-4 rounded-lg font-bold text-lg transition-all transform active:scale-95 text-center block">
+                        Book a Session
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        {# Back to Consultants #}
+        <div class="text-center">
+            <a href="{% url 'consultant_list' %}" class="inline-flex items-center rs-btn-secondary px-8 py-4 rounded-lg font-semibold">
+                <i class="fas fa-arrow-left mr-2"></i> Back to All Consultants
+            </a>
+        </div>
+    </main>
+
+    {# Footer #}
+    <footer class="rs-bg-surface-dim w-full py-12 px-6 md:px-8">
+        <div class="flex flex-col md:flex-row justify-between items-center gap-6 max-w-7xl mx-auto">
+            <div class="rs-headline text-lg italic rs-text-primary">Yoga Kailasa.</div>
+            <div class="flex gap-8">
+                <a href="{% url 'privacy_policy' %}" class="rs-text-on-surface-variant/50 hover:rs-text-primary font-sans text-sm tracking-normal transition-colors">Privacy</a>
+                <a href="{% url 'about' %}" class="rs-text-on-surface-variant/50 hover:rs-text-primary font-sans text-sm tracking-normal transition-colors">Ethics</a>
+                <a href="{% url 'contact' %}" class="rs-text-on-surface-variant/50 hover:rs-text-primary font-sans text-sm tracking-normal transition-colors">Contact</a>
+                <a href="{% url 'home' %}" class="rs-text-on-surface-variant/50 hover:rs-text-primary font-sans text-sm tracking-normal transition-colors">Careers</a>
+            </div>
+            <div class="rs-text-on-surface-variant/50 font-sans text-sm tracking-normal">
+                &copy; {% now "Y" %} Yoga Kailasa. The Radiant Sanctuary.
             </div>
         </div>
-    </div>
-</section>
+    </footer>
+</div>
 {% endblock %}

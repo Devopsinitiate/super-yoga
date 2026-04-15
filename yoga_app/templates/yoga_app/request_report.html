@@ -1,6 +1,14 @@
 {% extends 'yoga_app/base.html' %}
 {% block content %}
 <div class="max-w-lg mx-auto mt-10 p-6 bg-white rounded shadow">
+    {# Back to Dashboard #}
+    <div class="mb-6">
+        <a href="{% url 'dashboard' %}" class="inline-flex items-center gap-2 text-gray-600 hover:text-[#855300] font-medium transition-colors">
+            <i class="fas fa-arrow-left"></i>
+            <span class="text-sm">Back to Dashboard</span>
+        </a>
+    </div>
+
     <h2 class="text-2xl font-bold mb-4">Request a Report</h2>
     <form method="post">
         {% csrf_token %}

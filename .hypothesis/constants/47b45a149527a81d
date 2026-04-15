@@ -1,0 +1,4 @@
+# file: C:\Users\Orunmila1\Documents\Projects\yoga_kailasa_project\yoga_app\services\payment_service.py
+# hypothesis_version: 6.151.12
+
+[100, 'Authorization', 'Content-Type', 'Payment failed', 'amount', 'amount_kobo', 'application/json', 'charge.success', 'course', 'course_id', 'customer', 'data', 'email', 'event', 'gateway_response', 'message', 'metadata', 'metadata_json', 'our_reference', 'paid_at', 'payment', 'payment_id', 'pending', 'public_key', 'reference', 'status', 'success', 'updated_at', 'user_id', 'utf-8', 'verified_at']

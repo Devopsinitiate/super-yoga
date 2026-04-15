@@ -11,125 +11,435 @@
 {% block og_image %}{% static 'yoga_app/images/default_breathing_og_image.jpg' %}{% endblock %}
 
 {% block extra_css %}
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif:ital,wght@0,400;0,700;1,400&family=Manrope:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
-    /* CSS for the fade-in-up animation, specific to breathing_list.html elements */
-    @keyframes fadeInUp {
-        from {
-            opacity: 0;
-            transform: translateY(20px);
-        }
-        to {
-            opacity: 1;
-            transform: translateY(0);
-        }
+    body { font-family: 'Manrope', sans-serif; }
+    .rs-headline { font-family: 'Noto Serif', serif; line-height: 1.4; }
+    
+    .rs-surface { background-color: #fff8f3; }
+    .rs-surface-container { background-color: #f7ece1; }
+    .rs-surface-container-low { background-color: #fdf2e7; }
+    .rs-surface-container-lowest { background-color: #ffffff; }
+    .rs-surface-container-high { background-color: #f1e7db; }
+    .rs-surface-container-highest { background-color: #ebe1d6; }
+    .rs-surface-dim { background-color: #e2d8cd; }
+    
+    .rs-on-surface { color: #1f1b14; }
+    .rs-on-surface-variant { color: #534434; }
+    .rs-primary { color: #855300; }
+    .rs-secondary { color: #a73a00; }
+    .rs-outline { color: #867461; }
+    .rs-outline-variant { color: #d8c3ad; }
+    .rs-primary-container { color: #f59e0b; }
+    .rs-on-primary { color: #ffffff; }
+    .rs-on-primary-container { color: #613b00; }
+    .rs-on-secondary-container { color: #571a00; }
+    .rs-secondary-fixed { background-color: #ffdbce; }
+    .rs-on-secondary-fixed { color: #370e00; }
+    .rs-tertiary-container { background-color: #f79a6c; }
+    .rs-on-tertiary-container { color: #72300a; }
+    
+    .rs-glass {
+        background-color: rgba(255, 248, 243, 0.8);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
     }
-    .animate-fade-in-up {
-        opacity: 0; /* Hidden by default */
-        animation: fadeInUp 0.6s ease-out forwards;
+    
+    .rs-btn-primary {
+        background: linear-gradient(135deg, #855300 0%, #f59e0b 100%);
+        color: #ffffff;
+        transition: all 0.3s ease;
     }
-    /* Ensure card image styling is consistent */
-    .breathing-card .card-image { /* Using breathing-card for specificity */
-        width: 100%;
-        height: 192px; /* h-48 equivalent */
-        object-fit: cover; /* Ensures images cover the area without distortion */
-        border-radius: 0.75rem 0.75rem 0 0; /* rounded-xl on top corners */
+    .rs-btn-primary:hover {
+        opacity: 0.92;
+        transform: scale(1.02);
     }
-    /* Ensure the breathing circle animation is applied */
-    .breathing-circle {
-        animation: pulse 8s infinite;
+    
+    .rs-btn-secondary {
+        background-color: #f1e7db;
+        color: #855300;
+        transition: all 0.3s ease;
     }
-    @keyframes pulse {
-        0% { transform: scale(1); }
-        50% { transform: scale(1.05); }
-        100% { transform: scale(1); }
+    .rs-btn-secondary:hover {
+        background-color: #ebe1d6;
+    }
+    
+    .rs-technique-card {
+        transition: all 0.5s ease;
+    }
+    .rs-technique-card:hover {
+        background-color: #ebe1d6;
+    }
+    .rs-technique-card:hover .rs-technique-image {
+        transform: scale(1.05);
+    }
+    .rs-technique-image {
+        transition: transform 0.7s ease;
+    }
+    
+    .rs-input {
+        background-color: #fdf2e7;
+        border: none;
+        border-bottom: 2px solid rgba(216, 195, 173, 0.3);
+        transition: all 0.5s ease;
+    }
+    .rs-input:focus {
+        border-bottom-color: #855300;
+        background-color: #ffffff;
+        outline: none;
+    }
+    
+    /* Breathing circle animation */
+    .rs-breathing-circle {
+        animation: rs-breathe 8s infinite ease-in-out;
+    }
+    @keyframes rs-breathe {
+        0%, 100% { transform: scale(1); }
+        50% { transform: scale(1.08); }
+    }
+    
+    /* Hide base.html elements */
+    .breathing-page > header,
+    .breathing-page > #backToTopBtn {
+        display: none !important;
+    }
+    .breathing-page > main {
+        padding: 0 !important;
+    }
+    
+    /* Hide horizontal scrollbar */
+    .rs-no-scrollbar::-webkit-scrollbar {
+        display: none;
+    }
+    .rs-no-scrollbar {
+        -ms-overflow-style: none;
+        scrollbar-width: none;
     }
 </style>
 {% endblock %}
 
 {% block content %}
-<section class="py-16 bg-gradient-to-r from-amber-100 to-amber-50 min-h-screen">
-    <div class="container mx-auto px-4">
-        <div class="text-center mb-12">
-            <h2 class="text-3xl md:text-4xl font-bold text-gray-800 mb-2 animate-fade-in-up" style="animation-delay: 0.1s;">Explore Breathing Techniques</h2>
-            <p class="text-gray-600 max-w-2xl mx-auto animate-fade-in-up" style="animation-delay: 0.2s;">Learn powerful pranayama techniques to calm your mind and energize your body.</p>
-        </div>
-
-        <!-- Search Form -->
-        <div class="bg-white p-6 rounded-lg shadow-md mb-8 flex flex-col md:flex-row justify-center items-center animate-fade-in-up" style="animation-delay: 0.3s;">
-            <form action="{% url 'breathing' %}" method="get" class="w-full md:w-1/2 relative">
-                <input type="search" name="q" placeholder="Search techniques..."
-                       class="pl-10 pr-4 py-2 rounded-full border border-gray-300 focus:outline-none focus:ring-1 focus:ring-amber-500 focus:border-amber-500 text-sm w-full"
-                       value="{{ request.GET.q }}">
-                <button type="submit" class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
-                    <i class="fas fa-search"></i>
-                </button>
-            </form>
-            {% if request.GET.q %}
-                <a href="{% url 'breathing' %}" class="mt-4 md:mt-0 md:ml-4 bg-gray-200 hover:bg-gray-300 text-gray-800 px-4 py-2 rounded-full transition duration-300 transform hover:scale-105">Clear Search</a>
-            {% endif %}
-        </div>
-
-        {% if breathing_techniques %}
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {% for technique in breathing_techniques %}
-            <div class="bg-white rounded-xl shadow-lg overflow-hidden breathing-card transform transition duration-300 hover:shadow-xl hover:scale-105 animate-fade-in-up" style="animation-delay: {{ forloop.counter|multiply:0.1 }}s;">
-                <a href="{% url 'breathing_technique_detail' technique.id %}" class="block">
-                    {% if technique.image_url %}
-                        <img src="{{ technique.image_url }}" alt="{{ technique.name }}" class="breathing-card-image card-image">
-                    {% else %}
-                        <div class="w-full h-48 bg-gray-200 flex items-center justify-center rounded-t-xl">
-                            <i class="fas fa-lungs text-6xl text-gray-400"></i>
-                        </div>
-                    {% endif %}
-                    <div class="p-6">
-                        <h3 class="text-xl font-bold text-gray-800 mb-2">{{ technique.name }}</h3>
-                        <p class="text-green-600 text-sm mb-2">{{ technique.sanskrit_name }}</p>
-                        <p class="text-gray-600 text-sm mb-4">{{ technique.description|striptags|truncatechars:100 }}</p>
-                        <div class="flex items-center text-sm text-gray-600">
-                            <i class="fas fa-clock text-amber-500 mr-2"></i>
-                            <span>Duration: {{ technique.duration }}</span>
-                        </div>
-                    </div>
-                </a>
+<div class="breathing-page rs-surface min-h-screen selection:bg-[#f59e0b]/30">
+    {# Top Navigation Bar #}
+    <header class="rs-glass fixed top-0 left-0 right-0 z-50 border-b border-[#d8c3ad]/10">
+        <nav class="flex justify-between items-center px-6 md:px-8 h-20 max-w-screen-2xl mx-auto">
+            <div class="flex items-center gap-8">
+                <a href="{% url 'home' %}" class="rs-headline text-2xl font-semibold italic rs-primary">Yoga Kailasa</a>
+                <nav class="hidden md:flex gap-6 rs-headline text-lg tracking-tight">
+                    <a href="{% url 'poses' %}" class="rs-on-surface-variant hover:rs-primary transition-colors duration-300">Techniques</a>
+                    <a href="{% url 'breathing' %}" class="rs-primary border-b-2 border-[#855300] pb-1">Practices</a>
+                    <a href="{% url 'blog_list' %}" class="rs-on-surface-variant hover:rs-primary transition-colors duration-300">Journal</a>
+                    <a href="{% url 'course_discussion_list' course.id|default:1 %}" class="rs-on-surface-variant hover:rs-primary transition-colors duration-300">Community</a>
+                </nav>
             </div>
-            {% endfor %}
+            <div class="flex items-center gap-4">
+                <a href="{% url 'global_search' %}" class="hidden md:inline-block rs-on-surface-variant hover:rs-primary transition-colors scale-95 active:scale-90 p-2">
+                    <i class="fas fa-search text-lg"></i>
+                </a>
+                {% if user.is_authenticated %}
+                <a href="{% url 'profile_edit' %}" class="hidden md:inline-block rs-on-surface-variant hover:rs-primary transition-colors scale-95 active:scale-90 p-2">
+                    <i class="fas fa-user-circle text-xl"></i>
+                </a>
+                {% else %}
+                <a href="{% url 'login' %}" class="hidden md:inline-block rs-on-surface-variant hover:rs-primary font-medium transition-all">Sign In</a>
+                {% endif %}
+                <button type="button" id="mobile-menu-button-page" class="md:hidden text-[#534434] text-2xl focus:outline-none">
+                    <i class="fas fa-bars"></i>
+                </button>
+            </div>
+        </nav>
+    </header>
+
+    {# Mobile Menu Overlay #}
+    <div id="mobile-menu-overlay-page" class="fixed inset-0 bg-black/50 z-40 hidden" style="transition: opacity 0.3s ease-out, visibility 0.3s ease-out; opacity: 0; visibility: hidden;"></div>
+
+    {# Mobile Menu Sidebar #}
+    <div id="mobile-menu-page" class="fixed top-0 right-0 w-64 h-full bg-white shadow-lg z-50 p-6 pb-20 transform translate-x-full md:hidden overflow-y-auto" style="transition: transform 0.3s ease-out;">
+        <div class="flex justify-end mb-6">
+            <button id="close-mobile-menu-page" class="text-[#534434] text-2xl focus:outline-none">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <nav class="flex flex-col space-y-4">
+            <a href="{% url 'home' %}" class="text-[#534434] hover:text-[#855300] font-medium text-lg">Home</a>
+            <a href="{% url 'courses' %}" class="text-[#534434] hover:text-[#855300] font-medium text-lg">Courses</a>
+            <a href="{% url 'poses' %}" class="text-[#534434] hover:text-[#855300] font-medium text-lg">Poses</a>
+            <a href="{% url 'breathing' %}" class="text-[#855300] font-bold text-lg">Breathing</a>
+            <a href="{% url 'consultant_list' %}" class="text-[#534434] hover:text-[#855300] font-medium text-lg">Consultants</a>
+            <a href="{% url 'blog_list' %}" class="text-[#534434] hover:text-[#855300] font-medium text-lg">Blog</a>
+            <a href="{% url 'booking' %}" class="text-[#534434] hover:text-[#855300] font-medium text-lg">Booking</a>
+            <a href="{% url 'contact' %}" class="text-[#534434] hover:text-[#855300] font-medium text-lg">Contact</a>
+            <a href="{% url 'about' %}" class="text-[#534434] hover:text-[#855300] font-medium text-lg">About</a>
+
+            {% if user.is_authenticated %}
+                <div class="border-t border-[#d8c3ad]/30 pt-4 mt-4">
+                    <a href="{% url 'profile_edit' %}" class="flex items-center text-[#534434] hover:text-[#855300] font-medium text-lg mb-2">
+                        {% if user_profile.profile_picture %}
+                            <img src="{{ user_profile.profile_picture.url }}" alt="Profile Picture" class="w-8 h-8 rounded-full object-cover mr-2">
+                        {% else %}
+                            <div class="w-8 h-8 rounded-full bg-[#f7ece1] flex items-center justify-center mr-2">
+                                <i class="fas fa-user text-[#855300] text-sm"></i>
+                            </div>
+                        {% endif %}
+                        {{ user.username }}
+                    </a>
+                    <a href="{% url 'all_notifications' %}" class="block px-2 py-1 text-[#534434] hover:bg-[#fdf2e7] rounded-md relative">
+                        <i class="fas fa-bell mr-2 text-[#855300]"></i> Notifications
+                        {% if unread_notifications_count > 0 %}
+                            <span class="notification-count">{{ unread_notifications_count }}</span>
+                        {% endif %}
+                    </a>
+                    <a href="{% url 'dashboard' %}" class="block px-2 py-1 text-[#534434] hover:bg-[#fdf2e7] rounded-md"><i class="fas fa-tachometer-alt mr-2 text-[#855300]"></i> Dashboard</a>
+                    <a href="{% url 'profile_edit' %}" class="block px-2 py-1 text-[#534434] hover:bg-[#fdf2e7] rounded-md"><i class="fas fa-user mr-2 text-[#855300]"></i> My Profile</a>
+                    <form action="{% url 'logout' %}" method="post" class="block w-full mt-2">
+                        {% csrf_token %}
+                        <button type="submit" class="w-full text-left py-2 text-white bg-[#a73a00] hover:bg-[#855300] font-bold text-lg flex items-center justify-center rounded">
+                            <i class="fas fa-sign-out-alt mr-2"></i> Logout
+                        </button>
+                    </form>
+                </div>
+            {% else %}
+                <div class="border-t border-[#d8c3ad]/30 pt-4 mt-4">
+                    <a href="{% url 'login' %}" class="block text-[#534434] hover:text-[#855300] font-medium text-lg">Login</a>
+                    <a href="{% url 'register' %}" class="block rs-btn-primary px-5 py-2 rounded-lg shadow-md transition duration-300 text-center mt-3">Sign Up</a>
+                </div>
+            {% endif %}
+        </nav>
+    </div>
+
+    <main class="pt-20">
+        {# Back to Home #}
+        <div class="max-w-screen-2xl mx-auto px-6 md:px-8 pt-6">
+            <a href="{% url 'home' %}" class="inline-flex items-center gap-2 rs-on-surface-variant hover:rs-primary font-medium transition-colors">
+                <i class="fas fa-arrow-left"></i>
+                <span class="text-sm uppercase tracking-widest">Back to Home</span>
+            </a>
         </div>
 
-        <!-- Pagination Controls -->
-        {% if breathing_techniques.has_other_pages %}
-        <div class="flex justify-center mt-12 space-x-2 animate-fade-in-up" style="animation-delay: {{ breathing_techniques.count|add:1|multiply:0.1 }}s;">
-            {% if breathing_techniques.has_previous %}
-                <a href="?page={{ breathing_techniques.previous_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}"
-                   class="px-4 py-2 bg-amber-500 text-white rounded-full hover:bg-amber-600 transition duration-300 transform hover:scale-105">Previous</a>
-            {% else %}
-                <span class="px-4 py-2 bg-gray-300 text-gray-600 rounded-full cursor-not-allowed">Previous</span>
-            {% endif %}
+        {# Hero Header #}
+        <section class="mb-20 text-center space-y-6 px-6 md:px-12 pt-16 md:pt-24">
+            <h1 class="rs-headline text-5xl md:text-7xl italic rs-primary leading-tight">
+                The Breath Within
+            </h1>
+            <p class="max-w-2xl mx-auto text-lg md:text-xl rs-on-surface-variant leading-relaxed">
+                Discover ancient pranayama techniques to calm the mind and energize the soul. A sanctuary for intentional breathing.
+            </p>
+        </section>
 
-            {% for i in breathing_techniques.paginator.page_range %}
-                {% if breathing_techniques.number == i %}
-                    <span class="px-4 py-2 bg-amber-700 text-white rounded-full">{{ i }}</span>
-                {% else %}
-                    <a href="?page={{ i }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}"
-                       class="px-4 py-2 bg-gray-200 text-gray-700 rounded-full hover:bg-gray-300 transition duration-300 transform hover:scale-105">{{ i }}</a>
+        {# Refined Search Bar #}
+        <section class="max-w-xl mx-auto mb-20 px-6">
+            <form action="{% url 'breathing' %}" method="get" class="relative group">
+                <i class="fas fa-wind absolute left-4 top-1/2 -translate-y-1/2 rs-outline"></i>
+                <input type="search" name="q" 
+                       class="w-full rs-input py-4 pl-12 pr-4 rs-on-surface placeholder:rs-outline rounded-lg"
+                       placeholder="Find a technique (e.g. Calming, Morning, Energy)..."
+                       value="{{ request.GET.q }}">
+                {% if request.GET.q %}
+                <a href="{% url 'breathing' %}" class="absolute right-4 top-1/2 -translate-y-1/2 rs-secondary text-sm font-medium hover:underline">
+                    Clear
+                </a>
                 {% endif %}
-            {% endfor %}
+            </form>
+        </section>
 
-            {% if breathing_techniques.has_next %}
+        {# Asymmetric Bento Grid of Techniques #}
+        {% if breathing_techniques %}
+        <div class="px-6 md:px-12 max-w-7xl mx-auto">
+            <div class="grid grid-cols-1 md:grid-cols-12 gap-8">
+                {% for technique in breathing_techniques %}
+                {% if forloop.counter == 1 %}
+                {# Technique 1: Featured Large #}
+                <div class="md:col-span-8 group cursor-pointer rs-animate-in">
+                    <a href="{% url 'breathing_technique_detail' technique.id %}" class="block">
+                        <div class="relative overflow-hidden rs-surface-container-low rounded-xl aspect-[16/9] rs-technique-card">
+                            {% if technique.image_url %}
+                            <img src="{{ technique.image_url }}" alt="{{ technique.name }}" class="absolute inset-0 w-full h-full object-cover mix-blend-multiply opacity-80 rs-technique-image">
+                            {% else %}
+                            <div class="absolute inset-0 rs-surface-container flex items-center justify-center">
+                                <i class="fas fa-lungs text-8xl rs-primary/10 rs-breathing-circle"></i>
+                            </div>
+                            {% endif %}
+                            <div class="absolute inset-0 bg-gradient-to-t from-[#fff8f3]/90 via-transparent to-transparent"></div>
+                            <div class="absolute bottom-0 left-0 p-8 space-y-2">
+                                <div class="flex gap-4 mb-4">
+                                    {% if technique.duration %}
+                                    <span class="bg-[#855300]/10 rs-primary px-3 py-1 text-xs font-semibold tracking-widest uppercase rounded">{{ technique.duration }}</span>
+                                    {% endif %}
+                                </div>
+                                <h2 class="rs-headline text-3xl italic rs-on-surface">{{ technique.name }}</h2>
+                                {% if technique.sanskrit_name %}
+                                <h3 class="text-lg rs-primary/70 font-body uppercase tracking-[0.2em] text-sm">{{ technique.sanskrit_name }}</h3>
+                                {% endif %}
+                                <p class="max-w-md rs-on-surface-variant font-body leading-relaxed mt-2">{{ technique.description|striptags|truncatechars:150 }}</p>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+                {% elif forloop.counter == 2 %}
+                {# Technique 2: Small #}
+                <div class="md:col-span-4 group cursor-pointer rs-animate-in" style="animation-delay: 0.1s;">
+                    <a href="{% url 'breathing_technique_detail' technique.id %}" class="block h-full">
+                        <div class="h-full rs-surface-container-low rounded-xl p-8 rs-technique-card flex flex-col justify-between">
+                            <div>
+                                {% if technique.image_url %}
+                                <div class="mb-6 overflow-hidden rounded-lg aspect-square">
+                                    <img src="{{ technique.image_url }}" alt="{{ technique.name }}" class="w-full h-full object-cover rs-technique-image">
+                                </div>
+                                {% else %}
+                                <div class="mb-6 overflow-hidden rounded-lg aspect-square rs-surface-container flex items-center justify-center">
+                                    <i class="fas fa-wind text-6xl rs-primary/20"></i>
+                                </div>
+                                {% endif %}
+                                <h2 class="rs-headline text-2xl italic rs-on-surface">{{ technique.name }}</h2>
+                                {% if technique.sanskrit_name %}
+                                <h3 class="text-xs rs-primary/70 font-body uppercase tracking-widest mt-1">{{ technique.sanskrit_name }}</h3>
+                                {% endif %}
+                                <p class="rs-on-surface-variant font-body leading-relaxed mt-4 text-sm">{{ technique.description|striptags|truncatechars:100 }}</p>
+                            </div>
+                            {% if technique.duration %}
+                            <div class="mt-8 flex justify-between items-center pt-6 border-t border-[#d8c3ad]/10">
+                                <span class="text-xs font-bold rs-on-surface-variant">Duration</span>
+                                <span class="text-xs font-bold rs-on-surface-variant">{{ technique.duration }}</span>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </a>
+                </div>
+                {% elif forloop.counter == 3 %}
+                {# Technique 3: Wide #}
+                <div class="md:col-span-8 group cursor-pointer rs-animate-in" style="animation-delay: 0.2s;">
+                    <a href="{% url 'breathing_technique_detail' technique.id %}" class="block">
+                        <div class="relative overflow-hidden rs-surface-container-low rounded-xl h-full min-h-[320px] rs-technique-card flex items-center">
+                            <div class="grid md:grid-cols-2 w-full">
+                                <div class="p-10 space-y-4">
+                                    <h2 class="rs-headline text-3xl italic rs-on-surface">{{ technique.name }}</h2>
+                                    {% if technique.sanskrit_name %}
+                                    <h3 class="text-sm rs-primary/70 font-body uppercase tracking-[0.2em]">{{ technique.sanskrit_name }}</h3>
+                                    {% endif %}
+                                    <p class="rs-on-surface-variant font-body leading-relaxed">{{ technique.description|striptags|truncatechars:150 }}</p>
+                                    <button class="mt-4 px-6 py-2 rs-btn-primary rounded-md font-body text-sm font-semibold transition-transform active:scale-95">
+                                        Explore Technique
+                                    </button>
+                                </div>
+                                <div class="hidden md:block relative h-full">
+                                    {% if technique.image_url %}
+                                    <img src="{{ technique.image_url }}" alt="{{ technique.name }}" class="absolute inset-0 w-full h-full object-cover rs-technique-image">
+                                    {% else %}
+                                    <div class="absolute inset-0 rs-surface-container flex items-center justify-center">
+                                        <i class="fas fa-lungs text-8xl rs-primary/10"></i>
+                                    </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+                {% else %}
+                {# Technique 4+: Standard Card #}
+                <div class="md:col-span-4 group cursor-pointer rs-animate-in" style="animation-delay: {{ forloop.counter|multiply:0.05 }}s;">
+                    <a href="{% url 'breathing_technique_detail' technique.id %}" class="block h-full">
+                        <div class="h-full rs-surface-container-low rounded-xl p-8 rs-technique-card">
+                            <div class="mb-6 flex items-center justify-between">
+                                <i class="fas fa-wind text-4xl rs-primary/40"></i>
+                                {% if technique.duration %}
+                                <span class="text-[10px] uppercase tracking-widest font-bold px-2 py-1 rs-surface-container-highest rounded">{{ technique.duration }}</span>
+                                {% endif %}
+                            </div>
+                            <h2 class="rs-headline text-2xl italic rs-on-surface">{{ technique.name }}</h2>
+                            {% if technique.sanskrit_name %}
+                            <h3 class="text-xs rs-primary/70 font-body uppercase tracking-widest mt-1">{{ technique.sanskrit_name }}</h3>
+                            {% endif %}
+                            <p class="rs-on-surface-variant font-body leading-relaxed mt-4 text-sm">{{ technique.description|striptags|truncatechars:100 }}</p>
+                            {% if technique.video_url %}
+                            <div class="mt-8 flex items-center gap-2 rs-primary font-bold text-xs uppercase tracking-tighter">
+                                <i class="fas fa-play-circle text-sm"></i>
+                                Video Guide Available
+                            </div>
+                            {% endif %}
+                        </div>
+                    </a>
+                </div>
+                {% endif %}
+                {% endfor %}
+            </div>
+        </div>
+
+        {# Pagination / Load More #}
+        {% if breathing_techniques.has_other_pages %}
+        <div class="mt-20 flex flex-col items-center gap-4 px-6">
+            <div class="h-[1px] w-24 bg-[#d8c3ad]/30"></div>
+            <div class="flex items-center gap-3">
+                {% if breathing_techniques.has_previous %}
+                <a href="?page={{ breathing_techniques.previous_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}"
+                   class="rs-btn-secondary px-6 py-3 rounded-lg font-bold tracking-widest uppercase text-sm flex items-center gap-2">
+                    <i class="fas fa-chevron-left text-xs"></i> Previous
+                </a>
+                {% endif %}
+                
+                {% for i in breathing_techniques.paginator.page_range %}
+                    {% if breathing_techniques.number == i %}
+                    <span class="rs-primary font-bold tracking-widest uppercase text-sm px-4 py-3">{{ i }}</span>
+                    {% elif i <= breathing_techniques.number|add:2 and i >= breathing_techniques.number|add:-2 %}
+                    <a href="?page={{ i }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}"
+                       class="rs-on-surface-variant hover:rs-primary font-medium tracking-widest uppercase text-sm px-4 py-3 transition-colors">{{ i }}</a>
+                    {% endif %}
+                {% endfor %}
+                
+                {% if breathing_techniques.has_next %}
                 <a href="?page={{ breathing_techniques.next_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}"
-                   class="px-4 py-2 bg-amber-500 text-white rounded-full hover:bg-amber-600 transition duration-300 transform hover:scale-105">Next</a>
-            {% else %}
-                <span class="px-4 py-2 bg-gray-300 text-gray-600 rounded-full cursor-not-allowed">Next</span>
-            {% endif %}
+                   class="rs-btn-secondary px-6 py-3 rounded-lg font-bold tracking-widest uppercase text-sm flex items-center gap-2">
+                    Next <i class="fas fa-chevron-right text-xs"></i>
+                </a>
+                {% endif %}
+            </div>
         </div>
         {% endif %}
 
         {% else %}
-        <div class="text-center py-12 animate-fade-in-up" style="animation-delay: 0.4s;">
-            <i class="fas fa-frown text-6xl text-gray-400 mb-4"></i>
-            <p class="text-xl text-gray-700">No breathing techniques found matching your criteria.</p>
-            <p class="text-gray-500 mt-2">Try adjusting your search or filters.</p>
+        {# Empty State #}
+        <div class="text-center py-20 px-6">
+            <i class="fas fa-wind text-6xl rs-primary/20 mb-6"></i>
+            <h3 class="rs-headline text-2xl font-bold rs-on-surface mb-2">No techniques found</h3>
+            <p class="rs-on-surface-variant mb-6">
+                {% if request.GET.q %}
+                No breathing techniques match "{{ request.GET.q }}". Try a different search.
+                {% else %}
+                No breathing techniques have been added yet.
+                {% endif %}
+            </p>
+            {% if request.GET.q %}
+            <a href="{% url 'breathing' %}" class="rs-btn-primary px-8 py-3 rounded-lg font-semibold text-sm uppercase tracking-wider inline-block">
+                View All Techniques
+            </a>
+            {% endif %}
         </div>
         {% endif %}
-    </div>
-</section>
+    </main>
+
+    {# Footer #}
+    <footer class="w-full pt-16 pb-8 rs-surface-dim">
+        <div class="max-w-7xl mx-auto px-6 md:px-12 flex flex-col md:flex-row justify-between items-center gap-6">
+            <div class="rs-headline text-lg rs-primary">Yoga Kailasa</div>
+            <div class="flex flex-wrap justify-center gap-8 font-sans text-sm tracking-wide rs-on-surface-variant/60">
+                <a href="{% url 'home' %}" class="hover:rs-secondary transition-all opacity-80 hover:opacity-100">Home</a>
+                <a href="{% url 'about' %}" class="hover:rs-secondary transition-all opacity-80 hover:opacity-100">About</a>
+                <a href="{% url 'contact' %}" class="hover:rs-secondary transition-all opacity-80 hover:opacity-100">Contact</a>
+                <a href="{% url 'courses' %}" class="hover:rs-secondary transition-all opacity-80 hover:opacity-100">Courses</a>
+            </div>
+            <div class="rs-on-surface-variant/50 font-sans text-xs tracking-wider">
+                &copy; {% now "Y" %} Yoga Kailasa. Breath as Practice.
+            </div>
+        </div>
+    </footer>
+
+    {# FAB - Quick Start Breathing Exercise #}
+    <button class="fixed bottom-8 right-8 w-14 h-14 rs-btn-primary rounded-xl shadow-2xl flex items-center justify-center hover:scale-110 transition-transform z-40"
+            onclick="alert('Quick breathing exercise coming soon!')">
+        <i class="fas fa-lungs text-xl"></i>
+    </button>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+{{ block.super }}
 {% endblock %}

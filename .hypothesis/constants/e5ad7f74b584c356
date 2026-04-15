@@ -1,0 +1,4 @@
+# file: C:\Users\Orunmila1\Documents\Projects\yoga_kailasa_project\yoga_app\migrations\0012_discussiontopic_discussionpost.py
+# hypothesis_version: 6.151.12
+
+[255, '-created_at', 'Discussion Post', 'Discussion Posts', 'Discussion Topic', 'Discussion Topics', 'DiscussionPost', 'DiscussionTopic', 'ID', 'content', 'course', 'created_at', 'discussion_topics', 'id', 'lesson', 'ordering', 'parent_post', 'posts', 'replies', 'title', 'topic', 'updated_at', 'user', 'verbose_name', 'verbose_name_plural', 'yoga_app', 'yoga_app.course', 'yoga_app.lesson']

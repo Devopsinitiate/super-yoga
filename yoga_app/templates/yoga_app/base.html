@@ -4,42 +4,71 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    {# Primary Title Block - This is where child templates will set their title #}
     <title>{% block title %}Yoga Kailasa - Journey to Inner Peace{% endblock %}</title>
-
-    {# Primary Meta Description Block - This is where child templates will set their description #}
     <meta name="description" content="{% block meta_description %}Yoga Kailasa offers comprehensive online yoga courses, breathing techniques, and personalized consultations to help you achieve inner peace and physical well-being. Join our community today!{% endblock %}">
     
-    {# Open Graph Meta Tags for Social Sharing #}
+    {# Open Graph Meta Tags #}
     <meta property="og:title" content="{% block og_title %}{% endblock %}">
     <meta property="og:description" content="{% block og_description %}{% endblock %}">
     <meta property="og:type" content="website">
     <meta property="og:url" content="{{ request.build_absolute_uri }}">
-    <meta property="og:image" content="{% block og_image %}{% static 'yoga_app/images/hero_image.jpg' %}{% endblock %}"> {# Provide a default image #}
+    <meta property="og:image" content="{% block og_image %}{% static 'yoga_app/images/hero_image.jpg' %}{% endblock %}">
     <meta property="og:site_name" content="Yoga Kailasa">
     <meta property="og:locale" content="en_US">
 
-    {# Favicon #}
     <link rel="icon" type="image/x-icon" href="{% static 'yoga_app/images/favicon.ico' %}">
-
-    {# Tailwind CSS CDN - REVERTED TO CDN FOR RELIABILITY #}
     <link rel="stylesheet" href="{% static 'css/output.css' %}">
-    {# Font Awesome for icons #}
+    <link rel="stylesheet" href="{% static 'css/design_tokens.css' %}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif:ital,wght@0,400;0,600;0,700;1,400&family=Manrope:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
-    {# Custom CSS for animations or overrides #}
     {% block extra_css %}{% endblock %}
 
     <style>
-        /* Global form styling for consistency */
-        .form-field-wrapper {
-            margin-bottom: 1rem; /* Equivalent to mb-4 */
+        /* === Radiant Sanctuary Design System === */
+        :root {
+            --rs-surface: #fff8f3;
+            --rs-surface-container: #f7ece1;
+            --rs-surface-container-low: #fdf2e7;
+            --rs-surface-container-lowest: #ffffff;
+            --rs-surface-container-high: #f1e7db;
+            --rs-surface-container-highest: #ebe1d6;
+            --rs-surface-dim: #e2d8cd;
+            --rs-on-surface: #1f1b14;
+            --rs-on-surface-variant: #534434;
+            --rs-primary: #855300;
+            --rs-secondary: #a73a00;
+            --rs-outline: #867461;
+            --rs-outline-variant: #d8c3ad;
+            --rs-primary-container: #f59e0b;
+            --rs-on-primary: #ffffff;
         }
+        
+        body {
+            font-family: 'Manrope', sans-serif;
+            background-color: var(--rs-surface);
+            color: var(--rs-on-surface);
+        }
+        .rs-headline { font-family: 'Noto Serif', serif; line-height: 1.4; }
+        .rs-glass {
+            background-color: rgba(255, 248, 243, 0.85);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+        }
+        .rs-btn-primary {
+            background: linear-gradient(135deg, #855300 0%, #f59e0b 100%);
+            color: #ffffff;
+            transition: all 0.3s ease;
+        }
+        .rs-btn-primary:hover { opacity: 0.92; transform: scale(1.02); }
+        
+        /* Global form styling */
+        .form-field-wrapper { margin-bottom: 1rem; }
         .form-field-wrapper label {
             display: block;
-            font-weight: 600; /* semibold */
-            color: #4a5568; /* gray-700 */
-            margin-bottom: 0.5rem; /* mb-2 */
+            font-weight: 600;
+            color: #4a5568;
+            margin-bottom: 0.5rem;
         }
         .form-field-wrapper input[type="text"],
         .form-field-wrapper input[type="email"],
@@ -53,360 +82,117 @@
         .form-field-wrapper input[type="file"] {
             @apply w-full text-gray-700 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-amber-50 file:text-amber-700 hover:file:bg-amber-100 cursor-pointer;
         }
-        .form-field-wrapper .helptext {
-            @apply text-sm text-gray-500 mt-1 block;
+        .form-field-wrapper .helptext { @apply text-sm text-gray-500 mt-1 block; }
+        .form-field-wrapper .errorlist { @apply text-red-500 text-xs italic mt-1 list-none p-0; }
+        .form-field-wrapper .errorlist li { @apply m-0 p-0; }
+        .form-field-wrapper label.required::after { content: " *"; color: #ef4444; }
+        
+        /* Toast Messages */
+        #toast-container {
+            position: fixed; top: 1.5rem; right: 1.5rem; z-index: 1000;
+            display: flex; flex-direction: column; gap: 0.75rem; max-width: 350px; pointer-events: none;
         }
-        .form-field-wrapper .errorlist {
-            @apply text-red-500 text-xs italic mt-1 list-none p-0;
+        .toast {
+            padding: 1rem; border-radius: 0.5rem; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            display: flex; align-items: center; opacity: 0; transform: translateX(100%);
+            transition: opacity 0.5s ease-out, transform 0.5s ease-out; pointer-events: auto;
         }
-        .form-field-wrapper .errorlist li {
-            @apply m-0 p-0;
+        .toast.show { opacity: 1; transform: translateX(0); }
+        .toast.hide { opacity: 0; transform: translateX(100%); transition: opacity 0.5s ease-in, transform 0.5s ease-in; }
+        .toast.success { background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .toast.error { background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+        .toast.info { background-color: #d1ecf1; color: #0c5460; border: 1px solid #bee5eb; }
+        .toast.warning { background-color: #fff3cd; color: #664d03; border: 1px solid #ffeeba; }
+        .toast-icon { margin-right: 0.75rem; font-size: 1.25rem; }
+        .toast-close-button {
+            margin-left: auto; background: none; border: none; font-size: 1.25rem;
+            cursor: pointer; padding: 0 0.25rem; color: inherit; opacity: 0.7;
         }
-        /* Style for Django's default 'required' class on labels */
-        .form-field-wrapper label.required::after {
-            content: " *";
-            color: #ef4444; /* red-500 */
-        }
-        /* General message styling */
-        .messages-container {
-            position: fixed;
-            top: 1rem;
-            right: 1rem;
-            z-index: 1000;
-            width: 90%;
-            max-width: 400px;
-        }
-        .message-item {
-            padding: 1rem;
-            border-radius: 0.5rem;
-            margin-bottom: 0.5rem;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            display: flex;
-            align-items: center;
-        }
-        .message-item.success {
-            background-color: #d1fae5; /* green-100 */
-            color: #065f46; /* green-800 */
-        }
-        .message-item.error {
-            background-color: #fee2e2; /* red-100 */
-            color: #991b1b; /* red-800 */
-        }
-        .message-item.info {
-            background-color: #dbeafe; /* blue-100 */
-            color: #1e40af; /* blue-800 */
-        }
-        .message-item.warning {
-            background-color: #fffbeb; /* amber-100 */
-            color: #92400e; /* amber-800 */
-        }
-        .message-item .close-btn {
-            margin-left: auto;
-            background: none;
-            border: none;
-            font-size: 1.2rem;
-            cursor: pointer;
-            color: inherit;
-            opacity: 0.7;
-        }
-        .message-item .close-btn:hover {
-            opacity: 1;
-        }
-
-        /* Notification Dropdown Styling */
+        .toast-close-button:hover { opacity: 1; }
+        
+        /* Notification Dropdown */
         .notification-dropdown {
-            position: absolute;
-            top: 100%; /* Position below the bell icon */
-            right: 0;
-            background-color: white;
-            border-radius: 0.5rem;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-            width: 300px;
-            max-height: 400px;
-            overflow-y: auto;
-            opacity: 0;
-            visibility: hidden;
-            transform: translateY(10px);
+            position: absolute; top: 100%; right: 0;
+            background-color: var(--rs-surface-container-lowest);
+            border-radius: 0.75rem;
+            box-shadow: 0 8px 32px rgba(31, 27, 20, 0.1);
+            width: 320px; max-height: 400px; overflow-y: auto;
+            opacity: 0; visibility: hidden; transform: translateY(10px);
             transition: opacity 0.2s ease-out, transform 0.2s ease-out, visibility 0.2s ease-out;
-            z-index: 1000;
-            padding: 0.5rem;
+            z-index: 1000; padding: 0.5rem;
         }
-
-        .notification-dropdown.active {
-            opacity: 1;
-            visibility: visible;
-            transform: translateY(0);
-        }
-
+        .notification-dropdown.active { opacity: 1; visibility: visible; transform: translateY(0); }
         .notification-item {
             padding: 0.75rem 1rem;
-            border-bottom: 1px solid #f3f4f6; /* gray-100 */
-            display: flex;
-            align-items: center;
-            font-size: 0.875rem; /* text-sm */
-            color: #4b5563; /* gray-700 */
+            display: flex; align-items: center; font-size: 0.875rem;
+            color: var(--rs-on-surface-variant);
             transition: background-color 0.15s ease-in-out;
         }
-
-        .notification-item:last-child {
-            border-bottom: none;
-        }
-
-        .notification-item.unread {
-            background-color: #fff7ed; /* amber-50 */
-            font-weight: 600; /* semibold */
-        }
-
-        .notification-item:hover {
-            background-color: #f9fafb; /* gray-50 */
-        }
-
-        .notification-item .icon {
-            flex-shrink: 0;
-            margin-right: 0.75rem;
-            color: #f59e0b; /* amber-500 */
-        }
-
-        .notification-item .timestamp {
-            font-size: 0.75rem; /* text-xs */
-            color: #6b7280; /* gray-500 */
-            margin-top: 0.25rem;
-        }
-
-        .notification-item .message-content {
-            flex-grow: 1;
-        }
-        .notification-item a {
-            color: inherit; /* Inherit color from parent */
-            text-decoration: none;
-            display: block; /* Make the whole item clickable */
-        }
-        .notification-item a:hover {
-            text-decoration: none; /* No underline on hover for the whole item */
-        }
-        .notification-item a .message-content:hover {
-            text-decoration: underline; /* Underline only the text content on hover */
-        }
+        .notification-item:last-child { border-bottom: none; }
+        .notification-item.unread { background-color: #fdf2e7; font-weight: 600; }
+        .notification-item:hover { background-color: #f7ece1; }
+        .notification-item .icon { flex-shrink: 0; margin-right: 0.75rem; color: #f59e0b; }
+        .notification-item .timestamp { font-size: 0.75rem; color: #6b7280; margin-top: 0.25rem; }
+        .notification-item .message-content { flex-grow: 1; }
+        .notification-item a { color: inherit; text-decoration: none; display: block; }
+        .notification-item a:hover { text-decoration: none; }
+        .notification-item a .message-content:hover { text-decoration: underline; }
         .notification-count {
-            position: absolute;
-            top: -5px;
-            right: -5px;
-            background-color: #ef4444; /* red-500 */
-            color: white;
-            font-size: 0.75rem;
-            font-weight: bold;
-            border-radius: 9999px;
-            padding: 0.1rem 0.5rem;
-            min-width: 20px;
-            text-align: center;
+            position: absolute; top: -5px; right: -5px;
+            background-color: #ef4444; color: white; font-size: 0.75rem; font-weight: bold;
+            border-radius: 9999px; padding: 0.1rem 0.5rem; min-width: 20px; text-align: center;
         }
-        /* Mobile menu specific styling */
-        .mobile-menu {
-            transition: transform 0.3s ease-out;
-            transform: translateX(100%); /* Hidden by default */
-        }
-        .mobile-menu.active {
-            transform: translateX(0); /* Visible */
-        }
+        
+        /* Mobile menu */
+        .mobile-menu { transition: transform 0.3s ease-out; }
         .mobile-menu-overlay {
-            background-color: rgba(0, 0, 0, 0.5);
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            z-index: 40; /* Below mobile menu, above content */
-            opacity: 0;
-            visibility: hidden;
+            background-color: rgba(0, 0, 0, 0.5); position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+            z-index: 40; opacity: 0; visibility: hidden;
             transition: opacity 0.3s ease-out, visibility 0.3s ease-out;
         }
-        .mobile-menu-overlay.active {
-            opacity: 1;
-            visibility: visible;
-        }
-        /* CKEditor 5 specific styling for frontend content */
-        .prose img {
-            max-width: 100%;
-            height: auto;
-            border-radius: 0.5rem; /* rounded-lg */
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-            margin-top: 1rem;
-            margin-bottom: 1rem;
-        }
-        .prose figure {
-            margin: 0; /* Remove default figure margin */
-        }
-        .prose figcaption {
-            font-size: 0.875rem; /* text-sm */
-            color: #6b7280; /* gray-500 */
-            text-align: center;
-            margin-top: 0.5rem;
-        }
-        /* Ensure responsive video embeds */
-        .video-embed-container {
-            position: relative;
-            width: 100%;
-            padding-bottom: 56.25%; /* 16:9 aspect ratio */
-            height: 0;
-            overflow: hidden;
-            border-radius: 0.75rem; /* rounded-xl */
-        }
-        .video-embed-container iframe {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            border: 0;
-        }
-
-        /* Back to Top Button Styles */
+        
+        /* CKEditor 5 styling */
+        .prose img { max-width: 100%; height: auto; border-radius: 0.5rem; box-shadow: 0 2px 4px rgba(0,0,0,0.1); margin-top: 1rem; margin-bottom: 1rem; }
+        .prose figure { margin: 0; }
+        .prose figcaption { font-size: 0.875rem; color: #6b7280; text-align: center; margin-top: 0.5rem; }
+        .video-embed-container { position: relative; width: 100%; padding-bottom: 56.25%; height: 0; overflow: hidden; border-radius: 0.75rem; }
+        .video-embed-container iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: 0; }
+        
+        /* Back to Top Button */
         #backToTopBtn {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            background-color: #f59e0b; /* amber-500 */
-            color: white;
-            border: none;
-            border-radius: 50%;
-            width: 50px;
-            height: 50px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.5rem;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-            cursor: pointer;
-            opacity: 0; /* Hidden by default */
-            visibility: hidden; /* Hidden by default */
-            transform: translateY(10px); /* Start slightly below */
+            position: fixed; bottom: 20px; right: 20px;
+            background: linear-gradient(135deg, #855300 0%, #f59e0b 100%);
+            color: white; border: none; border-radius: 50%; width: 50px; height: 50px;
+            display: flex; align-items: center; justify-content: center; font-size: 1.5rem;
+            box-shadow: 0 4px 10px rgba(133, 83, 0, 0.3); cursor: pointer;
+            opacity: 0; visibility: hidden; transform: translateY(10px);
             transition: opacity 0.3s ease-in-out, visibility 0.3s ease-in-out, transform 0.3s ease-in-out;
-            z-index: 1000; /* Ensure it's above other content */
-        }
-
-        #backToTopBtn.show {
-            opacity: 1;
-            visibility: visible;
-            transform: translateY(0);
-        }
-
-        #backToTopBtn:hover {
-            background-color: #d97706; /* amber-600 */
-            transform: translateY(-3px); /* Slight lift effect */
-        }
-
-        /* Toast Message Specific Styles - UPDATED FOR AUTO-HIDE */
-        #toast-container {
-            position: fixed;
-            top: 1.5rem;
-            right: 1.5rem;
             z-index: 1000;
-            display: flex;
-            flex-direction: column;
-            gap: 0.75rem;
-            max-width: 350px;
-            pointer-events: none; /* Allows clicks to pass through container */
         }
-
-        .toast {
-            padding: 1rem;
-            border-radius: 0.5rem;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            display: flex;
-            align-items: center;
-            opacity: 0;
-            transform: translateX(100%);
-            transition: opacity 0.5s ease-out, transform 0.5s ease-out; /* Added transition for show */
-            pointer-events: auto; /* Allows interaction with toast */
-        }
-
-        .toast.show {
-            opacity: 1;
-            transform: translateX(0);
-        }
-
-        .toast.hide {
-            opacity: 0;
-            transform: translateX(100%);
-            transition: opacity 0.5s ease-in, transform 0.5s ease-in; /* Added transition for hide */
-        }
-
-        .toast.success {
-            background-color: #d4edda;
-            color: #155724;
-            border: 1px solid #c3e6cb;
-        }
-        .toast.error {
-            background-color: #f8d7da;
-            color: #721c24;
-            border: 1px solid #f5c6cb;
-        }
-        .toast.info {
-            background-color: #d1ecf1;
-            color: #0c5460;
-            border: 1px solid #bee5eb;
-        }
-        .toast.warning { /* Added warning style */
-            background-color: #fff3cd;
-            color: #664d03;
-            border: 1px solid #ffeeba;
-        }
-        .toast-icon {
-            margin-right: 0.75rem;
-            font-size: 1.25rem;
-        }
-        .toast-close-button {
-            margin-left: auto;
-            background: none;
-            border: none;
-            font-size: 1.25rem;
-            cursor: pointer;
-            padding: 0 0.25rem;
-            color: inherit; /* Inherit color from toast type */
-            opacity: 0.7;
-        }
-        .toast-close-button:hover {
-            opacity: 1;
-        }
-
-        /* Skip link styles for accessibility */
+        #backToTopBtn.show { opacity: 1; visibility: visible; transform: translateY(0); }
+        #backToTopBtn:hover { transform: translateY(-3px); }
+        
+        /* Skip link */
         .skip-link {
-            position: absolute;
-            left: -999px;
-            top: auto;
-            width: 1px;
-            height: 1px;
-            overflow: hidden;
-            z-index: 10000;
-            background: #f59e0b;
-            color: #fff;
-            padding: 8px 16px;
-            border-radius: 4px;
+            position: absolute; left: -999px; top: auto; width: 1px; height: 1px; overflow: hidden;
+            z-index: 10000; background: #f59e0b; color: #fff; padding: 8px 16px; border-radius: 4px;
         }
-        .skip-link:focus {
-            left: 16px;
-            top: 16px;
-            width: auto;
-            height: auto;
-            outline: 2px solid #d97706;
-        }
+        .skip-link:focus { left: 16px; top: 16px; width: auto; height: auto; outline: 2px solid #d97706; }
     </style>
 </head>
-<body class="font-sans bg-gray-50 text-gray-800">
-    <!-- Skip to main content link for keyboard users -->
+<body data-csrf-token="{{ csrf_token }}">
     <a href="#main-content" class="skip-link">Skip to main content</a>
 
-    <!-- Global AJAX Loading Spinner Overlay -->
-    <div id="global-ajax-spinner" class="fixed inset-0 z-50 flex items-center justify-center bg-gray-100 bg-opacity-70 hidden">
+    {# Global AJAX Loading Spinner #}
+    <div id="global-ajax-spinner" class="fixed inset-0 z-50 flex items-center justify-center bg-[#fff8f3]/80 backdrop-blur-sm hidden">
         <div class="flex flex-col items-center">
-            <span class="animate-spin rounded-full border-8 border-amber-500 border-t-transparent h-16 w-16 mb-4"></span>
-            <span class="text-lg font-semibold text-amber-700">Loading...</span>
+            <span class="animate-spin rounded-full border-8 border-[#855300] border-t-transparent h-16 w-16 mb-4"></span>
+            <span class="text-lg font-semibold text-[#855300]">Loading...</span>
         </div>
     </div>
 
-    {# Global Message Display #}
-    {# This div is still present for Django's default messages, but they will be converted to toasts by JS below #}
-    <div id="django-messages-list">
+    {# Django Messages (converted to toasts) #}
+    <div id="django-messages-list" class="hidden">
         {% if messages %}
             <ul>
                 {% for message in messages %}
@@ -416,108 +202,175 @@
         {% endif %}
     </div>
 
-    {# Toast Message Container - Toasts will be dynamically added here by JavaScript #}
+    {# Toast Container #}
     <div id="toast-container"></div>
 
     {# Header #}
-    <header class="bg-white shadow-md py-4" role="banner">
+    <header class="rs-glass shadow-sm py-4 sticky top-0 z-40" role="banner">
         <div class="container mx-auto px-4 flex justify-between items-center">
             {# Logo #}
             <a href="{% url 'home' %}" class="flex items-center space-x-2">
-                <img src="{% static 'yoga_app/images/logo.jpg' %}" alt="Yoga Kailasa Logo" aria-hidden="false" class="h-10">
-                <span class="text-2xl font-bold text-amber-600">Yoga Kailasa</span>
+                <img src="{% static 'yoga_app/images/logo.jpg' %}" alt="Yoga Kailasa Logo" class="h-10 w-10 rounded-full object-cover">
+                <span class="text-2xl font-bold rs-headline text-[#855300]">Yoga Kailasa</span>
             </a>
 
             {# Desktop Navigation #}
-            <nav class="hidden md:flex items-center space-x-6" role="navigation" aria-label="Main navigation">
-                {# Global Search Bar with Suggestions #}
+            <nav class="hidden md:flex items-center space-x-5" role="navigation" aria-label="Main navigation">
+                {# Global Search Bar #}
                 <div class="relative flex items-center">
                     <input type="text" id="global-search-input" placeholder="Search..."
-                           class="pl-4 pr-10 py-2 rounded-full border border-gray-300 focus:outline-none focus:ring-1 focus:ring-amber-500 focus:border-amber-500 text-sm w-48">
-                    <button type="submit" class="absolute right-3 text-gray-400 hover:text-amber-600">
+                           class="pl-4 pr-10 py-2 rounded-full border border-[#d8c3ad]/30 focus:outline-none focus:ring-1 focus:ring-[#855300] focus:border-[#855300] text-sm w-44 bg-[#fdf2e7]/50">
+                    <button type="submit" class="absolute right-3 text-[#867461] hover:text-[#855300]">
                         <i class="fas fa-search"></i>
                     </button>
-                    <div id="search-suggestions-container" class="absolute top-full left-0 w-full bg-white border border-gray-200 rounded-md shadow-lg z-30 hidden mt-1">
-                        {# Suggestions will be loaded here by JavaScript #}
+                    <div id="search-suggestions-container" class="absolute top-full left-0 w-full bg-white border border-[#d8c3ad]/20 rounded-md shadow-lg z-30 hidden mt-1">
                     </div>
                 </div>
-                <a href="{% url 'home' %}" class="text-gray-700 hover:text-amber-600 font-medium transition duration-300">Home</a>
-                <a href="{% url 'courses' %}" class="text-gray-700 hover:text-amber-600 font-medium transition duration-300">Courses</a>
-                <a href="{% url 'poses' %}" class="text-gray-700 hover:text-amber-600 font-medium transition duration-300">Poses</a>
-                <a href="{% url 'breathing' %}" class="text-gray-700 hover:text-amber-600 font-medium transition duration-300">Breathing</a>
-                <a href="{% url 'consultant_list' %}" class="text-gray-700 hover:text-amber-600 font-medium transition duration-300">Consultants</a>
-                <a href="{% url 'blog_list' %}" class="text-gray-700 hover:text-amber-600 font-medium transition duration-300">Blog</a>
-                <a href="{% url 'booking' %}" class="text-gray-700 hover:text-amber-600 font-medium transition duration-300">Booking</a>
-                <a href="{% url 'contact' %}" class="text-gray-700 hover:text-amber-600 font-medium transition duration-300">Contact</a>
-                <a href="{% url 'feedback' %}" class="text-gray-700 hover:text-amber-600 font-medium transition duration-300">Feedback</a>
-                <a href="{% url 'about' %}" class="text-gray-700 hover:text-amber-600 font-medium transition duration-300">About Us</a> {# ADDED ABOUT US LINK #}
+
+                <a href="{% url 'home' %}" class="text-[#534434] hover:text-[#855300] font-medium transition duration-300">Home</a>
+                <a href="{% url 'courses' %}" class="text-[#534434] hover:text-[#855300] font-medium transition duration-300">Courses</a>
+
+                {# Practice dropdown #}
+                <div class="relative group">
+                    <button class="flex items-center gap-1 text-[#534434] hover:text-[#855300] font-medium transition duration-300 focus:outline-none">
+                        Practice
+                        <i class="fas fa-chevron-down text-xs transition-transform duration-200 group-hover:rotate-180"></i>
+                    </button>
+                    <div class="absolute left-0 top-full mt-2 w-52 bg-white rounded-xl shadow-lg py-2 z-50 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 transform scale-95 group-hover:scale-100 origin-top-left"
+                         style="border:1px solid rgba(216,195,173,0.2);">
+                        <a href="{% url 'poses' %}" class="flex items-center gap-3 px-4 py-2.5 text-sm text-[#534434] hover:bg-[#fdf2e7] hover:text-[#855300] transition-colors">
+                            <i class="fas fa-spa w-4 text-[#f59e0b]"></i> Sacred Poses
+                        </a>
+                        <a href="{% url 'breathing' %}" class="flex items-center gap-3 px-4 py-2.5 text-sm text-[#534434] hover:bg-[#fdf2e7] hover:text-[#855300] transition-colors">
+                            <i class="fas fa-wind w-4 text-[#f59e0b]"></i> Breathing
+                        </a>
+                        <a href="{% url 'mudras' %}" class="flex items-center gap-3 px-4 py-2.5 text-sm text-[#534434] hover:bg-[#fdf2e7] hover:text-[#855300] transition-colors">
+                            <i class="fas fa-hand-paper w-4 text-[#f59e0b]"></i> Mudras
+                        </a>
+                        <a href="{% url 'meditations' %}" class="flex items-center gap-3 px-4 py-2.5 text-sm text-[#534434] hover:bg-[#fdf2e7] hover:text-[#855300] transition-colors">
+                            <i class="fas fa-om w-4 text-[#f59e0b]"></i> Meditation
+                        </a>
+                        <a href="{% url 'chakra_guide' %}" class="flex items-center gap-3 px-4 py-2.5 text-sm text-[#534434] hover:bg-[#fdf2e7] hover:text-[#855300] transition-colors">
+                            <i class="fas fa-circle-notch w-4 text-[#f59e0b]"></i> Chakra Guide
+                        </a>
+                        <a href="{% url 'kriyas' %}" class="flex items-center gap-3 px-4 py-2.5 text-sm text-[#534434] hover:bg-[#fdf2e7] hover:text-[#855300] transition-colors">
+                            <i class="fas fa-infinity w-4 text-[#f59e0b]"></i> Kriya Sessions
+                        </a>
+                        {% if user.is_authenticated %}
+                        <div class="my-1 mx-4" style="border-top:1px solid rgba(216,195,173,0.3);"></div>
+                        <a href="{% url 'daily_practice' %}" class="flex items-center gap-3 px-4 py-2.5 text-sm text-[#534434] hover:bg-[#fdf2e7] hover:text-[#855300] transition-colors">
+                            <i class="fas fa-journal-whills w-4 text-[#f59e0b]"></i> Practice Journal
+                        </a>
+                        {% endif %}
+                    </div>
+                </div>
+
+                {# Explore dropdown #}
+                <div class="relative group">
+                    <button class="flex items-center gap-1 text-[#534434] hover:text-[#855300] font-medium transition duration-300 focus:outline-none">
+                        Explore
+                        <i class="fas fa-chevron-down text-xs transition-transform duration-200 group-hover:rotate-180"></i>
+                    </button>
+                    <div class="absolute left-0 top-full mt-2 w-48 bg-white rounded-xl shadow-lg py-2 z-50 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 transform scale-95 group-hover:scale-100 origin-top-left"
+                         style="border:1px solid rgba(216,195,173,0.2);">
+                        <a href="{% url 'consultant_list' %}" class="flex items-center gap-3 px-4 py-2.5 text-sm text-[#534434] hover:bg-[#fdf2e7] hover:text-[#855300] transition-colors">
+                            <i class="fas fa-user-tie w-4 text-[#f59e0b]"></i> Consultants
+                        </a>
+                        <a href="{% url 'blog_list' %}" class="flex items-center gap-3 px-4 py-2.5 text-sm text-[#534434] hover:bg-[#fdf2e7] hover:text-[#855300] transition-colors">
+                            <i class="fas fa-feather-alt w-4 text-[#f59e0b]"></i> Journal
+                        </a>
+                        {% if user.is_authenticated %}
+                        <a href="{% url 'create_blog_post' %}" class="flex items-center gap-3 px-4 py-2.5 text-sm text-[#534434] hover:bg-[#fdf2e7] hover:text-[#855300] transition-colors">
+                            <i class="fas fa-pen w-4 text-[#f59e0b]"></i> Write a Post
+                        </a>
+                        {% endif %}
+                        <a href="{% url 'booking' %}" class="flex items-center gap-3 px-4 py-2.5 text-sm text-[#534434] hover:bg-[#fdf2e7] hover:text-[#855300] transition-colors">
+                            <i class="fas fa-calendar-alt w-4 text-[#f59e0b]"></i> Booking
+                        </a>
+                        <a href="{% url 'contact' %}" class="flex items-center gap-3 px-4 py-2.5 text-sm text-[#534434] hover:bg-[#fdf2e7] hover:text-[#855300] transition-colors">
+                            <i class="fas fa-envelope w-4 text-[#f59e0b]"></i> Contact
+                        </a>
+                        <a href="{% url 'about' %}" class="flex items-center gap-3 px-4 py-2.5 text-sm text-[#534434] hover:bg-[#fdf2e7] hover:text-[#855300] transition-colors">
+                            <i class="fas fa-info-circle w-4 text-[#f59e0b]"></i> About
+                        </a>
+                    </div>
+                </div>
 
                 {# User Authentication Links #}
                 {% if user.is_authenticated %}
+                    {% if not user.is_active %}
+                    <a href="{% url 'verify_email_pending' user_id=user.pk %}" class="flex items-center text-[#a73a00] hover:text-[#855300] font-medium transition duration-300 mr-4">
+                        <i class="fas fa-exclamation-circle mr-1.5"></i>
+                        Verify Email
+                    </a>
+                    {% endif %}
                     <div class="relative group">
-                        <a href="{% url 'profile_edit' %}" class="flex items-center text-gray-700 hover:text-amber-600 font-medium transition duration-300">
+                        <a href="{% url 'profile_edit' %}" class="flex items-center text-[#534434] hover:text-[#855300] font-medium transition duration-300">
                             {% if user_profile.profile_picture %}
                                 <img src="{{ user_profile.profile_picture.url }}" alt="{{ user.username }}'s profile picture" class="w-8 h-8 rounded-full object-cover mr-2">
                             {% else %}
-                                <i class="fas fa-user-circle text-2xl mr-2"></i>
+                                <div class="w-8 h-8 rounded-full bg-[#f7ece1] flex items-center justify-center mr-2">
+                                    <i class="fas fa-user text-[#855300] text-sm"></i>
+                                </div>
                             {% endif %}
                             {{ user.username }}
                             <i class="fas fa-chevron-down ml-1 text-xs"></i>
                         </a>
                         <div class="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-20 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 ease-in-out transform scale-95 group-hover:scale-100">
-                            <a href="{% url 'dashboard' %}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"><i class="fas fa-tachometer-alt mr-2"></i> Dashboard</a>
-                            <a href="{% url 'profile_edit' %}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"><i class="fas fa-user mr-2"></i> My Profile</a>
-                            <a href="{% url 'all_notifications' %}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 relative" id="desktop-notifications-link">
-                                <i class="fas fa-bell mr-2"></i> Notifications
+                            <a href="{% url 'dashboard' %}" class="block px-4 py-2 text-sm text-[#534434] hover:bg-[#fdf2e7]"><i class="fas fa-tachometer-alt mr-2 text-[#855300]"></i> Dashboard</a>
+                            <a href="{% url 'profile_edit' %}" class="block px-4 py-2 text-sm text-[#534434] hover:bg-[#fdf2e7]"><i class="fas fa-user mr-2 text-[#855300]"></i> My Profile</a>
+                            <a href="{% url 'daily_practice' %}" class="block px-4 py-2 text-sm text-[#534434] hover:bg-[#fdf2e7]"><i class="fas fa-journal-whills mr-2 text-[#855300]"></i> Practice Journal</a>
+                            {% if user.is_staff %}
+                            <div class="my-1 mx-3" style="border-top:1px solid rgba(216,195,173,0.3);"></div>
+                            <a href="{% url 'teacher_dashboard' %}" class="block px-4 py-2 text-sm text-[#534434] hover:bg-[#fdf2e7]"><i class="fas fa-calendar-check mr-2 text-[#855300]"></i> Manage Bookings</a>
+                            {% endif %}
+                            <a href="{% url 'all_notifications' %}" class="block px-4 py-2 text-sm text-[#534434] hover:bg-[#fdf2e7] relative" id="desktop-notifications-link">
+                                <i class="fas fa-bell mr-2 text-[#855300]"></i> Notifications
                                 {% if unread_notifications_count > 0 %}
                                     <span class="notification-count" id="desktop-notification-count">{{ unread_notifications_count }}</span>
                                 {% endif %}
                             </a>
-                            <a href="{% url 'request_report' %}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"><i class="fas fa-file-alt mr-2"></i> Request a Report</a>
-                            <form action="{% url 'logout' %}" method="post" class="block w-full"> {# Ensure form is block-level for full width click #}
-                                {% csrf_token %}
-                                <button type="submit" class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center">
-                                    <i class="fas fa-sign-out-alt mr-2"></i> Logout
-                                </button>
-                            </form>
+                            <a href="{% url 'request_report' %}" class="block px-4 py-2 text-sm text-[#534434] hover:bg-[#fdf2e7]"><i class="fas fa-file-alt mr-2 text-[#855300]"></i> Request a Report</a>
+                            <button type="button" class="logout-btn w-full text-left px-4 py-2 text-sm text-[#534434] hover:bg-[#fdf2e7] flex items-center">
+                                <i class="fas fa-sign-out-alt mr-2 text-[#855300]"></i> Logout
+                            </button>
                         </div>
                     </div>
-                    {# Desktop Notification Bell (standalone for quick access) #}
+                    {# Desktop Notification Bell #}
                     <div class="relative ml-4">
-                        <button id="notification-bell" class="text-gray-700 hover:text-amber-600 text-xl relative">
+                        <button id="notification-bell" class="text-[#534434] hover:text-[#855300] text-xl relative transition-colors">
                             <i class="fas fa-bell"></i>
                             {% if unread_notifications_count > 0 %}
                                 <span class="notification-count" id="notification-bell-count">{{ unread_notifications_count }}</span>
                             {% endif %}
                         </button>
                         <div id="notification-dropdown" class="notification-dropdown">
-                            <div class="px-4 py-2 text-sm font-semibold text-gray-800 border-b border-gray-100">Recent Notifications</div>
+                            <div class="px-4 py-2 text-sm font-semibold text-[#1f1b14] border-b border-[#d8c3ad]/20">Recent Notifications</div>
                             <div id="notification-list" class="py-1">
-                                {# Notifications will be loaded here by JS #}
-                                <div class="p-4 text-center text-gray-500">Loading notifications...</div>
+                                <div class="p-4 text-center text-[#534434]">Loading notifications...</div>
                             </div>
-                            <div class="px-4 py-2 border-t border-gray-100 text-center">
-                                <a href="{% url 'all_notifications' %}" class="text-amber-600 hover:underline text-sm">View All Notifications</a>
+                            <div class="px-4 py-2 border-t border-[#d8c3ad]/20 text-center">
+                                <a href="{% url 'all_notifications' %}" class="text-[#855300] hover:underline text-sm">View All Notifications</a>
                             </div>
                         </div>
                     </div>
                 {% else %}
-                    <a href="{% url 'login' %}" class="text-gray-700 hover:text-amber-600 font-medium transition duration-300">Login</a>
-                    <a href="{% url 'register' %}" class="bg-amber-500 hover:bg-amber-600 text-white px-5 py-2 rounded-full shadow-md transition duration-300 transform hover:scale-105">Sign Up</a>
+                    <a href="{% url 'login' %}" class="text-[#534434] hover:text-[#855300] font-medium transition duration-300">Login</a>
+                    <a href="{% url 'register' %}" class="rs-btn-primary px-5 py-2 rounded-lg shadow-md transition duration-300 transform hover:scale-105">Sign Up</a>
                 {% endif %}
             </nav>
 
             {# Mobile Menu Button #}
             <div class="md:hidden flex items-center space-x-4">
                 {% if user.is_authenticated %}
-                    <button id="mobile-notification-bell" class="text-gray-700 hover:text-amber-600 text-xl relative">
+                    <button id="mobile-notification-bell" class="text-[#534434] hover:text-[#855300] text-xl relative">
                         <i class="fas fa-bell"></i>
                         {% if unread_notifications_count > 0 %}
                             <span class="notification-count" id="mobile-notification-count">{{ unread_notifications_count }}</span>
                         {% endif %}
                     </button>
                 {% endif %}
-                <button id="mobile-menu-button" class="text-gray-700 text-2xl focus:outline-none">
+                <button id="mobile-menu-button" class="text-[#534434] text-2xl focus:outline-none">
                     <i class="fas fa-bars"></i>
                 </button>
             </div>
@@ -525,56 +378,81 @@
     </header>
 
     {# Mobile Menu Overlay #}
-    <div id="mobile-menu-overlay" class="mobile-menu-overlay fixed inset-0 bg-black bg-opacity-50 z-40 hidden"></div>
+    <div id="mobile-menu-overlay" class="mobile-menu-overlay fixed inset-0 bg-black/50 z-40 hidden" style="transition: opacity 0.3s ease-out, visibility 0.3s ease-out; opacity: 0; visibility: hidden;"></div>
 
     {# Mobile Menu Sidebar #}
-    <div id="mobile-menu" class="mobile-menu fixed top-0 right-0 w-64 h-full bg-white shadow-lg z-50 p-6 transform translate-x-full md:hidden">
+    <div id="mobile-menu" class="mobile-menu fixed top-0 right-0 w-64 h-full bg-white shadow-lg z-50 p-6 pb-20 transform translate-x-full md:hidden overflow-y-auto" style="transition: transform 0.3s ease-out;">
         <div class="flex justify-end mb-6">
-            <button id="close-mobile-menu" class="text-gray-700 text-2xl focus:outline-none">
+            <button id="close-mobile-menu" class="text-[#534434] text-2xl focus:outline-none">
                 <i class="fas fa-times"></i>
             </button>
         </div>
-        <nav class="flex flex-col space-y-4">
-            <a href="{% url 'home' %}" class="text-gray-700 hover:text-amber-600 font-medium text-lg">Home</a>
-            <a href="{% url 'courses' %}" class="text-gray-700 hover:text-amber-600 font-medium text-lg">Courses</a>
-            <a href="{% url 'poses' %}" class="text-gray-700 hover:text-amber-600 font-medium text-lg">Poses</a>
-            <a href="{% url 'breathing' %}" class="text-gray-700 hover:text-amber-600 font-medium text-lg">Breathing</a>
-            <a href="{% url 'consultant_list' %}" class="text-gray-700 hover:text-amber-600 font-medium text-lg">Consultants</a>
-            <a href="{% url 'blog_list' %}" class="text-gray-700 hover:text-amber-600 font-medium text-lg">Blog</a>
-            <a href="{% url 'booking' %}" class="text-gray-700 hover:text-amber-600 font-medium text-lg">Booking</a>
-            <a href="{% url 'contact' %}" class="text-gray-700 hover:text-amber-600 font-medium text-lg">Contact</a>
-            <a href="{% url 'feedback' %}" class="text-gray-700 hover:text-amber-600 font-medium text-lg">Feedback</a>
-            <a href="{% url 'about' %}" class="text-gray-700 hover:text-amber-600 font-medium text-lg">About Us</a> {# ADDED ABOUT US LINK FOR MOBILE #}
+        <nav class="flex flex-col space-y-1">
+            <a href="{% url 'home' %}" class="text-[#534434] hover:text-[#855300] font-medium text-base px-2 py-2 rounded-lg hover:bg-[#fdf2e7]">Home</a>
+            <a href="{% url 'courses' %}" class="text-[#534434] hover:text-[#855300] font-medium text-base px-2 py-2 rounded-lg hover:bg-[#fdf2e7]">Courses</a>
+
+            {# Practice accordion #}
+            <div>
+                <button onclick="toggleMobileSection('mobile-practice')" class="w-full flex items-center justify-between text-[#534434] hover:text-[#855300] font-medium text-base px-2 py-2 rounded-lg hover:bg-[#fdf2e7]">
+                    <span>Practice</span>
+                    <i class="fas fa-chevron-down text-xs transition-transform duration-200" id="mobile-practice-icon"></i>
+                </button>
+                <div id="mobile-practice" class="hidden pl-4 mt-1 space-y-1">
+                    <a href="{% url 'poses' %}" class="flex items-center gap-2 text-sm text-[#534434] hover:text-[#855300] px-2 py-1.5 rounded-lg hover:bg-[#fdf2e7]"><i class="fas fa-spa w-4 text-[#f59e0b]"></i> Sacred Poses</a>
+                    <a href="{% url 'breathing' %}" class="flex items-center gap-2 text-sm text-[#534434] hover:text-[#855300] px-2 py-1.5 rounded-lg hover:bg-[#fdf2e7]"><i class="fas fa-wind w-4 text-[#f59e0b]"></i> Breathing</a>
+                    <a href="{% url 'mudras' %}" class="flex items-center gap-2 text-sm text-[#534434] hover:text-[#855300] px-2 py-1.5 rounded-lg hover:bg-[#fdf2e7]"><i class="fas fa-hand-paper w-4 text-[#f59e0b]"></i> Mudras</a>
+                    <a href="{% url 'meditations' %}" class="flex items-center gap-2 text-sm text-[#534434] hover:text-[#855300] px-2 py-1.5 rounded-lg hover:bg-[#fdf2e7]"><i class="fas fa-om w-4 text-[#f59e0b]"></i> Meditation</a>
+                    <a href="{% url 'chakra_guide' %}" class="flex items-center gap-2 text-sm text-[#534434] hover:text-[#855300] px-2 py-1.5 rounded-lg hover:bg-[#fdf2e7]"><i class="fas fa-circle-notch w-4 text-[#f59e0b]"></i> Chakra Guide</a>
+                    <a href="{% url 'kriyas' %}" class="flex items-center gap-2 text-sm text-[#534434] hover:text-[#855300] px-2 py-1.5 rounded-lg hover:bg-[#fdf2e7]"><i class="fas fa-infinity w-4 text-[#f59e0b]"></i> Kriya Sessions</a>
+                    {% if user.is_authenticated %}
+                    <a href="{% url 'daily_practice' %}" class="flex items-center gap-2 text-sm text-[#534434] hover:text-[#855300] px-2 py-1.5 rounded-lg hover:bg-[#fdf2e7]"><i class="fas fa-journal-whills w-4 text-[#f59e0b]"></i> Practice Journal</a>
+                    {% endif %}
+                </div>
+            </div>
+
+            {# Explore accordion #}
+            <div>
+                <button onclick="toggleMobileSection('mobile-explore')" class="w-full flex items-center justify-between text-[#534434] hover:text-[#855300] font-medium text-base px-2 py-2 rounded-lg hover:bg-[#fdf2e7]">
+                    <span>Explore</span>
+                    <i class="fas fa-chevron-down text-xs transition-transform duration-200" id="mobile-explore-icon"></i>
+                </button>
+                <div id="mobile-explore" class="hidden pl-4 mt-1 space-y-1">
+                    <a href="{% url 'consultant_list' %}" class="flex items-center gap-2 text-sm text-[#534434] hover:text-[#855300] px-2 py-1.5 rounded-lg hover:bg-[#fdf2e7]"><i class="fas fa-user-tie w-4 text-[#f59e0b]"></i> Consultants</a>
+                    <a href="{% url 'blog_list' %}" class="flex items-center gap-2 text-sm text-[#534434] hover:text-[#855300] px-2 py-1.5 rounded-lg hover:bg-[#fdf2e7]"><i class="fas fa-feather-alt w-4 text-[#f59e0b]"></i> Journal</a>
+                    <a href="{% url 'booking' %}" class="flex items-center gap-2 text-sm text-[#534434] hover:text-[#855300] px-2 py-1.5 rounded-lg hover:bg-[#fdf2e7]"><i class="fas fa-calendar-alt w-4 text-[#f59e0b]"></i> Booking</a>
+                    <a href="{% url 'contact' %}" class="flex items-center gap-2 text-sm text-[#534434] hover:text-[#855300] px-2 py-1.5 rounded-lg hover:bg-[#fdf2e7]"><i class="fas fa-envelope w-4 text-[#f59e0b]"></i> Contact</a>
+                    <a href="{% url 'about' %}" class="flex items-center gap-2 text-sm text-[#534434] hover:text-[#855300] px-2 py-1.5 rounded-lg hover:bg-[#fdf2e7]"><i class="fas fa-info-circle w-4 text-[#f59e0b]"></i> About</a>
+                </div>
+            </div>
 
             {% if user.is_authenticated %}
-                <div class="border-t border-gray-200 pt-4 mt-4">
-                    <a href="{% url 'profile_edit' %}" class="flex items-center text-gray-700 hover:text-amber-600 font-medium text-lg mb-2" id="mobile-profile-link">
+                <div class="border-t border-[#d8c3ad]/30 pt-4 mt-4">
+                    <a href="{% url 'profile_edit' %}" class="flex items-center text-[#534434] hover:text-[#855300] font-medium text-lg mb-2" id="mobile-profile-link">
                         {% if user_profile.profile_picture %}
                             <img src="{{ user_profile.profile_picture.url }}" alt="Profile Picture" class="w-8 h-8 rounded-full object-cover mr-2">
                         {% else %}
-                            <i class="fas fa-user-circle text-2xl mr-2"></i>
+                            <div class="w-8 h-8 rounded-full bg-[#f7ece1] flex items-center justify-center mr-2">
+                                <i class="fas fa-user text-[#855300] text-sm"></i>
+                            </div>
                         {% endif %}
                         {{ user.username }}
                     </a>
-                    <a href="{% url 'all_notifications' %}" class="block px-2 py-1 text-gray-700 hover:bg-gray-100 rounded-md relative" id="mobile-notifications-link">
-                        <i class="fas fa-bell mr-2"></i> Notifications
+                    <a href="{% url 'all_notifications' %}" class="block px-2 py-1 text-[#534434] hover:bg-[#fdf2e7] rounded-md relative" id="mobile-notifications-link">
+                        <i class="fas fa-bell mr-2 text-[#855300]"></i> Notifications
                         {% if unread_notifications_count > 0 %}
                             <span class="notification-count" id="mobile-notification-count-nav">{{ unread_notifications_count }}</span>
                         {% endif %}
                     </a>
-                    <a href="{% url 'dashboard' %}" class="block px-2 py-1 text-gray-700 hover:bg-gray-100 rounded-md"><i class="fas fa-tachometer-alt mr-2"></i> Dashboard</a>
-                    <a href="{% url 'profile_edit' %}" class="block px-2 py-1 text-gray-700 hover:bg-gray-100 rounded-md"><i class="fas fa-user mr-2"></i> My Profile</a>
-                    <form action="{% url 'logout' %}" method="post" class="block w-full mt-2">
-                        {% csrf_token %}
-                        <button type="submit" class="w-full text-left py-2 text-white bg-red-600 hover:bg-red-700 font-bold text-lg flex items-center justify-center rounded" id="mobile-logout-btn">
-                            <i class="fas fa-sign-out-alt mr-2"></i> Logout
-                        </button>
-                    </form>
+                    <a href="{% url 'dashboard' %}" class="block px-2 py-1 text-[#534434] hover:bg-[#fdf2e7] rounded-md"><i class="fas fa-tachometer-alt mr-2 text-[#855300]"></i> Dashboard</a>
+                    <a href="{% url 'profile_edit' %}" class="block px-2 py-1 text-[#534434] hover:bg-[#fdf2e7] rounded-md"><i class="fas fa-user mr-2 text-[#855300]"></i> My Profile</a>
+                    <button type="button" class="logout-btn w-full text-left py-2 text-white bg-[#a73a00] hover:bg-[#855300] font-bold text-lg flex items-center justify-center rounded" id="mobile-logout-btn">
+                        <i class="fas fa-sign-out-alt mr-2"></i> Logout
+                    </button>
                 </div>
             {% else %}
-                <div class="border-t border-gray-200 pt-4 mt-4">
-                    <a href="{% url 'login' %}" class="block text-gray-700 hover:text-amber-600 font-medium text-lg">Login</a>
-                    <a href="{% url 'register' %}" class="block bg-amber-500 hover:bg-amber-600 text-white px-5 py-2 rounded-full shadow-md transition duration-300 text-center mt-3">Sign Up</a>
+                <div class="border-t border-[#d8c3ad]/30 pt-4 mt-4">
+                    <a href="{% url 'login' %}" class="block text-[#534434] hover:text-[#855300] font-medium text-lg">Login</a>
+                    <a href="{% url 'register' %}" class="block rs-btn-primary px-5 py-2 rounded-lg shadow-md transition duration-300 text-center mt-3">Sign Up</a>
                 </div>
             {% endif %}
         </nav>
@@ -586,185 +464,142 @@
     </main>
 
     {# Footer #}
-    <footer class="bg-gray-800 text-white py-8" role="contentinfo">
-        <div class="container mx-auto px-4 text-center">
-            <div class="flex flex-wrap justify-center gap-8 mb-6">
-                <a href="{% url 'home' %}" class="hover:text-amber-500 transition duration-300">Home</a>
-                <a href="{% url 'courses' %}" class="hover:text-amber-500 transition duration-300">Courses</a>
-                <a href="{% url 'poses' %}" class="hover:text-amber-500 transition duration-300">Poses</a>
-                <a href="{% url 'breathing' %}" class="hover:text-amber-500 transition duration-300">Breathing</a>
-                <a href="{% url 'consultant_list' %}" class="hover:text-amber-500 transition duration-300">Consultants</a>
-                <a href="{% url 'blog_list' %}" class="hover:text-amber-500 transition duration-300">Blog</a>
-                <a href="{% url 'booking' %}" class="hover:text-amber-500 transition duration-300">Booking</a>
-                <a href="{% url 'contact' %}" class="hover:text-amber-500 transition duration-300">Contact</a>
-                <a href="{% url 'feedback' %}" class="hover:text-amber-500 transition duration-300">Feedback</a>
-                <a href="{% url 'about' %}" class="hover:text-amber-500 transition duration-300">About Us</a> {# ADDED ABOUT US LINK IN FOOTER #}
+    <footer class="bg-[#e2d8cd] text-[#534434] py-12" role="contentinfo">
+        <div class="container mx-auto px-4">
+            <div class="flex flex-wrap justify-center gap-8 mb-8">
+                <a href="{% url 'home' %}" class="hover:text-[#855300] transition duration-300 font-medium">Home</a>
+                <a href="{% url 'courses' %}" class="hover:text-[#855300] transition duration-300 font-medium">Courses</a>
+                <a href="{% url 'poses' %}" class="hover:text-[#855300] transition duration-300 font-medium">Poses</a>
+                <a href="{% url 'breathing' %}" class="hover:text-[#855300] transition duration-300 font-medium">Breathing</a>
+                <a href="{% url 'mudras' %}" class="hover:text-[#855300] transition duration-300 font-medium">Mudras</a>
+                <a href="{% url 'meditations' %}" class="hover:text-[#855300] transition duration-300 font-medium">Meditation</a>
+                <a href="{% url 'chakra_guide' %}" class="hover:text-[#855300] transition duration-300 font-medium">Chakras</a>
+                <a href="{% url 'consultant_list' %}" class="hover:text-[#855300] transition duration-300 font-medium">Consultants</a>
+                <a href="{% url 'blog_list' %}" class="hover:text-[#855300] transition duration-300 font-medium">Blog</a>
+                <a href="{% url 'booking' %}" class="hover:text-[#855300] transition duration-300 font-medium">Booking</a>
+                <a href="{% url 'contact' %}" class="hover:text-[#855300] transition duration-300 font-medium">Contact</a>
+                <a href="{% url 'about' %}" class="hover:text-[#855300] transition duration-300 font-medium">About</a>
             </div>
-            <p class="text-gray-400 text-sm">&copy; {{ "now"|date:"Y" }} Yoga Kailasa. All rights reserved.</p>
-            <div class="flex justify-center space-x-4 mt-4">
-                <a href="#" class="text-gray-400 hover:text-amber-500 transition duration-300"><i class="fab fa-facebook-f"></i></a>
-                <a href="#" class="text-gray-400 hover:text-amber-500 transition duration-300"><i class="fab fa-twitter"></i></a>
-                <a href="#" class="text-gray-400 hover:text-amber-500 transition duration-300"><i class="fab fa-instagram"></i></a>
-                <a href="#" class="text-gray-400 hover:text-amber-500 transition duration-300"><i class="fab fa-youtube"></i></a>
+            <p class="text-center text-[#534434]/60 text-sm mb-4">&copy; {% now "Y" %} Yoga Kailasa. All rights reserved.</p>
+            <div class="flex justify-center space-x-6">
+                <a href="#" class="text-[#534434]/60 hover:text-[#855300] transition duration-300"><i class="fab fa-facebook-f text-lg"></i></a>
+                <a href="#" class="text-[#534434]/60 hover:text-[#855300] transition duration-300"><i class="fab fa-twitter text-lg"></i></a>
+                <a href="#" class="text-[#534434]/60 hover:text-[#855300] transition duration-300"><i class="fab fa-instagram text-lg"></i></a>
+                <a href="#" class="text-[#534434]/60 hover:text-[#855300] transition duration-300"><i class="fab fa-youtube text-lg"></i></a>
             </div>
         </div>
     </footer>
 
-    {# Back to Top Button HTML - NEWLY ADDED/REINTEGRATED #}
+    {# Back to Top Button #}
     <button id="backToTopBtn" title="Go to top">
         <i class="fas fa-arrow-up"></i>
     </button>
+
+    {# Shared utilities — CSRF helper, ajaxPost, like buttons, toasts #}
+    <script src="{% static 'yoga_app/js/kailasa.js' %}"></script>
 
     {# JavaScript Block #}
     {% block extra_js %}
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // GLOBAL AJAX SPINNER HELPERS
             window.showGlobalSpinner = function() {
                 document.getElementById('global-ajax-spinner').classList.remove('hidden');
             }
             window.hideGlobalSpinner = function() {
                 document.getElementById('global-ajax-spinner').classList.add('hidden');
             }
-            /* Mobile Menu Toggle */
-            const mobileMenuButton = document.getElementById('mobile-menu-button');
-            const closeMobileMenuButton = document.getElementById('close-mobile-menu');
-            const mobileMenu = document.getElementById('mobile-menu');
-            const mobileMenuOverlay = document.getElementById('mobile-menu-overlay');
+            
+            // Mobile Menu Toggle
+            function setupMobileMenu(menuButtonId, closeBtnId, menuId, overlayId) {
+                const mobileMenuButtons = document.querySelectorAll(menuButtonId);
+                const closeButtons = document.querySelectorAll(closeBtnId);
+                const menu = document.getElementById(menuId);
+                const overlay = document.getElementById(overlayId);
+                
+                if (!menu || !overlay) return;
 
-            function toggleMobileMenu() {
-                mobileMenu.classList.toggle('translate-x-full');
-                mobileMenu.classList.toggle('active');
-                mobileMenuOverlay.classList.toggle('hidden');
-                mobileMenuOverlay.classList.toggle('active');
-                document.body.style.overflow = mobileMenu.classList.contains('active') ? 'hidden' : ''; // Prevent scrolling when menu is open
-            }
-
-            if (mobileMenuButton) mobileMenuButton.addEventListener('click', toggleMobileMenu);
-            if (closeMobileMenuButton) closeMobileMenuButton.addEventListener('click', toggleMobileMenu);
-            if (mobileMenuOverlay) mobileMenuOverlay.addEventListener('click', toggleMobileMenu); // Close when clicking outside
-
-            // Global Message close functionality
-            document.querySelectorAll('.message-item .close-btn').forEach(button => {
-                button.addEventListener('click', function() {
-                    this.parentElement.style.display = 'none';
-                });
-            });
-
-            /* Smooth Scrolling for Anchor Links (REFINED) */
-            // This now ONLY applies to links with the 'anchor-link' class.
-            document.querySelectorAll('a.anchor-link').forEach(anchor => {
-                anchor.addEventListener('click', function (e) {
-                    const href = this.getAttribute('href');
-                    const [path, hash] = href.split('#');
-                    const targetId = hash;
-                    const targetElement = document.getElementById(targetId);
-
-                    const isCurrentPageHome = (window.location.pathname === '/' || window.location.pathname === '{% url "home" %}');
-                    const isLinkToHome = (path === '' || path === '{% url "home" %}');
-
-                    if (targetElement && (isCurrentPageHome || isLinkToHome)) {
-                        e.preventDefault();
-                        window.scrollTo({
-                            top: targetElement.offsetTop - 80, // Adjust for fixed header
-                            behavior: 'smooth'
-                        });
-                        if (mobileMenu.classList.contains('active')) { // Close mobile menu if open
-                            toggleMobileMenu();
-                        }
-                    } else if (targetId) {
-                        // This part handles navigating to home and then scrolling if the link is an anchor
-                        // This is for cases where an anchor link is clicked from a non-home page
-                        window.location.href = `{% url 'home' %}?scroll_to=${targetId}`;
+                function toggleMobileMenu() {
+                    const isOpen = !menu.classList.contains('translate-x-full');
+                    if (isOpen) {
+                        menu.classList.add('translate-x-full');
+                        overlay.style.opacity = '0';
+                        overlay.style.visibility = 'hidden';
+                        overlay.addEventListener('transitionend', function handler() {
+                            overlay.classList.add('hidden');
+                            overlay.removeEventListener('transitionend', handler);
+                        }, { once: true });
+                        document.body.style.overflow = '';
+                    } else {
+                        menu.classList.remove('translate-x-full');
+                        overlay.classList.remove('hidden');
+                        void overlay.offsetWidth;
+                        overlay.style.opacity = '1';
+                        overlay.style.visibility = 'visible';
+                        document.body.style.overflow = 'hidden';
                     }
-                });
-            });
-
-            /* Handle scrolling to anchor on homepage load (if redirected from another page) */
-            const urlParams = new URLSearchParams(window.location.search);
-            const scrollToId = urlParams.get('scroll_to');
-
-            if (scrollToId && (window.location.pathname === '/' || window.location.pathname === '{% url "home" %}')) {
-                const targetElement = document.getElementById(scrollToId);
-                if (targetElement) {
-                    setTimeout(() => {
-                        window.scrollTo({
-                            top: targetElement.offsetTop - 80, // Adjust for fixed header
-                            behavior: 'smooth'
-                        });
-                        history.replaceState(null, '', window.location.pathname); // Clean up URL
-                    }, 100); // Small delay to ensure page layout is stable
                 }
+
+                mobileMenuButtons.forEach(btn => {
+                    btn.addEventListener('click', function(e) { e.preventDefault(); e.stopPropagation(); toggleMobileMenu(); });
+                });
+                closeButtons.forEach(btn => {
+                    btn.addEventListener('click', function(e) { e.preventDefault(); e.stopPropagation(); toggleMobileMenu(); });
+                });
+                overlay.addEventListener('click', function(e) { e.preventDefault(); e.stopPropagation(); toggleMobileMenu(); });
             }
 
+            // Setup for base.html mobile menu
+            setupMobileMenu('#mobile-menu-button', '#close-mobile-menu', 'mobile-menu', 'mobile-menu-overlay');
+
+            // Mobile accordion sections
+            function toggleMobileSection(id) {
+                const panel = document.getElementById(id);
+                const icon = document.getElementById(id + '-icon');
+                if (!panel) return;
+                const isOpen = !panel.classList.contains('hidden');
+                panel.classList.toggle('hidden', isOpen);
+                if (icon) icon.style.transform = isOpen ? '' : 'rotate(180deg)';
+            }
+            // Expose globally so onclick= works
+            window.toggleMobileSection = toggleMobileSection;
+            // Setup for page-specific mobile menus (pose page, etc.)
+            setupMobileMenu('#mobile-menu-button-page', '#close-mobile-menu-page', 'mobile-menu-page', 'mobile-menu-overlay-page');
 
             /* Toast Notification System */
             window.showToast = function(message, type) {
-                console.log(`Attempting to show toast: Message: "${message}", Type: "${type}"`);
                 const toastContainer = document.getElementById('toast-container');
-                if (!toastContainer) {
-                    console.error("Toast container not found! Cannot display toast.");
-                    return;
-                }
+                if (!toastContainer) return;
 
                 const toast = document.createElement('div');
                 toast.classList.add('toast', type);
-                toast.innerHTML = `
-                    <span class="toast-icon"></span>
-                    <div>${message}</div>
-                    <button class="toast-close-button">&times;</button>
-                `;
-
-                const iconSpan = toast.querySelector('.toast-icon');
-                if (type === 'success') {
-                    iconSpan.innerHTML = '<i class="fas fa-check-circle"></i>';
-                } else if (type === 'error') {
-                    iconSpan.innerHTML = '<i class="fas fa-times-circle"></i>';
-                } else if (type === 'info') {
-                    iconSpan.innerHTML = '<i class="fas fa-info-circle"></i>';
-                } else if (type === 'warning') { // Added warning icon
-                    iconSpan.innerHTML = '<i class="fas fa-exclamation-triangle"></i>';
-                } else {
-                    iconSpan.innerHTML = '<i class="fas fa-bell"></i>';
-                }
-
+                const icons = { success: 'fa-check-circle', error: 'fa-times-circle', info: 'fa-info-circle', warning: 'fa-exclamation-triangle' };
+                toast.innerHTML = `<span class="toast-icon"><i class="fas ${icons[type] || 'fa-bell'}"></i></span><div>${message}</div><button class="toast-close-button">&times;</button>`;
                 toastContainer.appendChild(toast);
-
-                // Force reflow to ensure transition plays
                 void toast.offsetWidth;
                 toast.classList.add('show');
 
                 const hideToast = () => {
                     toast.classList.remove('show');
                     toast.classList.add('hide');
-                    toast.addEventListener('transitionend', function handler() {
-                        toast.remove();
-                        toast.removeEventListener('transitionend', handler);
-                    }, { once: true });
+                    toast.addEventListener('transitionend', () => toast.remove(), { once: true });
                 };
-
                 toast.querySelector('.toast-close-button').addEventListener('click', hideToast);
-
-                setTimeout(hideToast, 5000); // Auto-hide after 5 seconds
+                setTimeout(hideToast, 5000);
             }
 
-            // Iterate over Django messages and display as toasts
+            /* Django Messages */
             const djangoMessagesList = document.getElementById('django-messages-list');
-            
             if (djangoMessagesList) {
                 const messages = djangoMessagesList.querySelectorAll('li');
                 if (messages.length > 0) {
                     messages.forEach(msgElement => {
-                        const messageText = msgElement.textContent.trim();
-                        const messageType = msgElement.classList.length > 0 ? msgElement.classList[0] : 'info'; 
-                        window.showToast(messageText, messageType);
+                        window.showToast(msgElement.textContent.trim(), msgElement.classList[0] || 'info');
                     });
-                    // Optionally hide the original Django messages div after converting to toasts
                     djangoMessagesList.style.display = 'none';
                 }
             }
 
-            /* Global AJAX POST Utility for Like/Unlike */
+            /* Global AJAX POST Utility */
             function getCookie(name) {
                 let cookieValue = null;
                 if (document.cookie && document.cookie !== '') {
@@ -786,24 +621,16 @@
                 try {
                     const response = await fetch(url, {
                         method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'X-CSRFToken': csrftoken,
-                            'Accept': 'application/json'
-                        },
+                        headers: { 'Content-Type': 'application/json', 'X-CSRFToken': csrftoken, 'Accept': 'application/json' },
                         body: JSON.stringify(data)
                     });
-
                     if (!response.ok) {
                         const errorData = await response.json();
                         throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
                     }
-
-
                     const result = await response.json();
                     hideGlobalSpinner();
                     return result;
-
                 } catch (error) {
                     hideGlobalSpinner();
                     console.error("AJAX POST Error:", error);
@@ -812,87 +639,50 @@
                 }
             };
 
-            /* Notification System (Frontend) */
+            /* Notification System */
             const notificationBell = document.getElementById('notification-bell');
-            const notificationBellCount = document.getElementById('notification-bell-count'); // Desktop badge
+            const notificationBellCount = document.getElementById('notification-bell-count');
             const notificationDropdown = document.getElementById('notification-dropdown');
             const notificationList = document.getElementById('notification-list');
-
             const mobileNotificationBell = document.getElementById('mobile-notification-bell');
-            const mobileNotificationCount = document.getElementById('mobile-notification-count'); // Mobile badge
             const mobileNotificationDropdown = document.getElementById('mobile-notification-dropdown');
             const mobileNotificationList = document.getElementById('mobile-notification-list');
-            const mobileNotificationNavCount = document.getElementById('mobile-notification-count-nav'); // Mobile nav link count
 
             async function fetchNotificationsData() {
                 try {
                     const response = await fetch("{% url 'get_notifications_api' %}");
-                    if (!response.ok) {
-                        throw new Error(`HTTP error! status: ${response.status}`);
-                    }
-                    const data = await response.json();
-                    return data.notifications;
+                    if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+                    return (await response.json()).notifications;
                 } catch (error) {
-                    console.error("Error fetching notification data:", error);
+                    // Silently fail — notification errors should never break the page
                     return [];
                 }
             }
 
             function updateNotificationCounts(notifications) {
                 const unreadCount = notifications.filter(n => !n.read).length;
-                
-                if (notificationBellCount) {
-                    notificationBellCount.textContent = unreadCount;
-                    notificationBellCount.style.display = unreadCount > 0 ? 'block' : 'none';
-                }
-                if (mobileNotificationCount) {
-                    mobileNotificationCount.textContent = unreadCount;
-                    mobileNotificationCount.style.display = unreadCount > 0 ? 'block' : 'none';
-                }
-                if (mobileNotificationNavCount) {
-                    mobileNotificationNavCount.textContent = unreadCount;
-                    mobileNotificationNavCount.style.display = unreadCount > 0 ? 'block' : 'none';
-                }
+                [notificationBellCount, mobileNotificationBell].forEach((el, i) => {
+                    const countEl = i === 0 ? notificationBellCount : document.getElementById('mobile-notification-count');
+                    if (countEl) {
+                        countEl.textContent = unreadCount;
+                        countEl.style.display = unreadCount > 0 ? 'block' : 'none';
+                    }
+                });
             }
 
             function renderNotifications(notifications, targetListElement) {
                 targetListElement.innerHTML = '';
                 if (notifications.length === 0) {
-                    targetListElement.innerHTML = '<div class="p-4 text-center text-gray-500">No notifications yet.</div>';
+                    targetListElement.innerHTML = '<div class="p-4 text-center text-[#534434]">No notifications yet.</div>';
                     return;
                 }
-
+                const icons = { reply: 'fa-reply', like: 'fa-heart', blog_post_like: 'fa-heart', course_update: 'fa-book', admin_message: 'fa-user-shield', blog_comment: 'fa-comment-dots', new_blog_post: 'fa-newspaper' };
                 notifications.forEach(notif => {
                     const item = document.createElement('div');
                     item.classList.add('notification-item');
-                    if (!notif.read) {
-                        item.classList.add('unread');
-                    }
-
-                    let iconClass = 'fas fa-info-circle';
-                    if (notif.type === 'reply') {
-                        iconClass = 'fas fa-reply';
-                    } else if (notif.type === 'like' || notif.type === 'blog_post_like') {
-                        iconClass = 'fas fa-heart';
-                    } else if (notif.type === 'course_update') {
-                        iconClass = 'fas fa-book';
-                    } else if (notif.type === 'admin_message') {
-                        iconClass = 'fas fa-user-shield';
-                    } else if (notif.type === 'blog_comment') {
-                        iconClass = 'fas fa-comment-dots';
-                    } else if (notif.type === 'new_blog_post') {
-                        iconClass = 'fas fa-newspaper';
-                    }
-
+                    if (!notif.read) item.classList.add('unread');
                     const senderText = notif.sender_username ? `<span class="font-semibold">${notif.sender_username}</span>` : '';
-
-                    item.innerHTML = `
-                        <span class="icon"><i class="${iconClass}"></i></span>
-                        <a href="${notif.link || '#'}" class="flex-grow">
-                            <div class="message-content">${senderText} ${notif.message}</div>
-                            <div class="timestamp">${notif.created_at}</div>
-                        </a>
-                    `;
+                    item.innerHTML = `<span class="icon"><i class="fas ${icons[notif.type] || 'fa-info-circle'}"></i></span><a href="${notif.link || '#'}" class="flex-grow"><div class="message-content">${senderText} ${notif.message}</div><div class="timestamp">${notif.created_at}</div></a>`;
                     targetListElement.appendChild(item);
                 });
             }
@@ -900,118 +690,108 @@
             async function toggleNotificationDropdown(isMobile = false) {
                 const dropdown = isMobile ? mobileNotificationDropdown : notificationDropdown;
                 const listElement = isMobile ? mobileNotificationList : notificationList;
-                const bellElement = isMobile ? mobileNotificationBell : notificationBell;
-
                 if (dropdown.classList.contains('active')) {
                     dropdown.classList.remove('active');
                 } else {
-                    listElement.innerHTML = '<div class="p-4 text-center text-gray-500">Loading notifications...</div>';
+                    listElement.innerHTML = '<div class="p-4 text-center text-[#534434]">Loading notifications...</div>';
                     dropdown.classList.add('active');
                     const notifications = await fetchNotificationsData();
                     renderNotifications(notifications, listElement);
-                    updateNotificationCounts(notifications); // Update counts after rendering
+                    updateNotificationCounts(notifications);
                 }
             }
 
             if (notificationBell) {
-                notificationBell.addEventListener('click', (event) => {
-                    event.stopPropagation();
-                    toggleNotificationDropdown(false);
-                });
+                notificationBell.addEventListener('click', (e) => { e.stopPropagation(); toggleNotificationDropdown(false); });
             }
-
             if (mobileNotificationBell) {
-                mobileNotificationBell.addEventListener('click', (event) => {
-                    event.stopPropagation();
-                    toggleNotificationDropdown(true);
-                });
+                mobileNotificationBell.addEventListener('click', (e) => { e.stopPropagation(); toggleNotificationDropdown(true); });
             }
-
-            // Close notification dropdowns if clicked outside
-            document.addEventListener('click', (event) => {
-                if (notificationDropdown && notificationDropdown.classList.contains('active') && !notificationDropdown.contains(event.target) && notificationBell && !notificationBell.contains(event.target)) {
+            document.addEventListener('click', (e) => {
+                if (notificationDropdown && notificationDropdown.classList.contains('active') && !notificationDropdown.contains(e.target) && notificationBell && !notificationBell.contains(e.target)) {
                     notificationDropdown.classList.remove('active');
                 }
-                if (mobileNotificationDropdown && mobileNotificationDropdown.classList.contains('active') && !mobileNotificationDropdown.contains(event.target) && mobileNotificationBell && !mobileNotificationBell.contains(event.target)) {
+                if (mobileNotificationDropdown && mobileNotificationDropdown.classList.contains('active') && !mobileNotificationDropdown.contains(e.target) && mobileNotificationBell && !mobileNotificationBell.contains(e.target)) {
                     mobileNotificationDropdown.classList.remove('active');
                 }
             });
 
-            // Initial fetch on page load (only if user is authenticated)
             if (notificationBell || mobileNotificationBell) {
-                fetchNotificationsData().then(notifications => {
-                    updateNotificationCounts(notifications);
-                });
-                setInterval(() => {
-                    fetchNotificationsData().then(notifications => {
-                        updateNotificationCounts(notifications);
-                    });
-                }, 60000); // Poll for new notifications every 60 seconds
+                // Only poll if the page origin matches the server (avoids ERR_SSL_PROTOCOL_ERROR
+                // when the page is loaded via a tunnel but JS tries to hit localhost directly)
+                const isSameOrigin = window.location.protocol !== 'https:' || !window.location.hostname.includes('127.0.0.1');
+                if (isSameOrigin) {
+                    fetchNotificationsData().then(updateNotificationCounts);
+                    setInterval(() => fetchNotificationsData().then(updateNotificationCounts), 60000);
+                }
             }
 
-            /* Back to Top Button Logic */
+            /* Back to Top Button */
             const backToTopBtn = document.getElementById('backToTopBtn');
-
             if (backToTopBtn) {
                 window.addEventListener('scroll', () => {
-                    if (window.pageYOffset > 300) {
-                        backToTopBtn.classList.add('show');
-                    } else {
-                        backToTopBtn.classList.remove('show');
-                    }
+                    backToTopBtn.classList.toggle('show', window.pageYOffset > 300);
                 });
-                backToTopBtn.addEventListener('click', () => {
-                    window.scrollTo({ top: 0, behavior: 'smooth' });
-                });
+                backToTopBtn.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
             }
 
-            // Live Search Suggestions
+            /* Logout Handler - Creates form with fresh CSRF token from cookie */
+            function handleLogout() {
+                const form = document.createElement('form');
+                form.method = 'POST';
+                form.action = "{% url 'logout' %}";
+                const csrfInput = document.createElement('input');
+                csrfInput.type = 'hidden';
+                csrfInput.name = 'csrfmiddlewaretoken';
+                // Read from cookie (most reliable), fall back to body data attribute
+                const cookieMatch = document.cookie.split(';').map(c => c.trim()).find(c => c.startsWith('csrftoken='));
+                csrfInput.value = cookieMatch ? decodeURIComponent(cookieMatch.split('=')[1]) : (document.body.dataset.csrfToken || '');
+                form.appendChild(csrfInput);
+                document.body.appendChild(form);
+                form.submit();
+            }
+            document.querySelectorAll('.logout-btn').forEach(btn => {
+                btn.addEventListener('click', handleLogout);
+            });
+
+            /* Live Search Suggestions */
             const searchInput = document.getElementById('global-search-input');
             const suggestionsContainer = document.getElementById('search-suggestions-container');
             const searchUrl = "{% url 'global_search_suggestions_api' %}";
             const fullSearchUrl = "{% url 'global_search' %}";
-
             let debounceTimer;
 
             if (searchInput && suggestionsContainer) {
                 searchInput.addEventListener('input', function() {
                     clearTimeout(debounceTimer);
                     const query = this.value.trim();
-
-                    if (query.length > 2) { // Only search if query is at least 3 characters
+                    if (query.length > 2) {
                         debounceTimer = setTimeout(() => {
                             fetch(`${searchUrl}?q=${encodeURIComponent(query)}`)
-                                .then(response => response.json())
-                                .then(data => {
-                                    displaySuggestions(data.suggestions);
-                                })
-                                .catch(error => {
-                                    console.error('Error fetching search suggestions:', error);
-                                    suggestionsContainer.innerHTML = '<div class="p-2 text-gray-500">Error loading suggestions.</div>';
+                                .then(r => r.json())
+                                .then(data => displaySuggestions(data.suggestions))
+                                .catch(() => {
+                                    suggestionsContainer.innerHTML = '<div class="p-2 text-[#534434]">Error loading suggestions.</div>';
                                     suggestionsContainer.classList.remove('hidden');
                                 });
-                        }, 300); // Debounce for 300ms
+                        }, 300);
                     } else {
                         suggestionsContainer.classList.add('hidden');
                         suggestionsContainer.innerHTML = '';
                     }
                 });
 
-                // Handle clicking outside to hide suggestions
-                document.addEventListener('click', function(event) {
-                    if (!searchInput.contains(event.target) && !suggestionsContainer.contains(event.target)) {
+                document.addEventListener('click', (e) => {
+                    if (!searchInput.contains(e.target) && !suggestionsContainer.contains(e.target)) {
                         suggestionsContainer.classList.add('hidden');
                     }
                 });
 
-                // Handle pressing Enter in the search input
-                searchInput.addEventListener('keypress', function(event) {
-                    if (event.key === 'Enter') {
-                        event.preventDefault(); // Prevent form submission if it's part of a form
+                searchInput.addEventListener('keypress', function(e) {
+                    if (e.key === 'Enter') {
+                        e.preventDefault();
                         const query = this.value.trim();
-                        if (query) {
-                            window.location.href = `${fullSearchUrl}?q=${encodeURIComponent(query)}`;
-                        }
+                        if (query) window.location.href = `${fullSearchUrl}?q=${encodeURIComponent(query)}`;
                     }
                 });
             }
@@ -1019,49 +799,21 @@
             function displaySuggestions(suggestions) {
                 suggestionsContainer.innerHTML = '';
                 if (suggestions.length === 0) {
-                    suggestionsContainer.innerHTML = '<div class="p-2 text-gray-500">No suggestions found.</div>';
+                    suggestionsContainer.innerHTML = '<div class="p-2 text-[#534434]">No suggestions found.</div>';
                     suggestionsContainer.classList.remove('hidden');
                     return;
                 }
-
+                const icons = { pose: 'fa-spa', breathing: 'fa-wind', course: 'fa-book-open', blog_post: 'fa-newspaper' };
                 suggestions.forEach(item => {
                     const suggestionItem = document.createElement('a');
                     suggestionItem.href = item.url;
-                    suggestionItem.classList.add('block', 'p-2', 'text-gray-700', 'hover:bg-gray-100', 'transition', 'duration-150');
-                    
-                    let icon = '';
-                    if (item.type === 'pose') {
-                        icon = '<i class="fas fa-spa mr-2"></i>';
-                    } else if (item.type === 'breathing') {
-                        icon = '<i class="fas fa-wind mr-2"></i>';
-                    } else if (item.type === 'course') {
-                        icon = '<i class="fas fa-book-open mr-2"></i>';
-                    } else if (item.type === 'blog_post') {
-                        icon = '<i class="fas fa-newspaper mr-2"></i>';
-                    }
-
-                    suggestionItem.innerHTML = `${icon}<span>${item.title}</span>`;
+                    suggestionItem.classList.add('block', 'p-2', 'text-[#534434]', 'hover:bg-[#fdf2e7]', 'transition', 'duration-150');
+                    suggestionItem.innerHTML = `<i class="fas ${icons[item.type] || 'fa-search'} mr-2 text-[#855300]"></i><span>${item.title}</span>`;
                     suggestionsContainer.appendChild(suggestionItem);
                 });
                 suggestionsContainer.classList.remove('hidden');
             }
         });
-
-        // Function to get CSRF token from cookies (needed for POST requests)
-        function getCookie(name) {
-            let cookieValue = null;
-            if (document.cookie && document.cookie !== '') {
-                const cookies = document.cookie.split(';');
-                for (let i = 0; i < cookies.length; i++) {
-                    const cookie = cookies[i].trim();
-                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
-                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                        break;
-                    }
-                }
-            }
-            return cookieValue;
-        }
     </script>
     {% endblock %}
 </body>

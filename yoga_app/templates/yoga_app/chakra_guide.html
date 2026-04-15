@@ -1,0 +1,194 @@
+{% extends 'yoga_app/base.html' %}
+{% load static %}
+
+{% block title %}Chakra Guide — The Seven Energy Centres | Yoga Kailasa{% endblock %}
+{% block meta_description %}Explore the seven chakras — their colours, elements, mantras, and associated yoga poses, mudras, and breathing techniques.{% endblock %}
+
+{% block extra_css %}
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif:ital,wght@0,400;0,700;1,400&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+    body { font-family:'Manrope',sans-serif; background:#fff8f3; }
+    .rs-headline { font-family:'Noto Serif',serif; line-height:1.4; }
+    .rs-glass { background:rgba(255,248,243,0.85); backdrop-filter:blur(20px); }
+    .rs-btn-primary { background:linear-gradient(135deg,#855300 0%,#f59e0b 100%); color:#fff; transition:all .3s; }
+    .rs-btn-secondary { background-color:#f1e7db; color:#855300; transition:all .3s; }
+    .chakra-tab { transition:all .3s; cursor:pointer; border-left:3px solid transparent; }
+    .chakra-tab.active { border-left-color:var(--chakra-color); background:rgba(255,248,243,0.8); }
+    .chakra-tab:hover:not(.active) { background:#fdf2e7; }
+    .chakra-dot { width:14px; height:14px; border-radius:50%; flex-shrink:0; }
+    .detail-page > header, .detail-page > #mobile-menu, .detail-page > #mobile-menu-overlay, .detail-page > #backToTopBtn { display:none !important; }
+    .detail-page > main { padding:0 !important; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="detail-page min-h-screen" style="background:#fff8f3;">
+
+    <nav class="fixed top-0 w-full z-50 rs-glass shadow-sm">
+        <div class="flex justify-between items-center px-6 md:px-10 py-4 max-w-7xl mx-auto">
+            <a href="{% url 'home' %}" class="rs-headline text-xl font-bold" style="color:#855300;">Yoga Kailasa</a>
+            <div class="flex gap-6 text-sm" style="color:#534434;">
+                <a href="{% url 'mudras' %}" class="hover:underline">Mudras</a>
+                <a href="{% url 'meditations' %}" class="hover:underline">Meditation</a>
+            </div>
+        </div>
+    </nav>
+
+    <main class="pt-24 pb-20">
+
+        {# Hero #}
+        <section class="px-6 md:px-12 py-12 max-w-7xl mx-auto">
+            <p class="text-xs uppercase tracking-widest font-semibold mb-3" style="color:#867461;">Energy Anatomy</p>
+            <h1 class="rs-headline text-5xl md:text-6xl font-bold mb-4" style="color:#855300;">The Seven<br><em class="font-normal">Chakras</em></h1>
+            <p class="text-xl max-w-2xl leading-relaxed" style="color:#534434;">
+                Ancient energy centres that govern the flow of prana through the body. Each chakra is a gateway — when balanced, life flows with grace and clarity.
+            </p>
+        </section>
+
+        {% if chakras %}
+        <section class="px-6 md:px-12 max-w-7xl mx-auto">
+            <div class="flex flex-col lg:flex-row gap-8">
+
+                {# Sidebar — chakra list #}
+                <div class="lg:w-72 flex-shrink-0">
+                    <div class="sticky top-24 rounded-2xl overflow-hidden" style="background:#fdf2e7;">
+                        {% for chakra in chakras %}
+                        <a href="?chakra={{ chakra.key }}"
+                           class="chakra-tab flex items-center gap-4 px-5 py-4 {% if selected_chakra.key == chakra.key %}active{% endif %}"
+                           style="--chakra-color:{{ chakra.color_hex }};">
+                            {% if chakra.image_url %}
+                            <div class="w-8 h-8 rounded-full overflow-hidden flex-shrink-0 border-2" style="border-color:{{ chakra.color_hex }};">
+                                <img src="{{ chakra.image_url }}" alt="{{ chakra.name }}" class="w-full h-full object-cover">
+                            </div>
+                            {% else %}
+                            <div class="chakra-dot" style="background:{{ chakra.color_hex }};"></div>
+                            {% endif %}
+                            <div>
+                                <p class="font-bold text-sm" style="color:#1f1b14;">{{ chakra.name }}</p>
+                                <p class="text-xs italic" style="color:#867461;">{{ chakra.sanskrit_name }}</p>
+                            </div>
+                            <span class="ml-auto text-xs font-bold" style="color:{{ chakra.color_hex }};">{{ chakra.number }}</span>
+                        </a>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                {# Main content #}
+                {% if selected_chakra %}
+                <div class="flex-1 min-w-0">
+                    <div class="rounded-2xl overflow-hidden" style="background:#ffffff;box-shadow:0 4px 24px rgba(133,83,0,0.06);">
+
+                        {# Chakra header band #}
+                        <div class="p-8" style="background:{{ selected_chakra.color_hex }}15;">
+                            <div class="flex items-center gap-6 mb-4">
+                                {% if selected_chakra.image_url %}
+                                <div class="w-20 h-20 rounded-full overflow-hidden flex-shrink-0 border-4" style="border-color:{{ selected_chakra.color_hex }};">
+                                    <img src="{{ selected_chakra.image_url }}" alt="{{ selected_chakra.name }} chakra symbol" class="w-full h-full object-cover">
+                                </div>
+                                {% else %}
+                                <div class="w-16 h-16 rounded-full flex items-center justify-center text-white text-2xl font-bold rs-headline flex-shrink-0" style="background:{{ selected_chakra.color_hex }};">
+                                    {{ selected_chakra.number }}
+                                </div>
+                                {% endif %}
+                                <div>
+                                    <h2 class="rs-headline text-3xl font-bold" style="color:#1f1b14;">{{ selected_chakra.name }} Chakra</h2>
+                                    <p class="rs-headline text-xl italic" style="color:#867461;">{{ selected_chakra.sanskrit_name }}</p>
+                                </div>
+                            </div>
+                            <div class="flex flex-wrap gap-4 text-sm">
+                                {% if selected_chakra.color %}<span class="px-3 py-1 rounded-full font-semibold" style="background:{{ selected_chakra.color_hex }}25;color:{{ selected_chakra.color_hex }};">● {{ selected_chakra.color }}</span>{% endif %}
+                                {% if selected_chakra.element %}<span class="px-3 py-1 rounded-full font-semibold" style="background:#f1e7db;color:#534434;">{{ selected_chakra.element }}</span>{% endif %}
+                                {% if selected_chakra.seed_mantra %}<span class="px-3 py-1 rounded-full font-semibold rs-headline italic" style="background:#f1e7db;color:#855300;">{{ selected_chakra.seed_mantra }}</span>{% endif %}
+                                {% if selected_chakra.location %}<span class="px-3 py-1 rounded-full font-semibold" style="background:#f1e7db;color:#534434;"><i class="fas fa-map-marker-alt mr-1"></i>{{ selected_chakra.location }}</span>{% endif %}
+                            </div>
+                        </div>
+
+                        <div class="p-8 space-y-8">
+
+                            {# Description #}
+                            <p class="text-lg leading-relaxed" style="color:#534434;">{{ selected_chakra.description }}</p>
+
+                            {# Balance / Imbalance #}
+                            {% if selected_chakra.signs_of_balance or selected_chakra.signs_of_imbalance %}
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                {% if selected_chakra.signs_of_balance %}
+                                <div class="p-6 rounded-xl" style="background:#f0fdf4;">
+                                    <h3 class="font-bold mb-3 flex items-center gap-2" style="color:#166534;"><i class="fas fa-check-circle"></i> When Balanced</h3>
+                                    <p class="text-sm leading-relaxed" style="color:#166534;">{{ selected_chakra.signs_of_balance }}</p>
+                                </div>
+                                {% endif %}
+                                {% if selected_chakra.signs_of_imbalance %}
+                                <div class="p-6 rounded-xl" style="background:#fff7ed;">
+                                    <h3 class="font-bold mb-3 flex items-center gap-2" style="color:#9a3412;"><i class="fas fa-exclamation-circle"></i> Signs of Imbalance</h3>
+                                    <p class="text-sm leading-relaxed" style="color:#9a3412;">{{ selected_chakra.signs_of_imbalance }}</p>
+                                </div>
+                                {% endif %}
+                            </div>
+                            {% endif %}
+
+                            {# Associated practices #}
+                            {% if selected_chakra.associated_poses.all %}
+                            <div>
+                                <h3 class="rs-headline text-xl font-bold mb-4" style="color:#855300;">Associated Poses</h3>
+                                <div class="flex flex-wrap gap-3">
+                                    {% for pose in selected_chakra.associated_poses.all %}
+                                    <a href="{% url 'pose_detail' pose.id %}" class="px-4 py-2 rounded-lg text-sm font-semibold transition-all hover:-translate-y-0.5" style="background:#fdf2e7;color:#534434;">
+                                        {{ pose.name }}
+                                    </a>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                            {% endif %}
+
+                            {% if selected_chakra.associated_mudras.all %}
+                            <div>
+                                <h3 class="rs-headline text-xl font-bold mb-4" style="color:#855300;">Associated Mudras</h3>
+                                <div class="flex flex-wrap gap-3">
+                                    {% for mudra in selected_chakra.associated_mudras.all %}
+                                    <a href="{% url 'mudra_detail' mudra.id %}" class="px-4 py-2 rounded-lg text-sm font-semibold transition-all hover:-translate-y-0.5" style="background:#fdf2e7;color:#534434;">
+                                        {{ mudra.name }}
+                                    </a>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                            {% endif %}
+
+                            {% if selected_chakra.associated_breathing.all %}
+                            <div>
+                                <h3 class="rs-headline text-xl font-bold mb-4" style="color:#855300;">Breathing Techniques</h3>
+                                <div class="flex flex-wrap gap-3">
+                                    {% for bt in selected_chakra.associated_breathing.all %}
+                                    <a href="{% url 'breathing_technique_detail' bt.id %}" class="px-4 py-2 rounded-lg text-sm font-semibold transition-all hover:-translate-y-0.5" style="background:#fdf2e7;color:#534434;">
+                                        {{ bt.name }}
+                                    </a>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                            {% endif %}
+
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+
+            </div>
+        </section>
+
+        {% else %}
+        {# Empty state — admin hasn't added chakras yet #}
+        <section class="px-6 md:px-12 max-w-7xl mx-auto text-center py-24">
+            <div class="w-20 h-20 rounded-full mx-auto mb-6 flex items-center justify-center" style="background:linear-gradient(135deg,#855300,#f59e0b);">
+                <i class="fas fa-circle-notch text-3xl text-white"></i>
+            </div>
+            <h2 class="rs-headline text-3xl font-bold mb-4" style="color:#855300;">Chakra content coming soon</h2>
+            <p class="text-lg mb-8" style="color:#534434;">The seven energy centres are being prepared. Check back soon.</p>
+            <div class="flex gap-4 justify-center">
+                <a href="{% url 'mudras' %}" class="rs-btn-primary px-6 py-3 rounded-lg font-semibold">Explore Mudras</a>
+                <a href="{% url 'meditations' %}" class="rs-btn-secondary px-6 py-3 rounded-lg font-semibold">Meditations</a>
+            </div>
+        </section>
+        {% endif %}
+
+    </main>
+</div>
+{% endblock %}

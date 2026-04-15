@@ -1,0 +1,4 @@
+# file: C:\Users\Orunmila1\Documents\Projects\yoga_kailasa_project\yoga_app\views\user_views.py
+# hypothesis_version: 6.151.12
+
+[400, 500, '-booked_at', '-completed_at', '-created_at', '-paid_at', '30/m', '5/h', '60/m', 'POST', 'booking_history', 'course', 'dashboard', 'error', 'last_viewed_lesson', 'message', 'notifications', 'payment_history', 'progress', 'read', 'recent_completions', 'recent_notifications', 'report_type', 'sender', 'status', 'success', 'user', 'user_profile']

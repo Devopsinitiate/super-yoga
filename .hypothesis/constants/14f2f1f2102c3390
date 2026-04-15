@@ -1,0 +1,4 @@
+# file: C:\Users\Orunmila1\Documents\Projects\yoga_kailasa_project\yoga_app\services\search_service.py
+# hypothesis_version: 6.151.12
+
+[0.0, 0.1, 365, '-avg_rating', '-created_at', '-is_popular', '-likes_count', '-price', '-published_date', '-rank', '-title', ':*', 'A', 'B', 'C', 'D', 'alpha_asc', 'author__username', 'avg_rating', 'blog_post', 'breathing', 'breathing_techniques', 'content', 'course', 'courses', 'description', 'excerpt', 'free', 'id', 'instructor_name', 'likes', 'most_liked', 'name', 'newest', 'oldest', 'paid', 'past_month', 'past_week', 'past_year', 'popular_desc', 'pose', 'poses', 'postgresql', 'price', 'price_asc', 'price_desc', 'published_date', 'rating_desc', 'raw', 'reviews__rating', 'sanskrit_name', 'slug', 'title', 'title_asc', 'title_desc', 'type', 'url', 'websearch', 'yoga_poses']

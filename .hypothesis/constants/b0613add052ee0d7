@@ -1,0 +1,4 @@
+# file: C:\Users\Orunmila1\Documents\Projects\yoga_kailasa_project\yoga_app\migrations\0016_booking_phone_number_consultant_profile_picture_url_and_more.py
+# hypothesis_version: 6.151.12
+
+[255, 500, 'booking', 'consultant', 'contactmessage', 'created_at', 'last_viewed_by', 'last_viewed_lesson', 'paid_at', 'payment', 'phone_number', 'profile_picture_url', 'subject', 'updated_at', 'userprofile', 'yoga_app', 'yoga_app.lesson']

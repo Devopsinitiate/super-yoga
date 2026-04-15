@@ -1,0 +1,4 @@
+# file: C:\Users\Orunmila1\Documents\Projects\yoga_kailasa_project\yoga_app\migrations\0014_notification.py
+# hypothesis_version: 6.151.12
+
+[500, '-created_at', 'Admin Message', 'Course Update', 'ID', 'New Like', 'New Reply', 'Notification', 'Notifications', 'admin_message', 'course_update', 'created_at', 'id', 'like', 'link', 'message', 'notification_type', 'notifications', 'ordering', 'read', 'recipient', 'reply', 'sender', 'sent_notifications', 'verbose_name', 'verbose_name_plural', 'yoga_app']

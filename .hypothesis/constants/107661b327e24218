@@ -1,0 +1,4 @@
+# file: C:\Users\Orunmila1\Documents\Projects\yoga_kailasa_project\yoga_app\migrations\0006_remove_course_content_and_more.py
+# hypothesis_version: 6.151.12
+
+['content', 'course', 'payment', 'paystack_reference', 'yoga_app']

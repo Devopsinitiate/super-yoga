@@ -1,0 +1,4 @@
+# file: C:\Users\Orunmila1\Documents\Projects\yoga_kailasa_project\yoga_app\views\__init__.py
+# hypothesis_version: 6.151.12
+
+['-is_popular', '-submitted_at', '?', 'CustomLoginView', 'CustomLogoutView', 'about_view', 'blog_detail_view', 'blog_list_view', 'booking_view', 'breathing_list_view', 'breathing_techniques', 'consultant_list_view', 'consultants', 'contact_form', 'contact_view', 'course_content_view', 'course_detail_view', 'course_list_view', 'courses', 'delete_account_view', 'feedback_view', 'global_search_view', 'home_view', 'name', 'pose_detail_view', 'pose_list_view', 'price', 'profile_update_view', 'register_view', 'request_report_view', 'testimonials', 'toggle_post_like', 'toggle_topic_like', 'user_dashboard_view', 'verify_email_view', 'verify_payment_view', 'yoga_app/index.html', 'yoga_poses']

@@ -1,0 +1,4 @@
+# file: C:\Users\Orunmila1\Documents\Projects\yoga_kailasa_project\yoga_app\migrations\0031_remove_blogpost_featured_image_webp_and_more.py
+# hypothesis_version: 6.151.12
+
+['-created_at', '-is_popular', '-published_date', '-submitted_at', 'author', 'blogpost', 'course', 'coursereview', 'featured_image_webp', 'idx_blog_author', 'idx_blog_published', 'idx_blog_slug', 'idx_course_created', 'idx_course_free', 'idx_notif_type', 'idx_payment_status', 'idx_review_course', 'idx_review_rating', 'idx_userprofile_user', 'is_free', 'is_published', 'notification', 'notification_type', 'payment', 'price', 'profile_picture_webp', 'rating', 'read', 'recipient', 'reference', 'slug', 'status', 'user', 'userprofile', 'yoga_app']

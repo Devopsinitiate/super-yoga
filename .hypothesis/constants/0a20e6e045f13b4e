@@ -1,0 +1,4 @@
+# file: C:\Users\Orunmila1\Documents\Projects\yoga_kailasa_project\yoga_app\migrations\0005_course_content_payment_paystack_reference.py
+# hypothesis_version: 6.151.12
+
+[100, '0004_userprofile', 'content', 'course', 'payment', 'paystack_reference', 'yoga_app']

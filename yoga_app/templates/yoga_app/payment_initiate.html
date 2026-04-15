@@ -1,130 +1,298 @@
 {% extends 'yoga_app/base.html' %}
 {% load static %}
 
-{% block title %}Initiate Payment - Yoga Kailasa{% endblock %}
+{% block title %}Complete Enrollment — {{ course.title }} | Yoga Kailasa{% endblock %}
+
+{% block extra_css %}
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif:ital,wght@0,400;0,700;1,400&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
+<style>
+    .payment-page {
+        font-family: 'Manrope', sans-serif;
+        background-color: #fff8f3;
+        color: #1f1b14;
+        min-height: 100vh;
+    }
+    .payment-page .rs-glass {
+        background-color: rgba(255, 248, 243, 0.85);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+    }
+    .payment-page .rs-btn-primary {
+        background: linear-gradient(135deg, #855300 0%, #f59e0b 100%);
+        color: #ffffff;
+        transition: all 0.3s ease;
+    }
+    .payment-page .rs-btn-primary:hover:not(:disabled) {
+        opacity: 0.92;
+        transform: scale(1.02);
+    }
+    .payment-page .rs-btn-primary:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+        transform: none;
+    }
+    .trust-badge {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        color: #534434;
+        font-size: 0.8rem;
+    }
+    .trust-badge .material-icons-round {
+        font-size: 1.1rem;
+        color: #855300;
+    }
+    .price-tag {
+        font-family: 'Noto Serif', serif;
+        font-size: 2.5rem;
+        font-weight: 700;
+        color: #855300;
+        line-height: 1;
+    }
+    .course-card {
+        background: #ffffff;
+        border-radius: 1rem;
+        overflow: hidden;
+        box-shadow: 0 8px 32px rgba(31, 27, 20, 0.06);
+    }
+    .quote-bar {
+        background: linear-gradient(135deg, #855300 0%, #f59e0b 100%);
+        color: #ffffff;
+        font-family: 'Noto Serif', serif;
+        font-style: italic;
+        font-size: 0.9rem;
+        line-height: 1.6;
+        padding: 1.25rem 2rem;
+        text-align: center;
+    }
+    /* Spinner animation */
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .spinner {
+        display: inline-block;
+        width: 1rem;
+        height: 1rem;
+        border: 2px solid rgba(255,255,255,0.4);
+        border-top-color: #ffffff;
+        border-radius: 50%;
+        animation: spin 0.7s linear infinite;
+        vertical-align: middle;
+        margin-right: 0.4rem;
+    }
+    /* Hide base.html nav/footer overlap */
+    .payment-page > header,
+    .payment-page > #mobile-menu,
+    .payment-page > #mobile-menu-overlay,
+    .payment-page > #backToTopBtn {
+        display: none !important;
+    }
+    .payment-page > main { padding: 0 !important; }
+</style>
+{% endblock %}
 
 {% block content %}
-<section class="py-16 bg-gradient-to-r from-amber-100 to-amber-50 min-h-screen flex items-center justify-center">
-    <div class="bg-white p-8 rounded-lg shadow-xl text-center max-w-md w-full">
-        <h2 class="text-2xl font-bold text-gray-800 mb-4">Confirm Your Course Enrollment</h2>
-        <p class="text-gray-600 mb-6">You are about to enroll in: <br>
-           <strong class="text-amber-600 text-lg">{{ course.title }}</strong> for
-           <strong class="text-green-600 text-xl">${{ course.price|floatformat:2 }}</strong>.
-        </p>
-        <p class="text-gray-600 mb-6">Click the button below to complete your payment securely with Paystack.</p>
+<div class="payment-page">
 
-        <button id="paystack-button"
-                class="w-full bg-amber-500 hover:bg-amber-600 text-white font-medium py-3 px-4 rounded-lg transition duration-300 flex items-center justify-center">
-            <i class="fas fa-money-bill-wave mr-2"></i> Pay Now
-        </button>
+    {# ── Minimal Nav ── #}
+    <nav class="fixed top-0 w-full z-50 rs-glass shadow-sm">
+        <div class="flex justify-between items-center px-6 md:px-10 py-4 max-w-6xl mx-auto">
+            <a href="{% url 'home' %}" class="text-xl font-bold rs-headline" style="color:#855300;">Yoga Kailasa</a>
+            <a href="{% url 'course_detail' course.id %}"
+               class="inline-flex items-center gap-1.5 text-sm font-medium transition-colors"
+               style="color:#534434;">
+                <i class="fas fa-arrow-left text-xs"></i>
+                Back to Course
+            </a>
+        </div>
+    </nav>
 
-        <div id="payment-status" class="mt-4 text-sm text-gray-700"></div>
-    </div>
-</section>
+    <main class="pt-28 pb-20 px-4 md:px-6 min-h-screen flex items-center justify-center">
+        <div class="w-full max-w-lg">
+
+            {# ── Step label ── #}
+            <p class="text-xs uppercase tracking-widest font-semibold mb-3 text-center" style="color:#867461;">
+                Course Selection
+            </p>
+
+            {# ── Main card ── #}
+            <div class="course-card">
+
+                {# Course header band #}
+                <div class="px-8 pt-8 pb-6" style="background:#fdf2e7;">
+                    <h1 class="rs-headline text-xl font-bold mb-1" style="color:#1f1b14;">{{ course.title }}</h1>
+                    {% if course.description %}
+                    <p class="text-sm leading-relaxed mb-3" style="color:#534434;">
+                        {{ course.description|striptags|truncatechars:120 }}
+                    </p>
+                    {% endif %}
+                    <p class="text-xs" style="color:#867461;">
+                        Includes digital manual &amp; lifetime access
+                    </p>
+                </div>
+
+                {# Divider via tonal shift — no border #}
+                <div class="px-8 py-6" style="background:#ffffff;">
+
+                    {# Price row #}
+                    <div class="flex items-end justify-between mb-6">
+                        <div>
+                            <p class="text-xs uppercase tracking-widest mb-1" style="color:#867461;">Total</p>
+                            <div class="price-tag">${{ course.price|floatformat:2 }}</div>
+                        </div>
+                        {% if course.instructor_name %}
+                        <div class="text-right">
+                            <p class="text-xs uppercase tracking-widest mb-1" style="color:#867461;">Instructor</p>
+                            <p class="text-sm font-semibold" style="color:#534434;">{{ course.instructor_name }}</p>
+                        </div>
+                        {% endif %}
+                    </div>
+
+                    {# CTA button #}
+                    <button id="paystack-button"
+                            class="rs-btn-primary w-full py-4 rounded-xl font-semibold text-base flex items-center justify-center gap-2 mb-4">
+                        <span class="material-icons-round text-lg">arrow_forward</span>
+                        Complete Enrollment
+                    </button>
+
+                    {# Status message #}
+                    <div id="payment-status" class="text-sm text-center min-h-[1.5rem]" style="color:#534434;"></div>
+
+                    {# Trust badges #}
+                    <div class="flex items-center justify-center gap-6 mt-5 pt-5" style="border-top: 1px solid rgba(216,195,173,0.3);">
+                        <div class="trust-badge">
+                            <span class="material-icons-round">lock</span>
+                            <span>Secure Checkout</span>
+                        </div>
+                        <div class="trust-badge">
+                            <span class="material-icons-round">verified_user</span>
+                            <span>Guaranteed Access</span>
+                        </div>
+                    </div>
+                </div>
+
+                {# Quote bar #}
+                <div class="quote-bar">
+                    "Breath by breath, let the sanctuary within you grow."
+                </div>
+            </div>
+
+            {# Sign-in nudge for guests #}
+            {% if not user.is_authenticated %}
+            <p class="text-center text-sm mt-6" style="color:#867461;">
+                Already have an account?
+                <a href="{% url 'login' %}?next={{ request.path }}" style="color:#855300;" class="font-semibold hover:underline">Sign In</a>
+            </p>
+            {% endif %}
+
+        </div>
+    </main>
+
+    {# ── Footer ── #}
+    <footer style="background:#f1e7db;" class="py-8 px-6">
+        <div class="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
+            <div class="flex gap-6 text-xs uppercase tracking-widest" style="color:#867461;">
+                <a href="{% url 'privacy_policy' %}" class="hover:opacity-70 transition-opacity">Privacy Policy</a>
+                <a href="{% url 'terms_of_service' %}" class="hover:opacity-70 transition-opacity">Terms of Service</a>
+                <a href="{% url 'contact' %}" class="hover:opacity-70 transition-opacity">Contact Us</a>
+            </div>
+            <p class="text-xs" style="color:#867461;">© {% now "Y" %} Yoga Kailasa. Crafted for the Radiant Soul.</p>
+        </div>
+    </footer>
+
+</div>
 {% endblock %}
 
 {% block extra_js %}
-    {{ block.super }} {# Include any JS from base.html #}
-    <!-- Paystack Inline JavaScript SDK -->
-    <script src="https://js.paystack.co/v1/inline.js"></script>
+{{ block.super }}
+<script src="https://js.paystack.co/v1/inline.js"></script>
+<script>
+    let paymentButton;
+    let paymentStatusDiv;
 
-    <script>
-        // Moved declarations to a higher scope so payWithPaystack can access them
-        let paymentButton;
-        let paymentStatusDiv;
+    document.addEventListener('DOMContentLoaded', function () {
+        paymentButton = document.getElementById('paystack-button');
+        paymentStatusDiv = document.getElementById('payment-status');
 
-        document.addEventListener('DOMContentLoaded', function() {
-            paymentButton = document.getElementById('paystack-button');
-            paymentStatusDiv = document.getElementById('payment-status');
-
-            if (paymentButton) {
-                paymentButton.addEventListener('click', function(e) {
-                    e.preventDefault(); // Prevent default form submission if any
-                    payWithPaystack();
-                });
-            } else {
-                console.error("Paystack button not found on the page.");
-            }
-        });
-
-        function payWithPaystack() {
-            const publicKey = "{{ public_key }}";
-            const email = "{{ email }}";
-            const amount = "{{ amount }}"; // Amount in kobo
-            const transactionReference = "{{ transaction_reference }}"; // Our UUID reference
-            
-            // Debugging the values before passing to PaystackPop.setup
-            console.log("Paystack Setup Debug:");
-            console.log("Public Key:", publicKey);
-            console.log("Email:", email);
-            console.log("Amount (kobo):", amount);
-            console.log("Reference:", transactionReference);
-
-            let parsedMetadata;
-            try {
-                // Ensure the metadata_json is correctly parsed
-                const metadataJsonString = '{{ metadata_json|escapejs }}';
-                console.log("Metadata JSON String from Django:", metadataJsonString);
-                parsedMetadata = JSON.parse(metadataJsonString);
-                console.log("Parsed Metadata Object:", parsedMetadata);
-            } catch (e) {
-                console.error("Error parsing metadata JSON:", e);
-                // Ensure paymentStatusDiv is available before trying to use it
-                if (paymentStatusDiv) {
-                    paymentStatusDiv.innerHTML = '<i class="fas fa-exclamation-circle text-red-500"></i> Payment initialization error: Invalid metadata.';
-                }
-                return; // Stop execution if metadata is invalid
-            }
-
-            // Ensure paymentStatusDiv is available before trying to use it
-            if (paymentStatusDiv) {
-                paymentStatusDiv.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Initializing payment...';
-            }
-
-            if (typeof PaystackPop === 'undefined') {
-                console.error("PaystackPop is not defined. Paystack SDK might not have loaded correctly.");
-                if (paymentStatusDiv) {
-                    paymentStatusDiv.innerHTML = '<i class="fas fa-exclamation-circle text-red-500"></i> Payment service not available. Please try again later.';
-                }
-                return;
-            }
-
-            try {
-                let handler = PaystackPop.setup({
-                    key: publicKey,
-                    email: email,
-                    amount: amount,
-                    currency: "NGN",
-                    ref: transactionReference, // Use 'ref' for the transaction reference
-                    metadata: parsedMetadata, // Pass the parsed object
-                    callback: function(response){
-                        const reference = response.reference;
-                        if (response.status === 'success') {
-                            if (paymentStatusDiv) {
-                                paymentStatusDiv.innerHTML = '<i class="fas fa-check-circle text-green-500"></i> Payment successful! Verifying...';
-                            }
-                            window.location.href = "{% url 'verify_payment' %}?reference=" + reference;
-                        } else {
-                            if (paymentStatusDiv) {
-                                paymentStatusDiv.innerHTML = '<i class="fas fa-times-circle text-red-500"></i> Payment cancelled or failed. Please try again.';
-                            }
-                            console.error('Paystack payment failed:', response);
-                        }
-                    },
-                    onClose: function(){
-                        if (paymentStatusDiv) {
-                            paymentStatusDiv.innerHTML = '<i class="fas fa-info-circle"></i> Payment window closed. You can try again.';
-                        }
-                        console.log('Payment window closed');
-                    },
-                });
-                handler.openIframe();
-            } catch (e) {
-                console.error("Error setting up or opening Paystack PopUp:", e);
-                if (paymentStatusDiv) {
-                    paymentStatusDiv.innerHTML = '<i class="fas fa-exclamation-circle text-red-500"></i> An error occurred with the payment popup.';
-                }
-            }
+        if (paymentButton) {
+            paymentButton.addEventListener('click', function (e) {
+                e.preventDefault();
+                payWithPaystack();
+            });
         }
-    </script>
+    });
+
+    function setStatus(html, colour) {
+        if (paymentStatusDiv) {
+            paymentStatusDiv.innerHTML = html;
+            paymentStatusDiv.style.color = colour || '#534434';
+        }
+    }
+
+    function payWithPaystack() {
+        const publicKey = "{{ public_key }}";
+        const email = "{{ email }}";
+        const amount = "{{ amount }}";
+        const transactionReference = "{{ transaction_reference }}";
+
+        let parsedMetadata;
+        try {
+            parsedMetadata = JSON.parse('{{ metadata_json|escapejs }}');
+        } catch (e) {
+            setStatus('Payment initialisation error. Please refresh and try again.', '#a73a00');
+            return;
+        }
+
+        if (typeof PaystackPop === 'undefined') {
+            setStatus('Payment service unavailable. Please try again shortly.', '#a73a00');
+            return;
+        }
+
+        // Update button to loading state
+        if (paymentButton) {
+            paymentButton.disabled = true;
+            paymentButton.innerHTML = '<span class="spinner"></span> Opening secure checkout…';
+        }
+        setStatus('');
+
+        try {
+            let handler = PaystackPop.setup({
+                key: publicKey,
+                email: email,
+                amount: amount,
+                currency: "NGN",
+                ref: transactionReference,
+                metadata: parsedMetadata,
+                callback: function (response) {
+                    if (response.status === 'success') {
+                        if (paymentButton) {
+                            paymentButton.innerHTML = '<span class="spinner"></span> Verifying payment…';
+                        }
+                        setStatus('Payment successful — verifying your enrollment…', '#855300');
+                        window.location.href = "{% url 'verify_payment' %}?reference=" + response.reference;
+                    } else {
+                        if (paymentButton) {
+                            paymentButton.disabled = false;
+                            paymentButton.innerHTML = '<span class="material-icons-round text-lg">arrow_forward</span> Complete Enrollment';
+                        }
+                        setStatus('Payment was not completed. You can try again.', '#a73a00');
+                    }
+                },
+                onClose: function () {
+                    if (paymentButton) {
+                        paymentButton.disabled = false;
+                        paymentButton.innerHTML = '<span class="material-icons-round text-lg">arrow_forward</span> Complete Enrollment';
+                    }
+                    setStatus('Checkout closed. Click above when you\'re ready to continue.', '#867461');
+                },
+            });
+            handler.openIframe();
+        } catch (e) {
+            if (paymentButton) {
+                paymentButton.disabled = false;
+                paymentButton.innerHTML = '<span class="material-icons-round text-lg">arrow_forward</span> Complete Enrollment';
+            }
+            setStatus('An error occurred opening the payment window. Please try again.', '#a73a00');
+        }
+    }
+</script>
 {% endblock %}

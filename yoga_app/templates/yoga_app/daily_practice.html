@@ -1,0 +1,260 @@
+{% extends 'yoga_app/base.html' %}
+{% load static %}
+
+{% block title %}Daily Practice Journal — Yoga Kailasa{% endblock %}
+{% block meta_description %}Log your daily yoga practice — track poses, breathing, mudras, meditation, mood, and personal reflections.{% endblock %}
+
+{% block extra_css %}
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif:ital,wght@0,400;0,700;1,400&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+    body { font-family:'Manrope',sans-serif; background:#fff8f3; }
+    .rs-headline { font-family:'Noto Serif',serif; line-height:1.4; }
+    .rs-glass { background:rgba(255,248,243,0.85); backdrop-filter:blur(20px); }
+    .rs-btn-primary { background:linear-gradient(135deg,#855300 0%,#f59e0b 100%); color:#fff; transition:all .3s; }
+    .rs-btn-primary:hover { opacity:.92; transform:scale(1.02); }
+    .rs-btn-secondary { background-color:#f1e7db; color:#855300; transition:all .3s; }
+    .mood-btn { transition:all .2s; border:2px solid transparent; cursor:pointer; }
+    .mood-btn.selected { border-color:#855300; background:#fdf2e7; }
+    .mood-btn:hover:not(.selected) { background:#f1e7db; }
+    .practice-checkbox { display:none; }
+    .practice-label { display:flex; align-items:center; gap:.5rem; padding:.5rem .75rem; border-radius:.5rem; cursor:pointer; transition:all .2s; font-size:.85rem; }
+    .practice-label:hover { background:#f1e7db; }
+    .practice-checkbox:checked + .practice-label { background:#fdf2e7; color:#855300; font-weight:600; }
+    .practice-checkbox:checked + .practice-label::before { content:'✓'; color:#855300; font-weight:700; }
+    .streak-flame { animation: flicker 2s ease-in-out infinite alternate; }
+    @keyframes flicker { 0%{transform:scale(1) rotate(-2deg);} 100%{transform:scale(1.1) rotate(2deg);} }
+    .detail-page > header, .detail-page > #mobile-menu, .detail-page > #mobile-menu-overlay, .detail-page > #backToTopBtn { display:none !important; }
+    .detail-page > main { padding:0 !important; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="detail-page min-h-screen" style="background:#fff8f3;">
+
+    <nav class="fixed top-0 w-full z-50 rs-glass shadow-sm">
+        <div class="flex justify-between items-center px-6 md:px-10 py-4 max-w-7xl mx-auto">
+            <a href="{% url 'home' %}" class="rs-headline text-xl font-bold" style="color:#855300;">Yoga Kailasa</a>
+            <a href="{% url 'dashboard' %}" class="text-sm font-medium" style="color:#534434;">← Dashboard</a>
+        </div>
+    </nav>
+
+    <main class="pt-24 pb-20 px-6 md:px-12 max-w-7xl mx-auto">
+
+        {# Page header #}
+        <div class="mb-10">
+            <p class="text-xs uppercase tracking-widest font-semibold mb-2" style="color:#867461;">Your Journey</p>
+            <h1 class="rs-headline text-4xl font-bold" style="color:#855300;">Daily Practice Journal</h1>
+            <p style="color:#534434;">{{ today|date:"l, F j, Y" }}</p>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+
+            {# ── Left: Stats + History ── #}
+            <div class="space-y-6">
+
+                {# Stats cards #}
+                <div class="grid grid-cols-3 gap-4">
+                    <div class="p-4 rounded-xl text-center" style="background:#fdf2e7;">
+                        <div class="streak-flame text-2xl mb-1">🔥</div>
+                        <p class="rs-headline text-2xl font-bold" style="color:#855300;">{{ streak }}</p>
+                        <p class="text-xs uppercase tracking-widest" style="color:#867461;">Day Streak</p>
+                    </div>
+                    <div class="p-4 rounded-xl text-center" style="background:#fdf2e7;">
+                        <div class="text-2xl mb-1">🧘</div>
+                        <p class="rs-headline text-2xl font-bold" style="color:#855300;">{{ total_sessions }}</p>
+                        <p class="text-xs uppercase tracking-widest" style="color:#867461;">Sessions</p>
+                    </div>
+                    <div class="p-4 rounded-xl text-center" style="background:#fdf2e7;">
+                        <div class="text-2xl mb-1">⏱</div>
+                        <p class="rs-headline text-2xl font-bold" style="color:#855300;">{{ total_minutes }}</p>
+                        <p class="text-xs uppercase tracking-widest" style="color:#867461;">Minutes</p>
+                    </div>
+                </div>
+
+                {# Recent history #}
+                <div class="rounded-2xl overflow-hidden" style="background:#fdf2e7;">
+                    <div class="px-5 py-4" style="border-bottom:1px solid rgba(216,195,173,0.3);">
+                        <h3 class="rs-headline font-bold" style="color:#855300;">Recent Sessions</h3>
+                    </div>
+                    {% if recent_practices %}
+                    <div class="divide-y" style="divide-color:rgba(216,195,173,0.2);">
+                        {% for p in recent_practices %}
+                        <div class="px-5 py-3 flex items-center justify-between">
+                            <div>
+                                <p class="text-sm font-semibold" style="color:#1f1b14;">{{ p.date|date:"M j" }}</p>
+                                <p class="text-xs" style="color:#867461;">{{ p.duration_minutes }} min</p>
+                            </div>
+                            {% if p.mood_after %}
+                            <span class="text-lg">{% if p.mood_after == '5' %}😊{% elif p.mood_after == '4' %}🙂{% elif p.mood_after == '3' %}😐{% elif p.mood_after == '2' %}😔{% else %}😞{% endif %}</span>
+                            {% endif %}
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <div class="px-5 py-8 text-center">
+                        <p class="text-sm" style="color:#867461;">No sessions logged yet. Start today!</p>
+                    </div>
+                    {% endif %}
+                </div>
+
+            </div>
+
+            {# ── Right: Today's log form ── #}
+            <div class="lg:col-span-2">
+                <div class="rounded-2xl overflow-hidden" style="background:#ffffff;box-shadow:0 4px 24px rgba(133,83,0,0.06);">
+                    <div class="px-8 py-6" style="background:linear-gradient(135deg,#855300,#f59e0b);">
+                        <h2 class="rs-headline text-2xl font-bold text-white">
+                            {% if today_entry %}Edit Today's Practice{% else %}Log Today's Practice{% endif %}
+                        </h2>
+                        <p class="text-white/80 text-sm mt-1">{{ today|date:"l, F j" }}</p>
+                    </div>
+
+                    <form method="POST" action="{% url 'log_practice' %}" class="p-8 space-y-8">
+                        {% csrf_token %}
+
+                        {# Duration #}
+                        <div>
+                            <label class="block text-sm font-bold mb-2" style="color:#534434;">Session Duration (minutes)</label>
+                            <input type="number" name="duration_minutes" min="0" max="480"
+                                   value="{{ today_entry.duration_minutes|default:'' }}"
+                                   placeholder="e.g. 30"
+                                   class="w-full px-4 py-3 rounded-lg border-none outline-none focus:ring-1 focus:ring-[#855300]"
+                                   style="background:#fdf2e7;color:#1f1b14;">
+                        </div>
+
+                        {# Mood before #}
+                        <div>
+                            <label class="block text-sm font-bold mb-3" style="color:#534434;">How do you feel <em>before</em> practice?</label>
+                            <div class="flex gap-3 flex-wrap">
+                                {% for val, label in mood_choices %}
+                                <label class="mood-btn px-4 py-2 rounded-lg text-sm {% if today_entry.mood_before == val %}selected{% endif %}">
+                                    <input type="radio" name="mood_before" value="{{ val }}" class="hidden" {% if today_entry.mood_before == val %}checked{% endif %}>
+                                    {% if val == '5' %}😊{% elif val == '4' %}🙂{% elif val == '3' %}😐{% elif val == '2' %}😔{% else %}😞{% endif %}
+                                    {{ label }}
+                                </label>
+                                {% endfor %}
+                            </div>
+                        </div>
+
+                        {# Poses #}
+                        <div>
+                            <label class="block text-sm font-bold mb-3" style="color:#534434;">Poses practiced</label>
+                            <div class="grid grid-cols-2 md:grid-cols-3 gap-1 max-h-40 overflow-y-auto p-2 rounded-lg" style="background:#fdf2e7;">
+                                {% for pose in poses %}
+                                <div>
+                                    <input type="checkbox" name="poses" value="{{ pose.id }}" id="pose_{{ pose.id }}" class="practice-checkbox"
+                                           {% if today_entry and pose in today_entry.poses.all %}checked{% endif %}>
+                                    <label for="pose_{{ pose.id }}" class="practice-label" style="color:#534434;">{{ pose.name }}</label>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+
+                        {# Breathing #}
+                        <div>
+                            <label class="block text-sm font-bold mb-3" style="color:#534434;">Breathing techniques</label>
+                            <div class="grid grid-cols-2 md:grid-cols-3 gap-1 max-h-32 overflow-y-auto p-2 rounded-lg" style="background:#fdf2e7;">
+                                {% for bt in breathing_techniques %}
+                                <div>
+                                    <input type="checkbox" name="breathing_techniques" value="{{ bt.id }}" id="bt_{{ bt.id }}" class="practice-checkbox"
+                                           {% if today_entry and bt in today_entry.breathing_techniques.all %}checked{% endif %}>
+                                    <label for="bt_{{ bt.id }}" class="practice-label" style="color:#534434;">{{ bt.name }}</label>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+
+                        {# Mudras #}
+                        {% if mudras %}
+                        <div>
+                            <label class="block text-sm font-bold mb-3" style="color:#534434;">Mudras</label>
+                            <div class="grid grid-cols-2 md:grid-cols-3 gap-1 max-h-32 overflow-y-auto p-2 rounded-lg" style="background:#fdf2e7;">
+                                {% for mudra in mudras %}
+                                <div>
+                                    <input type="checkbox" name="mudras" value="{{ mudra.id }}" id="mudra_{{ mudra.id }}" class="practice-checkbox"
+                                           {% if today_entry and mudra in today_entry.mudras.all %}checked{% endif %}>
+                                    <label for="mudra_{{ mudra.id }}" class="practice-label" style="color:#534434;">{{ mudra.name }}</label>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        {% endif %}
+
+                        {# Meditations #}
+                        {% if meditations %}
+                        <div>
+                            <label class="block text-sm font-bold mb-3" style="color:#534434;">Meditations</label>
+                            <div class="grid grid-cols-2 md:grid-cols-3 gap-1 max-h-32 overflow-y-auto p-2 rounded-lg" style="background:#fdf2e7;">
+                                {% for med in meditations %}
+                                <div>
+                                    <input type="checkbox" name="meditations" value="{{ med.id }}" id="med_{{ med.id }}" class="practice-checkbox"
+                                           {% if today_entry and med in today_entry.meditations.all %}checked{% endif %}>
+                                    <label for="med_{{ med.id }}" class="practice-label" style="color:#534434;">{{ med.title }}</label>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        {% endif %}
+
+                        {# Kriyas #}
+                        {% if kriyas %}
+                        <div>
+                            <label class="block text-sm font-bold mb-3" style="color:#534434;">Kriya Sessions</label>
+                            <div class="grid grid-cols-2 md:grid-cols-3 gap-1 max-h-32 overflow-y-auto p-2 rounded-lg" style="background:#fdf2e7;">
+                                {% for kriya in kriyas %}
+                                <div>
+                                    <input type="checkbox" name="kriyas" value="{{ kriya.id }}" id="kriya_{{ kriya.id }}" class="practice-checkbox"
+                                           {% if today_entry and kriya in today_entry.kriyas.all %}checked{% endif %}>
+                                    <label for="kriya_{{ kriya.id }}" class="practice-label" style="color:#534434;">{{ kriya.name }}</label>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        {% endif %}
+
+                        {# Mood after #}
+                        <div>
+                            <label class="block text-sm font-bold mb-3" style="color:#534434;">How do you feel <em>after</em> practice?</label>
+                            <div class="flex gap-3 flex-wrap">
+                                {% for val, label in mood_choices %}
+                                <label class="mood-btn px-4 py-2 rounded-lg text-sm {% if today_entry.mood_after == val %}selected{% endif %}">
+                                    <input type="radio" name="mood_after" value="{{ val }}" class="hidden" {% if today_entry.mood_after == val %}checked{% endif %}>
+                                    {% if val == '5' %}😊{% elif val == '4' %}🙂{% elif val == '3' %}😐{% elif val == '2' %}😔{% else %}😞{% endif %}
+                                    {{ label }}
+                                </label>
+                                {% endfor %}
+                            </div>
+                        </div>
+
+                        {# Notes #}
+                        <div>
+                            <label class="block text-sm font-bold mb-2" style="color:#534434;">Reflections & Notes</label>
+                            <textarea name="notes" rows="4" placeholder="How was your practice today? Any insights, challenges, or gratitude..."
+                                      class="w-full px-4 py-3 rounded-lg border-none outline-none focus:ring-1 focus:ring-[#855300] resize-none"
+                                      style="background:#fdf2e7;color:#1f1b14;">{{ today_entry.notes|default:'' }}</textarea>
+                        </div>
+
+                        <button type="submit" class="rs-btn-primary w-full py-4 rounded-xl font-bold text-base">
+                            {% if today_entry %}Update Practice Log{% else %}Save Practice Log{% endif %}
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+        </div>
+    </main>
+</div>
+
+<script>
+// Make mood buttons work as radio selectors visually
+document.querySelectorAll('.mood-btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+        const name = this.querySelector('input').name;
+        document.querySelectorAll(`.mood-btn input[name="${name}"]`).forEach(inp => {
+            inp.closest('.mood-btn').classList.remove('selected');
+        });
+        this.classList.add('selected');
+    });
+});
+</script>
+{% endblock %}

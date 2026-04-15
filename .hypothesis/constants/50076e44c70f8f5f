@@ -1,0 +1,4 @@
+# file: C:\Users\Orunmila1\Documents\Projects\yoga_kailasa_project\yoga_app\services\progress_service.py
+# hypothesis_version: 6.151.12
+
+[100, 'completed', 'course', 'is_complete', 'is_completed', 'last_viewed_lesson', 'lesson__id', 'module__course', 'modules__lessons', 'percentage', 'progress_percentage', 'total', 'total_lessons', 'user_profile']

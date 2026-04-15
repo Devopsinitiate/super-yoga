@@ -1,0 +1,4 @@
+# file: C:\Users\Orunmila1\Documents\Projects\yoga_kailasa_project\yoga_app\migrations\0027_alter_testimonial_options_testimonial_is_approved_and_more.py
+# hypothesis_version: 6.151.12
+
+[254, '-submitted_at', 'Testimonial', 'Testimonials', 'email', 'feedback_text', 'is_approved', 'ordering', 'rating', 'submitted_at', 'testimonial', 'verbose_name', 'verbose_name_plural', 'yoga_app']

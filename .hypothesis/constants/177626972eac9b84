@@ -1,0 +1,4 @@
+# file: C:\Users\Orunmila1\Documents\Projects\yoga_kailasa_project\yoga_app\migrations\0011_remove_course_detailed_content_booking_message_and_more.py
+# hypothesis_version: 6.151.12
+
+[200, 500, 'ID', 'Lesson', 'Module', 'UserLessonCompletion', 'booking', 'completed_at', 'content', 'course', 'description', 'detailed_content', 'id', 'lesson', 'lessons', 'message', 'module', 'modules', 'order', 'ordering', 'overview_content', 'title', 'unique_together', 'user', 'verbose_name', 'verbose_name_plural', 'video_url', 'yoga_app', 'yoga_app.course', 'yoga_app.lesson', 'yoga_app.module']

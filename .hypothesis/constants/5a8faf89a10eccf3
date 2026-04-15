@@ -1,0 +1,4 @@
+# file: C:\Users\Orunmila1\Documents\Projects\yoga_kailasa_project\yoga_app\views\auth_views.py
+# hypothesis_version: 6.151.12
+
+['0', '5/m', 'Cache-Control', 'Expires', 'POST', 'Pragma', 'User not found.', '__all__', 'change_password', 'dashboard', 'dispatch', 'form', 'home', 'inactive', 'ip', 'is_active', 'login', 'no-cache', 'password_form', 'profile_edit', 'register', 'update_account', 'update_profile', 'user', 'user_account_form', 'user_profile', 'user_profile_form', 'username', 'verify_email_pending']

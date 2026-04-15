@@ -1,0 +1,21 @@
+{% extends 'yoga_app/base.html' %}
+{% load static %}
+
+{% block title %}Delete Post — Yoga Kailasa{% endblock %}
+
+{% block content %}
+<div class="min-h-screen pt-32 pb-20 px-6 flex items-center justify-center" style="background:#fff8f3;">
+    <div class="max-w-md w-full p-8 rounded-2xl text-center" style="background:#ffffff;box-shadow:0 4px 24px rgba(133,83,0,0.06);">
+        <i class="fas fa-trash-alt text-4xl mb-4" style="color:#991b1b;"></i>
+        <h1 class="text-2xl font-bold mb-2" style="font-family:'Noto Serif',serif;color:#1f1b14;">Delete Post?</h1>
+        <p class="text-sm mb-6" style="color:#534434;">
+            Are you sure you want to permanently delete <strong>"{{ post.title }}"</strong>? This cannot be undone.
+        </p>
+        <form method="POST" class="flex gap-3 justify-center">
+            {% csrf_token %}
+            <button type="submit" class="px-8 py-3 rounded-xl font-bold text-sm text-white" style="background:#991b1b;">Yes, Delete</button>
+            <a href="{% url 'my_blog_posts' %}" class="px-8 py-3 rounded-xl font-bold text-sm" style="background:#f1e7db;color:#534434;">Cancel</a>
+        </form>
+    </div>
+</div>
+{% endblock %}

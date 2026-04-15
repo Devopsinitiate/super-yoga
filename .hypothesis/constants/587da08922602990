@@ -1,0 +1,4 @@
+# file: C:\Users\Orunmila1\Documents\Projects\yoga_kailasa_project\yoga_app\services\report_service.py
+# hypothesis_version: 6.151.12
+
+[100, '%Y-%m-%d', '%Y-%m-%d %H:%M:%S', '-created_at', '=', 'N/A', 'activity', 'amount', 'blog_comments', 'completed_courses', 'completed_lessons', 'course', 'course_details', 'date', 'discussion_posts', 'discussion_topics', 'enrolled_courses', 'generated_at', 'lesson_comments', 'lessons', 'payment', 'payment_details', 'profile', 'progress', 'report_type', 'status', 'success', 'title', 'total', 'total_interactions', 'total_lessons', 'total_spent', 'total_transactions', 'user']

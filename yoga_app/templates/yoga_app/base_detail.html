@@ -1,0 +1,69 @@
+{% extends 'yoga_app/base.html' %}
+{% load static %}
+{#
+  base_detail.html — Intermediate base for all detail/custom-layout pages.
+
+  Hides the base.html global header, mobile menu, and back-to-top button
+  so each detail page can render its own fixed nav without conflicts.
+
+  Usage:
+    {% extends 'yoga_app/base_detail.html' %}
+
+  Blocks available:
+    detail_nav    — Override to provide a custom fixed navigation bar
+    detail_fonts  — Override to load page-specific Google Fonts
+    extra_css     — Inherited from base.html for additional styles
+    content       — Main page content (same as base.html)
+    extra_js      — Inherited from base.html for additional scripts
+
+  Golden ratio note:
+    The fixed nav height is 80px (≈ 49 × φ).
+    Default content padding-top is 5rem (80px) to clear the nav.
+#}
+
+{% block extra_css %}
+<style>
+  /* Hide base.html global chrome — detail pages manage their own nav */
+  body > header,
+  body > #mobile-menu,
+  body > #mobile-menu-overlay,
+  body > #backToTopBtn {
+    display: none !important;
+  }
+
+  /* Default font stack — override via detail_fonts block */
+  body { font-family: 'Manrope', sans-serif; }
+</style>
+{% block detail_fonts %}
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif:ital,wght@0,400;0,700;1,400&family=Manrope:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+{% endblock %}
+{% endblock %}
+
+{% block content %}
+{# ── Custom fixed navigation ─────────────────────────────────────────────── #}
+{% block detail_nav %}
+<nav class="fixed top-0 w-full z-50 rs-glass border-b border-[#d8c3ad]/10">
+  <div class="flex justify-between items-center px-6 md:px-8 h-20 max-w-screen-2xl mx-auto">
+    <a href="{% url 'home' %}" class="rs-headline text-2xl font-semibold italic rs-primary">Yoga Kailasa</a>
+    <div class="hidden md:flex items-center gap-8">
+      <a href="{% url 'courses' %}" class="rs-on-surface-variant hover:rs-primary transition-colors duration-300">Courses</a>
+      <a href="{% url 'breathing' %}" class="rs-on-surface-variant hover:rs-primary transition-colors duration-300">Practice</a>
+      <a href="{% url 'blog_list' %}" class="rs-on-surface-variant hover:rs-primary transition-colors duration-300">Journal</a>
+      <a href="{% url 'booking' %}" class="rs-on-surface-variant hover:rs-primary transition-colors duration-300">Retreats</a>
+    </div>
+    <div class="flex items-center gap-4">
+      {% if user.is_authenticated %}
+      <a href="{% url 'profile_edit' %}" class="rs-on-surface-variant hover:rs-primary transition-colors">
+        <i class="fas fa-user-circle text-xl"></i>
+      </a>
+      {% else %}
+      <a href="{% url 'login' %}" class="rs-on-surface-variant hover:rs-primary font-medium transition-all">Sign In</a>
+      {% endif %}
+    </div>
+  </div>
+</nav>
+{% endblock %}
+
+{# ── Page content — override in child templates ──────────────────────────── #}
+{% block detail_content %}{% endblock %}
+{% endblock %}

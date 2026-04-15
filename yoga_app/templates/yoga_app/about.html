@@ -3,100 +3,361 @@
 
 {% block title %}About Us - Yoga Kailasa{% endblock %}
 
-{# NEW: Meta Description for SEO #}
 {% block meta_description %}Learn about Yoga Kailasa's mission, vision, and philosophy. Discover our commitment to authentic yoga, mindfulness, and holistic well-being.{% endblock %}
 
-{# NEW: Open Graph Tags for Social Sharing #}
 {% block og_title %}About Us - Yoga Kailasa{% endblock %}
 {% block og_description %}Learn about Yoga Kailasa's mission, vision, and philosophy. Discover our commitment to authentic yoga, mindfulness, and holistic well-being.{% endblock %}
-{% block og_image %}{% static 'yoga_app/images/default_about_og_image.jpg' %}{% endblock %} {# Using a static default image for OG #}
+{% block og_image %}{% static 'yoga_app/images/default_about_og_image.jpg' %}{% endblock %}
 
 {% block extra_css %}
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif:ital,wght@0,400;0,700;1,400&family=Manrope:wght@300;400;600;800&display=swap" rel="stylesheet">
 <style>
-    /* CSS for the fade-in-up animation, specific to detail pages */
-    @keyframes fadeInUp {
-        from {
-            opacity: 0;
-            transform: translateY(20px);
-        }
-        to {
-            opacity: 1;
-            transform: translateY(0);
-        }
+    .about-page {
+        font-family: 'Manrope', sans-serif;
+        background-color: #fff8f3;
+        color: #1f1b14;
+        overflow-x: hidden;
     }
-    .animate-fade-in-up {
-        opacity: 0; /* Hidden by default */
-        animation: fadeInUp 0.6s ease-out forwards;
+    .about-page .rs-headline {
+        font-family: 'Noto Serif', serif;
+        line-height: 1.4;
+    }
+    .about-page .rs-glass {
+        background: rgba(255, 248, 243, 0.8);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+    }
+    .about-page .rs-btn-primary {
+        background: linear-gradient(135deg, #855300 0%, #f59e0b 100%);
+        color: #ffffff;
+        transition: all 0.3s ease;
+    }
+    .about-page .rs-btn-primary:hover {
+        opacity: 0.92;
+        transform: scale(1.02);
+    }
+    .about-page .rs-btn-secondary {
+        background-color: #f1e7db;
+        color: #855300;
+        transition: all 0.3s ease;
+    }
+    .about-page .rs-btn-secondary:hover {
+        background-color: #ebe1d6;
+    }
+    .about-page .rs-text-primary { color: #855300; }
+    .about-page .rs-text-secondary { color: #a73a00; }
+    .about-page .rs-text-on-surface { color: #1f1b14; }
+    .about-page .rs-text-on-surface-variant { color: #534434; }
+    .about-page .rs-text-outline { color: #867461; }
+    .about-page .rs-text-outline-variant { color: #d8c3ad; }
+    .about-page .rs-text-on-primary-container { color: #613b00; }
+    .about-page .rs-text-on-primary { color: #ffffff; }
+    .about-page .rs-text-stone-600 { color: #57534e; }
+    .about-page .rs-bg-surface { background-color: #fff8f3; }
+    .about-page .rs-bg-surface-container { background-color: #f7ece1; }
+    .about-page .rs-bg-surface-container-low { background-color: #fdf2e7; }
+    .about-page .rs-bg-surface-container-lowest { background-color: #ffffff; }
+    .about-page .rs-bg-surface-container-high { background-color: #f1e7db; }
+    .about-page .rs-bg-surface-container-highest { background-color: #ebe1d6; }
+    .about-page .rs-bg-surface-dim { background-color: #e2d8cd; }
+    .about-page .rs-bg-primary-container { background-color: #f59e0b; }
+    .about-page .rs-bg-primary { background-color: #855300; }
+    .about-page .rs-border-outline-variant { border-color: rgba(216, 195, 173, 0.3); }
+    .about-page .rs-border-primary { border-color: rgba(133, 83, 0, 0.3); }
+    .about-page .rs-offering-card {
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .about-page .rs-offering-card:hover {
+        background-color: #ebe1d6;
+        transform: translateY(-4px);
+    }
+    .about-page .rs-offering-card:hover .rs-offering-icon {
+        transform: scale(1.1);
+    }
+    .about-page .rs-offering-icon {
+        transition: transform 0.3s ease;
+    }
+    .about-page .rs-timeline-dot {
+        width: 16px;
+        height: 16px;
+        border-radius: 50%;
+        background-color: #855300;
+        border: 4px solid #f1e7db;
+        z-index: 10;
+    }
+    .about-page .rs-team-member {
+        transition: all 0.3s ease;
+    }
+    .about-page .rs-team-member:hover {
+        transform: translateX(8px);
+    }
+    .about-page .rs-team-icon {
+        transition: all 0.3s ease;
+    }
+    .about-page .rs-team-member:hover .rs-team-icon {
+        background-color: #855300;
+        color: #ffffff;
+    }
+    
+    /* Hide base.html elements */
+    .about-page > header,
+    .about-page > #mobile-menu,
+    .about-page > #mobile-menu-overlay,
+    .about-page > #backToTopBtn {
+        display: none !important;
+    }
+    .about-page > main {
+        padding: 0 !important;
     }
 </style>
 {% endblock %}
 
 {% block content %}
-<section class="py-16 bg-gradient-to-r from-amber-100 to-amber-50 min-h-screen">
-    <div class="container mx-auto px-4 max-w-3xl">
-        <div class="bg-white p-8 rounded-xl shadow-lg animate-fade-in-up">
-            <h2 class="text-3xl font-bold text-gray-800 mb-6 text-center animate-fade-in-up" style="animation-delay: 0.1s;">About Yoga Kailasa</h2>
-            <p class="text-gray-600 text-center mb-8 animate-fade-in-up" style="animation-delay: 0.2s;">Our journey towards inner peace and holistic well-being.</p>
+<div class="about-page">
+    {# Top Navigation #}
+    <nav class="fixed top-0 w-full z-50 rs-glass">
+        <div class="flex justify-between items-center px-6 md:px-8 py-6 max-w-screen-2xl mx-auto">
+            <a href="{% url 'home' %}" class="text-2xl rs-headline tracking-tight rs-text-primary">Yoga Kailasa</a>
+            <div class="hidden md:flex space-x-10 items-center">
+                <a href="{% url 'home' %}" class="rs-text-primary border-b-2 rs-border-primary pb-1 rs-headline">Sanctuary</a>
+                <a href="{% url 'courses' %}" class="rs-text-on-surface/70 hover:rs-text-primary transition-colors rs-headline">Classes</a>
+                <a href="{% url 'consultant_list' %}" class="rs-text-on-surface/70 hover:rs-text-primary transition-colors rs-headline">Teachers</a>
+                <a href="{% url 'booking' %}" class="rs-text-on-surface/70 hover:rs-text-primary transition-colors rs-headline">Retreats</a>
+            </div>
+            <a href="{% url 'booking' %}" class="rs-btn-primary px-8 py-3 rounded-lg font-medium hover:opacity-80 transition-all scale-95 active:scale-100">
+                Book a Mat
+            </a>
+        </div>
+    </nav>
 
-            <div class="prose max-w-none text-gray-700">
-                <p class="animate-fade-in-up" style="animation-delay: 0.3s;">Welcome to Yoga Kailasa, your sanctuary for authentic yoga and mindfulness practices. Founded in 2023, our mission is to guide individuals on their unique path to inner peace, physical vitality, and mental clarity through the ancient wisdom of yoga.</p>
+    <main class="pt-24">
+        {# Back to Home #}
+        <div class="max-w-screen-2xl mx-auto px-6 md:px-8 pt-6">
+            <a href="{% url 'home' %}" class="inline-flex items-center gap-2 rs-text-on-surface/60 hover:rs-text-primary font-medium transition-all duration-300">
+                <i class="fas fa-arrow-left"></i>
+                <span class="text-sm uppercase tracking-widest">Back to Home</span>
+            </a>
+        </div>
 
-                <h3 class="animate-fade-in-up" style="animation-delay: 0.4s;">Our Vision</h3>
-                <p class="animate-fade-in-up" style="animation-delay: 0.5s;">We envision a world where everyone has access to the transformative power of yoga, fostering a global community dedicated to holistic health and harmonious living. We believe that true well-being extends beyond the physical, encompassing mental, emotional, and spiritual balance.</p>
+        {# Hero Section #}
+        <section class="relative min-h-[600px] md:min-h-[700px] flex items-center justify-center overflow-hidden px-6 md:px-8">
+            <div class="absolute inset-0 z-0">
+                <img src="https://images.unsplash.com/photo-1506126613408-eca07ce68773?w=1920&h=1080&fit=crop" alt="Yoga at sunrise" class="w-full h-full object-cover opacity-60 mix-blend-multiply grayscale-[20%]">
+                <div class="absolute inset-0 bg-gradient-to-b from-[#fff8f3]/40 via-transparent to-[#fff8f3]"></div>
+            </div>
+            <div class="relative z-10 text-center max-w-4xl mx-auto">
+                <span class="inline-block mb-6 tracking-[0.4em] rs-text-secondary font-bold text-xs uppercase">Est. {% now "Y" %}</span>
+                <h1 class="rs-headline text-6xl md:text-8xl rs-text-primary font-bold mb-8 leading-tight tracking-tight">
+                    The Wisdom of <br/>Kailasa
+                </h1>
+                <p class="text-xl md:text-2xl rs-text-on-surface-variant font-light max-w-2xl mx-auto leading-relaxed italic">
+                    A digital altar where ancient tradition meets contemporary mindfulness.
+                </p>
+            </div>
+        </section>
 
-                <h3 class="animate-fade-in-up" style="animation-delay: 0.6s;">What We Offer</h3>
-                <ul class="space-y-3 list-none pl-0"> {# Removed default list styling, will add custom icons #}
-                    <li class="flex items-start animate-fade-in-up" style="animation-delay: 0.7s;">
-                        <i class="fas fa-leaf text-amber-500 mr-3 mt-1"></i>
-                        <div>
-                            <strong>Diverse Yoga Poses:</strong> Explore a wide range of asanas, from foundational poses for beginners to advanced sequences for experienced practitioners.
-                        </div>
-                    </li>
-                    <li class="flex items-start animate-fade-in-up" style="animation-delay: 0.8s;">
-                        <i class="fas fa-wind text-amber-500 mr-3 mt-1"></i>
-                        <div>
-                            <strong>Pranayama Techniques:</strong> Master various breathing exercises to enhance energy, reduce stress, and improve focus.
-                        </div>
-                    </li>
-                    <li class="flex items-start animate-fade-in-up" style="animation-delay: 0.9s;">
-                        <i class="fas fa-book-open text-amber-500 mr-3 mt-1"></i>
-                        <div>
-                            <strong>Comprehensive Courses:</strong> Enroll in structured courses designed to deepen your understanding and practice, covering different styles and philosophies of yoga.
-                        </div>
-                    </li>
-                    <li class="flex items-start animate-fade-in-up" style="animation-delay: 1.0s;">
-                        <i class="fas fa-chalkboard-teacher text-amber-500 mr-3 mt-1"></i>
-                        <div>
-                            <strong>Expert Guidance:</strong> Learn from certified and experienced instructors who are passionate about sharing their knowledge and supporting your growth.
-                        </div>
-                    </li>
-                    <li class="flex items-start animate-fade-in-up" style="animation-delay: 1.1s;">
-                        <i class="fas fa-users text-amber-500 mr-3 mt-1"></i>
-                        <div>
-                            <strong>Community and Support:</strong> Join a vibrant community of like-minded individuals, share experiences, and find encouragement on your yoga journey.
-                        </div>
-                    </li>
-                </ul>
-
-                <h3 class="animate-fade-in-up" style="animation-delay: 1.2s;">Our Philosophy</h3>
-                <p class="animate-fade-in-up" style="animation-delay: 1.3s;">At Yoga Kailasa, we honor the traditional roots of yoga while making it accessible and relevant for modern life. We emphasize mindful movement, conscious breathing, and self-awareness, encouraging you to listen to your body and cultivate a deeper connection with yourself.</p>
-
-                <p class="animate-fade-in-up" style="animation-delay: 1.4s;">Thank you for choosing Yoga Kailasa as your partner on this incredible journey. We are here to support you every step of the way.</p>
-
-                <div class="mt-8 text-center animate-fade-in-up" style="animation-delay: 1.5s;">
-                    <img src="{% static 'yoga_app/images/yoga_kailasa_team.jpg' %}" alt="Yoga Kailasa Team" class="mx-auto rounded-lg shadow-md mb-4 w-full max-w-sm object-cover h-auto"> {# Changed to static image #}
-                    <p class="text-amber-600 font-semibold">The Yoga Kailasa Team</p>
+        {# Our Philosophy #}
+        <section class="py-24 md:py-32 px-6 md:px-8 rs-bg-surface">
+            <div class="max-w-screen-xl mx-auto grid grid-cols-1 md:grid-cols-12 gap-16 items-center">
+                <div class="md:col-span-7">
+                    <h2 class="rs-headline text-4xl md:text-5xl rs-text-primary mb-10 leading-snug">Our Philosophy</h2>
+                    <div class="space-y-8 text-lg md:text-xl rs-text-on-surface leading-loose font-light italic">
+                        <p>
+                            Yoga is not a destination, but a return. At Kailasa, we believe the body is a living temple, and breath is the bridge between the physical and the infinite. Our mission is to preserve the "Radiant Sanctuary"—a space of intentionality where every movement is a prayer and every breath is a renewal.
+                        </p>
+                        <p>
+                            We reject the noise of modern aesthetics in favor of the quiet hum of presence. Here, we offer more than classes; we offer a container for transformation, guided by the wisdom of the Himalayan lineages and the science of the nervous system.
+                        </p>
+                    </div>
                 </div>
+                <div class="md:col-span-5 relative">
+                    <div class="aspect-[4/5] rs-bg-surface-container-high rounded-xl overflow-hidden shadow-2xl">
+                        <img src="https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=800&h=1000&fit=crop" alt="Yoga mudra" class="w-full h-full object-cover">
+                    </div>
+                    <div class="absolute -bottom-8 -left-8 rs-bg-primary-container p-12 hidden md:block">
+                        <p class="rs-headline text-2xl rs-text-on-primary-container leading-tight">
+                            "Breathe in the <br/>universe, breathe <br/>out the self."
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
 
-                {# Added Call to Action #}
-                <div class="mt-10 text-center animate-fade-in-up" style="animation-delay: 1.6s;">
-                    <h4 class="text-2xl font-bold text-gray-800 mb-4">Ready to begin your journey?</h4>
-                    <a href="{% url 'courses' %}" class="bg-amber-500 hover:bg-amber-600 text-white font-bold py-3 px-8 rounded-full shadow-lg transition duration-300 transform hover:scale-105">
-                        Explore Our Courses <i class="fas fa-arrow-right ml-2"></i>
+        {# Sacred Offerings #}
+        <section class="py-24 md:py-32 px-6 md:px-8 rs-bg-surface-container-low">
+            <div class="max-w-screen-2xl mx-auto">
+                <div class="flex flex-col md:flex-row justify-between items-end mb-20 gap-8">
+                    <h2 class="rs-headline text-5xl rs-text-primary">Sacred Offerings</h2>
+                    <p class="max-w-md rs-text-on-surface-variant text-right">Four pillars of practice designed to align your physical, energetic, and mental bodies.</p>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                    {# Offering 1: Poses #}
+                    <a href="{% url 'poses' %}" class="rs-bg-surface p-12 rs-offering-card flex flex-col justify-between min-h-[400px] block">
+                        <div>
+                            <i class="fas fa-spa rs-text-secondary text-4xl mb-8 rs-offering-icon inline-block"></i>
+                            <h3 class="rs-headline text-2xl mb-4 rs-text-primary">The Poses</h3>
+                            <p class="rs-text-on-surface-variant leading-relaxed font-light">Asana practice that builds structural integrity and energetic flow through alignment-based movement.</p>
+                        </div>
+                        <span class="rs-text-secondary font-semibold group flex items-center gap-2 mt-8">
+                            Explore Path <i class="fas fa-arrow-right transition-transform group-hover:translate-x-1"></i>
+                        </span>
+                    </a>
+                    {# Offering 2: Pranayama #}
+                    <a href="{% url 'breathing' %}" class="rs-bg-surface p-12 rs-offering-card flex flex-col justify-between min-h-[400px] block">
+                        <div>
+                            <i class="fas fa-wind rs-text-secondary text-4xl mb-8 rs-offering-icon inline-block"></i>
+                            <h3 class="rs-headline text-2xl mb-4 rs-text-primary">Pranayama</h3>
+                            <p class="rs-text-on-surface-variant leading-relaxed font-light">The science of breath control. Unlock vital energy and calm the fluctuations of the mind through ancient techniques.</p>
+                        </div>
+                        <span class="rs-text-secondary font-semibold group flex items-center gap-2 mt-8">
+                            Discover Breath <i class="fas fa-arrow-right transition-transform group-hover:translate-x-1"></i>
+                        </span>
+                    </a>
+                    {# Offering 3: Courses #}
+                    <a href="{% url 'courses' %}" class="rs-bg-surface p-12 rs-offering-card flex flex-col justify-between min-h-[400px] block">
+                        <div>
+                            <i class="fas fa-book-open rs-text-secondary text-4xl mb-8 rs-offering-icon inline-block"></i>
+                            <h3 class="rs-headline text-2xl mb-4 rs-text-primary">Courses</h3>
+                            <p class="rs-text-on-surface-variant leading-relaxed font-light">Deep dives into philosophy, anatomy, and spiritual history for the dedicated seeker.</p>
+                        </div>
+                        <span class="rs-text-secondary font-semibold group flex items-center gap-2 mt-8">
+                            View Curriculum <i class="fas fa-arrow-right transition-transform group-hover:translate-x-1"></i>
+                        </span>
+                    </a>
+                    {# Offering 4: Community #}
+                    <a href="{% url 'blog_list' %}" class="rs-bg-surface p-12 rs-offering-card flex flex-col justify-between min-h-[400px] block">
+                        <div>
+                            <i class="fas fa-users rs-text-secondary text-4xl mb-8 rs-offering-icon inline-block"></i>
+                            <h3 class="rs-headline text-2xl mb-4 rs-text-primary">Community</h3>
+                            <p class="rs-text-on-surface-variant leading-relaxed font-light">A sangha for collective growth. Join our journal and global circles for shared wisdom.</p>
+                        </div>
+                        <span class="rs-text-secondary font-semibold group flex items-center gap-2 mt-8">
+                            Join Sangha <i class="fas fa-arrow-right transition-transform group-hover:translate-x-1"></i>
+                        </span>
                     </a>
                 </div>
             </div>
+        </section>
+
+        {# The Journey (Timeline) #}
+        <section class="py-24 md:py-32 px-6 md:px-8 rs-bg-surface">
+            <div class="max-w-4xl mx-auto">
+                <div class="text-center mb-24">
+                    <h2 class="rs-headline text-5xl rs-text-primary mb-6">Our Origins</h2>
+                    <div class="h-1 w-24 rs-bg-primary-container mx-auto"></div>
+                </div>
+                <div class="space-y-32 relative">
+                    {# Vertical Timeline Line #}
+                    <div class="absolute left-1/2 top-0 bottom-0 w-[1px] rs-border-outline-variant -translate-x-1/2 hidden md:block"></div>
+                    {# Step 1 #}
+                    <div class="relative flex flex-col md:flex-row items-center gap-12">
+                        <div class="md:w-1/2 md:text-right">
+                            <span class="text-sm font-bold tracking-widest rs-text-secondary mb-2 block uppercase">2023: The Seed</span>
+                            <h3 class="rs-headline text-2xl rs-text-primary mb-4">A Vision Takes Root</h3>
+                            <p class="rs-text-on-surface-variant leading-relaxed">Our founder journeyed to the banks of the Ganges, seeking a way to translate traditional Ashram discipline into a modern digital sanctuary.</p>
+                        </div>
+                        <div class="rs-timeline-dot hidden md:block"></div>
+                        <div class="md:w-1/2"></div>
+                    </div>
+                    {# Step 2 #}
+                    <div class="relative flex flex-col md:flex-row-reverse items-center gap-12">
+                        <div class="md:w-1/2 md:text-left">
+                            <span class="text-sm font-bold tracking-widest rs-text-secondary mb-2 block uppercase">2024: The Grounding</span>
+                            <h3 class="rs-headline text-2xl rs-text-primary mb-4">The First Platform</h3>
+                            <p class="rs-text-on-surface-variant leading-relaxed">Opening our digital sanctuary, we grounded our offerings in real-world communal experience, connecting practitioners across the globe.</p>
+                        </div>
+                        <div class="rs-timeline-dot hidden md:block"></div>
+                        <div class="md:w-1/2"></div>
+                    </div>
+                    {# Step 3 #}
+                    <div class="relative flex flex-col md:flex-row items-center gap-12">
+                        <div class="md:w-1/2 md:text-right">
+                            <span class="text-sm font-bold tracking-widest rs-text-secondary mb-2 block uppercase">Present: The Radiance</span>
+                            <h3 class="rs-headline text-2xl rs-text-primary mb-4">Global Sanctuary</h3>
+                            <p class="rs-text-on-surface-variant leading-relaxed">Yoga Kailasa now breathes life into thousands of practitioners worldwide, maintaining the intimacy of a private mountain retreat.</p>
+                        </div>
+                        <div class="rs-timeline-dot hidden md:block"></div>
+                        <div class="md:w-1/2"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        {# The Team #}
+        <section class="py-24 md:py-32 px-6 md:px-8 rs-bg-surface-container">
+            <div class="max-w-screen-xl mx-auto">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-24 items-center">
+                    <div class="order-2 md:order-1">
+                        <div class="relative">
+                            <img src="https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=800&h=600&fit=crop" alt="Yoga Kailasa Team" class="w-full h-auto rounded-lg shadow-xl">
+                            <div class="absolute -top-12 -right-12 w-48 h-48 rs-bg-primary-container/20 rounded-full blur-3xl -z-10"></div>
+                        </div>
+                    </div>
+                    <div class="order-1 md:order-2">
+                        <h2 class="rs-headline text-5xl rs-text-primary mb-8">The Guiding Lights</h2>
+                        <p class="text-xl rs-text-on-surface-variant italic mb-12 leading-relaxed">
+                            "Our teachers are not masters of the body, but humble students of the spirit. We hold the space so you may find the light."
+                        </p>
+                        <div class="space-y-6">
+                            <a href="{% url 'consultant_list' %}" class="rs-team-member flex items-center gap-4 group cursor-pointer block">
+                                <div class="w-12 h-12 rounded-full rs-bg-primary/10 flex items-center justify-center rs-text-primary rs-team-icon">
+                                    <i class="fas fa-spa"></i>
+                                </div>
+                                <div>
+                                    <h4 class="font-bold rs-text-on-surface">Our Instructors</h4>
+                                    <p class="text-sm rs-text-on-surface-variant">Certified yoga practitioners and wellness guides</p>
+                                </div>
+                            </a>
+                            <a href="{% url 'consultant_list' %}" class="rs-team-member flex items-center gap-4 group cursor-pointer block">
+                                <div class="w-12 h-12 rounded-full rs-bg-primary/10 flex items-center justify-center rs-text-primary rs-team-icon">
+                                    <i class="fas fa-chalkboard-teacher"></i>
+                                </div>
+                                <div>
+                                    <h4 class="font-bold rs-text-on-surface">Our Consultants</h4>
+                                    <p class="text-sm rs-text-on-surface-variant">Personalized guidance for your unique journey</p>
+                                </div>
+                            </a>
+                        </div>
+                        <a href="{% url 'consultant_list' %}" class="mt-12 rs-text-secondary underline decoration-secondary/30 underline-offset-8 font-bold hover:rs-text-primary transition-colors inline-block">Meet the full faculty</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        {# Call to Action #}
+        <section class="py-32 md:py-40 px-6 md:px-8 rs-bg-surface-container-lowest text-center">
+            <div class="max-w-3xl mx-auto">
+                <i class="fas fa-leaf rs-text-primary-container text-6xl mb-8 inline-block"></i>
+                <h2 class="rs-headline text-5xl md:text-6xl rs-text-primary mb-8">Begin Your Journey</h2>
+                <p class="text-xl rs-text-on-surface-variant mb-12 font-light leading-relaxed">
+                    The door to the sanctuary is always open. Step onto the mat and rediscover the stillness within.
+                </p>
+                <div class="flex flex-col sm:flex-row gap-6 justify-center">
+                    <a href="{% url 'courses' %}" class="rs-bg-primary rs-text-on-primary px-10 py-5 rounded-lg text-lg font-bold shadow-lg hover:shadow-xl transition-all transform hover:-translate-y-1">
+                        View All Courses
+                    </a>
+                    <a href="{% url 'booking' %}" class="rs-bg-surface-container-high rs-text-primary px-10 py-5 rounded-lg text-lg font-bold hover:bg-surface-container-highest transition-all">
+                        Schedule a Consultation
+                    </a>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    {# Footer #}
+    <footer class="rs-bg-surface-container-high w-full py-16 px-6 md:px-8 mt-20">
+        <div class="max-w-screen-2xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-12 items-center text-center md:text-left">
+            <div>
+                <div class="rs-headline text-lg rs-text-primary mb-4">Yoga Kailasa</div>
+                <p class="font-['Manrope'] text-sm tracking-wide rs-text-on-surface/60">&copy; {% now "Y" %} Yoga Kailasa. Breathing life into every moment.</p>
+            </div>
+            <div class="flex flex-wrap justify-center md:justify-end gap-8 font-['Manrope'] text-sm tracking-wide">
+                <a href="{% url 'privacy_policy' %}" class="rs-text-on-surface/60 hover:rs-text-secondary underline decoration-secondary/30 underline-offset-4 transition-all">Privacy Policy</a>
+                <a href="{% url 'terms_of_service' %}" class="rs-text-on-surface/60 hover:rs-text-secondary underline decoration-secondary/30 underline-offset-4 transition-all">Terms of Service</a>
+                <a href="{% url 'contact' %}" class="rs-text-on-surface/60 hover:rs-text-secondary underline decoration-secondary/30 underline-offset-4 transition-all">Contact</a>
+                <a href="{% url 'blog_list' %}" class="rs-text-on-surface/60 hover:rs-text-secondary underline decoration-secondary/30 underline-offset-4 transition-all font-bold rs-text-primary">Journal</a>
+            </div>
         </div>
-    </div>
-</section>
+    </footer>
+</div>
 {% endblock %}

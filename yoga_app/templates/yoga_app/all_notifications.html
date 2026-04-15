@@ -1,59 +1,244 @@
 {% extends 'yoga_app/base.html' %}
 {% load static %}
 
-{% block title %}All Notifications - Yoga Kailasa{% endblock %}
+{% block title %}Your Radiant Updates - Yoga Kailasa{% endblock %}
+
+{% block extra_css %}
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif:wght@400;700&family=Manrope:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+    .notifications-page {
+        font-family: 'Manrope', sans-serif;
+        background-color: #fff8f3;
+        color: #1f1b14;
+        min-height: 100vh;
+    }
+    .notifications-page .rs-headline {
+        font-family: 'Noto Serif', serif;
+        line-height: 1.4;
+    }
+    .notifications-page .rs-glass {
+        background-color: rgba(255, 248, 243, 0.8);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+    }
+    .notifications-page .rs-btn-primary {
+        background: linear-gradient(135deg, #855300 0%, #f59e0b 100%);
+        color: #ffffff;
+        transition: all 0.3s ease;
+    }
+    .notifications-page .rs-btn-primary:hover {
+        opacity: 0.92;
+        transform: scale(1.02);
+    }
+    .notifications-page .rs-text-primary { color: #855300; }
+    .notifications-page .rs-text-secondary { color: #a73a00; }
+    .notifications-page .rs-text-on-surface { color: #1f1b14; }
+    .notifications-page .rs-text-on-surface-variant { color: #534434; }
+    .notifications-page .rs-text-outline { color: #867461; }
+    .notifications-page .rs-text-outline-variant { color: #d8c3ad; }
+    .notifications-page .rs-text-on-primary { color: #ffffff; }
+    .notifications-page .rs-text-on-primary-container { color: #613b00; }
+    .notifications-page .rs-bg-surface { background-color: #fff8f3; }
+    .notifications-page .rs-bg-surface-container { background-color: #f7ece1; }
+    .notifications-page .rs-bg-surface-container-low { background-color: #fdf2e7; }
+    .notifications-page .rs-bg-surface-container-lowest { background-color: #ffffff; }
+    .notifications-page .rs-bg-surface-container-high { background-color: #f1e7db; }
+    .notifications-page .rs-bg-surface-container-highest { background-color: #ebe1d6; }
+    .notifications-page .rs-bg-surface-dim { background-color: #e2d8cd; }
+    .notifications-page .rs-bg-primary { background-color: #855300; }
+    .notifications-page .rs-bg-primary-container { background-color: #f59e0b; }
+    .notifications-page .rs-border-outline-variant { border-color: rgba(216, 195, 173, 0.2); }
+    .notifications-page .rs-border-primary { border-color: rgba(133, 83, 0, 0.3); }
+    .notifications-page .rs-notification-card {
+        transition: all 0.3s ease;
+    }
+    .notifications-page .rs-notification-card:hover {
+        background-color: #f1e7db;
+    }
+    .notifications-page .rs-notification-icon {
+        transition: all 0.3s ease;
+    }
+    .notifications-page .rs-notification-card:hover .rs-notification-icon {
+        transform: scale(1.1);
+    }
+    .notifications-page .rs-empty-state {
+        transition: all 0.3s ease;
+    }
+    .notifications-page .rs-empty-state:hover {
+        transform: translateY(-4px);
+    }
+    
+    /* Hide base.html elements */
+    .notifications-page > header,
+    .notifications-page > #mobile-menu,
+    .notifications-page > #mobile-menu-overlay,
+    .notifications-page > #backToTopBtn {
+        display: none !important;
+    }
+    
+    /* Line clamp utility */
+    .line-clamp-1 {
+        display: -webkit-box;
+        -webkit-line-clamp: 1;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+</style>
+{% endblock %}
 
 {% block content %}
-<section class="py-16 bg-gradient-to-r from-amber-100 to-amber-50 min-h-screen">
-    <div class="container mx-auto px-4 max-w-4xl">
-        <div class="bg-white p-8 rounded-xl shadow-lg">
-            <h2 class="text-3xl font-bold text-gray-800 mb-6 text-center">Your Notifications</h2>
-            <p class="text-gray-600 text-center mb-8">Stay updated with your course activities, discussion replies, and more.</p>
+<div class="notifications-page">
+    {# Top Navigation #}
+    <header class="rs-bg-surface dark:bg-[#1f1b14] w-full fixed top-0 z-50 rs-glass">
+        <div class="flex justify-between items-center px-6 md:px-8 py-4 w-full max-w-7xl mx-auto rs-headline leading-[1.4]">
+            <a href="{% url 'home' %}" class="text-2xl font-bold rs-text-primary tracking-tight">Yoga Kailasa</a>
+            <nav class="hidden md:flex space-x-8 items-center">
+                <a href="{% url 'courses' %}" class="rs-text-on-surface-variant/70 hover:rs-text-secondary transition-colors duration-300">Practice</a>
+                <a href="{% url 'booking' %}" class="rs-text-on-surface-variant/70 hover:rs-text-secondary transition-colors duration-300">Schedule</a>
+                <a href="{% url 'consultant_list' %}" class="rs-text-on-surface-variant/70 hover:rs-text-secondary transition-colors duration-300">Retreats</a>
+                <a href="{% url 'blog_list' %}" class="rs-text-on-surface-variant/70 hover:rs-text-secondary transition-colors duration-300">Community</a>
+            </nav>
+            <div class="flex items-center space-x-6">
+                <a href="{% url 'all_notifications' %}" class="rs-text-primary cursor-pointer hover:scale-95 duration-200">
+                    <i class="fas fa-bell"></i>
+                </a>
+                <a href="{% url 'profile_edit' %}" class="rs-text-primary cursor-pointer hover:scale-95 duration-200">
+                    <i class="fas fa-user-circle"></i>
+                </a>
+            </div>
+        </div>
+        <div class="rs-bg-surface-container-high h-px w-full"></div>
+    </header>
 
+    {# Main Content #}
+    <main class="pt-32 pb-24 px-6 min-h-screen">
+        <div class="max-w-3xl mx-auto">
+            {# Back to Home #}
+            <div class="mb-8">
+                <a href="{% url 'dashboard' %}" class="inline-flex items-center gap-2 rs-text-on-surface-variant hover:rs-text-primary font-medium transition-colors">
+                    <i class="fas fa-arrow-left"></i>
+                    <span class="text-sm uppercase tracking-widest">Back to Dashboard</span>
+                </a>
+            </div>
+
+            {# Header Section #}
+            <div class="text-center mb-16 space-y-4">
+                <h1 class="text-4xl md:text-5xl rs-text-primary leading-tight rs-headline">Your Radiant Updates</h1>
+                <p class="rs-text-on-surface-variant max-w-lg mx-auto font-body text-lg opacity-80 italic">
+                    Quiet your mind and review the latest whispers from your sanctuary community.
+                </p>
+            </div>
+
+            {# Notifications Actions #}
             {% if notifications %}
-                <div class="space-y-4">
+            <div class="flex justify-between items-center mb-8 px-2">
+                <h3 class="text-xl rs-headline rs-text-on-surface">Recent Activity</h3>
+                <form method="post" action="{% url 'get_notifications_api' %}" class="inline">
+                    {% csrf_token %}
+                    <button type="button" id="markAllReadBtn" class="rs-text-secondary text-sm font-semibold hover:underline decoration-secondary/30 underline-offset-4">
+                        Mark all as read
+                    </button>
+                </form>
+            </div>
+            {% endif %}
+
+            {# Notifications List #}
+            <div class="space-y-6">
+                {% if notifications %}
                     {% for notification in notifications %}
-                        <div class="p-4 rounded-lg shadow-sm border border-gray-200 flex items-start space-x-4
-                            {% if not notification.read %}bg-blue-50 border-blue-200 font-semibold{% else %}bg-gray-50{% endif %}">
-                            <div class="flex-shrink-0">
-                                <i class="text-xl
-                                    {% if notification.notification_type == 'reply' %}fas fa-reply text-blue-600
-                                    {% elif notification.notification_type == 'like' %}fas fa-heart text-red-500
-                                    {% elif notification.notification_type == 'course_update' %}fas fa-book text-green-600
-                                    {% elif notification.notification_type == 'admin_message' %}fas fa-user-shield text-purple-600
-                                    {% else %}fas fa-info-circle text-gray-500{% endif %}"></i>
+                    <div class="group relative {% if not notification.read %}rs-bg-surface-container-low{% else %}rs-bg-surface-container-lowest opacity-90{% endif %} rounded-xl p-6 rs-notification-card {% if not notification.read %}rs-border-primary border-l-4{% else %}border-l-4 border-transparent{% endif %}">
+                        <div class="flex gap-5">
+                            <div class="flex-shrink-0 w-12 h-12 rounded-full {% if not notification.read %}rs-bg-primary-container/20{% else %}rs-bg-surface-container-high{% endif %} flex items-center justify-center rs-notification-icon">
+                                {% if notification.notification_type == 'reply' %}
+                                <i class="fas fa-reply {% if not notification.read %}rs-text-primary{% else %}rs-text-outline{% endif %}"></i>
+                                {% elif notification.notification_type == 'like' or notification.notification_type == 'blog_post_like' %}
+                                <i class="fas fa-heart {% if not notification.read %}rs-text-primary{% else %}rs-text-outline{% endif %}"></i>
+                                {% elif notification.notification_type == 'course_update' %}
+                                <i class="fas fa-book {% if not notification.read %}rs-text-primary{% else %}rs-text-outline{% endif %}"></i>
+                                {% elif notification.notification_type == 'blog_comment' %}
+                                <i class="fas fa-comment {% if not notification.read %}rs-text-primary{% else %}rs-text-outline{% endif %}"></i>
+                                {% elif notification.notification_type == 'admin_message' %}
+                                <i class="fas fa-user-shield {% if not notification.read %}rs-text-primary{% else %}rs-text-outline{% endif %}"></i>
+                                {% else %}
+                                <i class="fas fa-info-circle {% if not notification.read %}rs-text-primary{% else %}rs-text-outline{% endif %}"></i>
+                                {% endif %}
                             </div>
-                            <div class="flex-grow">
-                                <a href="{{ notification.link|default:'#' }}" class="block text-gray-800 hover:text-amber-700 transition duration-200">
-                                    <p class="text-sm">
+                            <div class="flex-1">
+                                <div class="flex justify-between items-start mb-1">
+                                    <p class="rs-text-on-surface font-body">
                                         {% if notification.sender_username %}
-                                            <span class="font-bold">{{ notification.sender_username }}</span>
+                                        <span class="font-bold">{{ notification.sender_username }}</span>
                                         {% endif %}
                                         {{ notification.message }}
                                     </p>
-                                    <p class="text-xs text-gray-500 mt-1">{{ notification.created_at|date:"M d, Y H:i" }}</p>
-                                </a>
+                                    <span class="text-xs rs-text-on-surface-variant/60 font-medium whitespace-nowrap ml-4">{{ notification.created_at|timesince }} ago</span>
+                                </div>
+                                {% if notification.link %}
+                                <div class="flex items-center gap-4">
+                                    <a href="{{ notification.link }}" class="text-xs font-bold rs-text-primary hover:rs-text-secondary transition-colors">View</a>
+                                </div>
+                                {% endif %}
                             </div>
                             {% if not notification.read %}
-                                {# Optional: A button to mark individual notification as read - requires AJAX #}
-                                {# For now, they are marked read on page load. #}
-                                <span class="text-xs text-blue-500 flex-shrink-0">New!</span>
+                            <div class="w-2 h-2 rounded-full rs-bg-primary-container mt-2"></div>
                             {% endif %}
                         </div>
+                    </div>
                     {% endfor %}
-                </div>
-            {% else %}
-                <div class="text-center py-10">
-                    <i class="fas fa-bell-slash text-6xl text-gray-400 mb-4"></i>
-                    <p class="text-gray-600 text-lg">You don't have any notifications yet.</p>
-                    <p class="text-gray-500 text-sm mt-2">Activity on courses or discussions will appear here.</p>
-                </div>
-            {% endif %}
-
-            <div class="text-center mt-8">
-                <a href="{% url 'dashboard' %}" class="text-amber-600 hover:underline">Back to Dashboard</a>
+                {% else %}
+                    {# Empty State #}
+                    <div class="flex flex-col items-center justify-center py-20 space-y-6 text-center rs-empty-state">
+                        <div class="w-24 h-24 rounded-full rs-bg-surface-container flex items-center justify-center mb-4">
+                            <i class="fas fa-bell-slash rs-text-outline-variant text-5xl"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-2xl rs-headline rs-text-on-surface mb-2">Stillness Prevails</h3>
+                            <p class="rs-text-on-surface-variant font-body max-w-xs mx-auto">Your sanctuary is quiet for now. Use this moment of peace to return to your practice.</p>
+                        </div>
+                        <a href="{% url 'courses' %}" class="rs-bg-surface-container-high rs-text-primary px-8 py-3 rounded-lg font-semibold hover:rs-bg-surface-container-highest transition-colors">
+                            Explore Library
+                        </a>
+                    </div>
+                {% endif %}
             </div>
         </div>
-    </div>
-</section>
+    </main>
+
+    {# Footer #}
+    <footer class="rs-bg-surface-dim py-12 px-8">
+        <div class="max-w-4xl mx-auto flex flex-col md:flex-row justify-between items-center gap-8 opacity-70">
+            <div class="text-center md:text-left">
+                <div class="text-lg rs-headline rs-text-primary mb-2">Yoga Kailasa</div>
+                <p class="text-sm font-body">Nurturing the spirit through movement and mindfulness.</p>
+            </div>
+            <div class="flex gap-8 text-sm font-semibold rs-text-on-surface-variant">
+                <a href="{% url 'privacy_policy' %}" class="hover:rs-text-primary transition-colors">Privacy</a>
+                <a href="{% url 'terms_of_service' %}" class="hover:rs-text-primary transition-colors">Terms</a>
+                <a href="{% url 'contact' %}" class="hover:rs-text-primary transition-colors">Contact</a>
+            </div>
+            <div class="text-sm rs-text-on-surface-variant italic">
+                &copy; {% now "Y" %} Radiant Sanctuary. All rights reserved.
+            </div>
+        </div>
+    </footer>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const markAllBtn = document.getElementById('markAllReadBtn');
+    if (markAllBtn) {
+        markAllBtn.addEventListener('click', function() {
+            fetch("{% url 'get_notifications_api' %}")
+                .then(response => response.json())
+                .then(data => {
+                    // Notifications are automatically marked as read when fetched
+                    location.reload();
+                })
+                .catch(error => console.error('Error marking notifications as read:', error));
+        });
+    }
+});
+</script>
 {% endblock %}

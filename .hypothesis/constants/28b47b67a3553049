@@ -1,0 +1,4 @@
+# file: C:\Users\Orunmila1\Documents\Projects\yoga_kailasa_project\yoga_app\migrations\0026_consultant_created_at_consultant_is_available_and_more.py
+# hypothesis_version: 6.151.12
+
+['consultant', 'created_at', 'is_available', 'updated_at', 'yoga_app']

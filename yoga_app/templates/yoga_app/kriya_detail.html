@@ -1,0 +1,171 @@
+{% extends 'yoga_app/base.html' %}
+{% load static %}
+{% load app_filters %}
+
+{% block title %}{{ kriya.name }} — Kriya Session | Yoga Kailasa{% endblock %}
+{% block meta_description %}{{ kriya.description|truncatechars:160 }}{% endblock %}
+
+{% block extra_css %}
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif:ital,wght@0,400;0,700;1,400&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+    body { font-family:'Manrope',sans-serif; background:#fff8f3; }
+    .rs-headline { font-family:'Noto Serif',serif; line-height:1.4; }
+    .rs-glass { background:rgba(255,248,243,0.85); backdrop-filter:blur(20px); }
+    .rs-btn-primary { background:linear-gradient(135deg,#855300 0%,#f59e0b 100%); color:#fff; transition:all .3s; }
+    .rs-btn-secondary { background-color:#f1e7db; color:#855300; transition:all .3s; }
+    .rs-btn-secondary:hover { background-color:#ebe1d6; }
+    .detail-page > header, .detail-page > #mobile-menu, .detail-page > #mobile-menu-overlay, .detail-page > #backToTopBtn { display:none !important; }
+    .detail-page > main { padding:0 !important; }
+    .step-type-pose     { background:#fdf2e7; border-left:4px solid #855300; }
+    .step-type-breathing{ background:#f0f9ff; border-left:4px solid #0ea5e9; }
+    .step-type-mudra    { background:#fdf4ff; border-left:4px solid #a855f7; }
+    .step-type-meditation{ background:#f0fdf4; border-left:4px solid #22c55e; }
+    .step-icon-pose      { color:#855300; }
+    .step-icon-breathing { color:#0ea5e9; }
+    .step-icon-mudra     { color:#a855f7; }
+    .step-icon-meditation{ color:#22c55e; }
+    .step-card { transition:all .2s; }
+    .step-card:hover { transform:translateX(4px); }
+    .progress-ring { transition: stroke-dashoffset 0.5s ease; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="detail-page min-h-screen" style="background:#fff8f3;">
+
+    <nav class="fixed top-0 w-full z-50 rs-glass shadow-sm">
+        <div class="flex justify-between items-center px-6 md:px-10 py-4 max-w-7xl mx-auto">
+            <a href="{% url 'home' %}" class="rs-headline text-xl font-bold" style="color:#855300;">Yoga Kailasa</a>
+            <a href="{% url 'kriyas' %}" class="text-sm font-medium" style="color:#534434;">← Back to Kriyas</a>
+        </div>
+    </nav>
+
+    <main class="pt-24 pb-20">
+        <div class="max-w-5xl mx-auto px-6 md:px-12">
+
+            {# Hero #}
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-12 mb-16 items-center">
+                <div class="space-y-4">
+                    <div class="flex flex-wrap gap-2">
+                        <span class="px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider text-white" style="background:#855300;">{{ kriya.get_category_display }}</span>
+                        <span class="px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider" style="background:#f1e7db;color:#534434;">{{ kriya.difficulty }}</span>
+                        <span class="px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider" style="background:#f1e7db;color:#534434;"><i class="fas fa-clock mr-1"></i>{{ kriya.duration_minutes }} min</span>
+                        <span class="px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider" style="background:#f1e7db;color:#534434;"><i class="fas fa-list-ol mr-1"></i>{{ kriya.step_count }} steps</span>
+                    </div>
+                    <h1 class="rs-headline text-5xl font-bold" style="color:#1f1b14;">{{ kriya.name }}</h1>
+                    {% if kriya.sanskrit_name %}
+                    <p class="rs-headline text-2xl italic" style="color:#867461;">{{ kriya.sanskrit_name }}</p>
+                    {% endif %}
+                    <p class="text-lg leading-relaxed" style="color:#534434;">{{ kriya.description|safe }}</p>
+                </div>
+                <div class="aspect-square rounded-2xl overflow-hidden" style="background:#f1e7db;">
+                    {% if kriya.display_image %}
+                    <img src="{{ kriya.display_image }}" alt="{{ kriya.name }}" class="w-full h-full object-cover">
+                    {% else %}
+                    <div class="w-full h-full flex items-center justify-center">
+                        <i class="fas fa-infinity text-8xl" style="color:#d8c3ad;"></i>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            {# Benefits #}
+            {% if kriya.benefits %}
+            <div class="p-8 rounded-2xl mb-10" style="background:#fdf2e7;">
+                <h2 class="rs-headline text-2xl font-bold mb-4" style="color:#855300;">Benefits</h2>
+                <div class="prose-sm leading-relaxed" style="color:#534434;">{{ kriya.benefits|safe }}</div>
+            </div>
+            {% endif %}
+
+            {# Step sequence #}
+            {% if steps %}
+            <div class="mb-12">
+                <h2 class="rs-headline text-3xl font-bold mb-8" style="color:#855300;">The Sequence</h2>
+
+                {# Legend #}
+                <div class="flex flex-wrap gap-4 mb-6 text-xs font-semibold uppercase tracking-wider">
+                    <span class="flex items-center gap-1.5"><i class="fas fa-spa step-icon-pose"></i> Pose</span>
+                    <span class="flex items-center gap-1.5"><i class="fas fa-wind step-icon-breathing"></i> Breathing</span>
+                    <span class="flex items-center gap-1.5"><i class="fas fa-hand-paper step-icon-mudra"></i> Mudra</span>
+                    <span class="flex items-center gap-1.5"><i class="fas fa-om step-icon-meditation"></i> Meditation</span>
+                </div>
+
+                <div class="space-y-3">
+                    {% for step in steps %}
+                    <div class="step-card step-type-{{ step.step_type }} p-5 rounded-xl flex items-start gap-5">
+                        {# Step number #}
+                        <div class="w-9 h-9 rounded-full flex items-center justify-center flex-shrink-0 font-bold text-sm text-white"
+                             style="background:linear-gradient(135deg,#855300,#f59e0b);">
+                            {{ step.order }}
+                        </div>
+
+                        {# Icon #}
+                        <div class="flex-shrink-0 mt-0.5">
+                            {% if step.step_type == 'pose' %}
+                            <i class="fas fa-spa text-xl step-icon-pose"></i>
+                            {% elif step.step_type == 'breathing' %}
+                            <i class="fas fa-wind text-xl step-icon-breathing"></i>
+                            {% elif step.step_type == 'mudra' %}
+                            <i class="fas fa-hand-paper text-xl step-icon-mudra"></i>
+                            {% else %}
+                            <i class="fas fa-om text-xl step-icon-meditation"></i>
+                            {% endif %}
+                        </div>
+
+                        {# Content #}
+                        <div class="flex-1 min-w-0">
+                            <div class="flex items-start justify-between gap-4">
+                                <div>
+                                    <p class="text-xs uppercase tracking-widest font-semibold mb-0.5" style="color:#867461;">{{ step.get_step_type_display }}</p>
+                                    <h3 class="rs-headline font-bold text-lg" style="color:#1f1b14;">
+                                        {% if step.step_type == 'pose' and step.pose %}
+                                        <a href="{% url 'pose_detail' step.pose.id %}" class="hover:underline" style="color:#855300;">{{ step.pose.name }}</a>
+                                        {% elif step.step_type == 'breathing' and step.breathing %}
+                                        <a href="{% url 'breathing_technique_detail' step.breathing.id %}" class="hover:underline" style="color:#0ea5e9;">{{ step.breathing.name }}</a>
+                                        {% elif step.step_type == 'mudra' and step.mudra %}
+                                        <a href="{% url 'mudra_detail' step.mudra.id %}" class="hover:underline" style="color:#a855f7;">{{ step.mudra.name }}</a>
+                                        {% elif step.step_type == 'meditation' and step.meditation %}
+                                        <a href="{% url 'meditation_detail' step.meditation.id %}" class="hover:underline" style="color:#22c55e;">{{ step.meditation.title }}</a>
+                                        {% else %}
+                                        <span style="color:#867461;">—</span>
+                                        {% endif %}
+                                    </h3>
+                                    {% if step.instruction_note %}
+                                    <div class="text-sm mt-1 leading-relaxed" style="color:#534434;">{{ step.instruction_note|safe }}</div>
+                                    {% endif %}
+                                </div>
+                                <div class="text-right flex-shrink-0 text-xs" style="color:#867461;">
+                                    {% if step.duration_display %}
+                                    <p class="font-semibold">{{ step.duration_display }}</p>
+                                    {% endif %}
+                                    {% if step.repetitions > 1 %}
+                                    <p>× {{ step.repetitions }}</p>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+
+            {# Related kriyas #}
+            {% if related_kriyas %}
+            <div>
+                <h2 class="rs-headline text-2xl font-bold mb-6" style="color:#855300;">Related Kriyas</h2>
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    {% for k in related_kriyas %}
+                    <a href="{% url 'kriya_detail' k.id %}" class="block p-4 rounded-xl transition-all hover:-translate-y-1" style="background:#fdf2e7;">
+                        <p class="rs-headline font-bold text-sm mb-1" style="color:#1f1b14;">{{ k.name }}</p>
+                        <p class="text-xs" style="color:#867461;">{{ k.duration_minutes }} min · {{ k.step_count }} steps</p>
+                    </a>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+
+        </div>
+    </main>
+</div>
+{% endblock %}

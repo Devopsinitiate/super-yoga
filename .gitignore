@@ -11,6 +11,9 @@ media/
 staticfiles/
 .env
 
+# Node / Tailwind
+node_modules/
+
 # VSCode
 .vscode/
 

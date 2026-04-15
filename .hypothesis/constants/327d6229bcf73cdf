@@ -1,0 +1,4 @@
+# file: C:\Users\Orunmila1\Documents\Projects\yoga_kailasa_project\yoga_app\migrations\0020_alter_booking_preferred_date_and_more.py
+# hypothesis_version: 6.151.12
+
+[100, 200, 254, '1', '2', '3', '4', '5', 'Admin Message', 'Afternoon (12pm-4pm)', 'Course Update', 'Evening (4pm-8pm)', 'Failed', 'Morning (8am-12pm)', 'New Like', 'New Reply', 'Pending', 'Refunded', 'Success', 'admin_message', 'booking', 'breathingtechnique', 'consultant', 'contactmessage', 'course', 'course_update', 'coursereview', 'created_at', 'discussionpost', 'discussiontopic', 'email', 'failed', 'is_popular', 'lesson', 'lessoncomment', 'like', 'module', 'name', 'notification', 'notification_type', 'order', 'paid_at', 'payment', 'pending', 'preferred_date', 'preferred_time', 'rating', 'read', 'refunded', 'reply', 'sanskrit_name', 'specialty', 'status', 'submitted_at', 'success', 'testimonial', 'title', 'yoga_app', 'yogapose']

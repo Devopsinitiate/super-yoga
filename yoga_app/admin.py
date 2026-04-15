@@ -9,7 +9,9 @@ from .models import (
     UserLessonCompletion, DiscussionTopic, DiscussionPost, UserCourseCompletion,
     CourseReview, Consultant, Testimonial, Booking, NewsletterSubscription,
     ContactMessage, Payment, Notification, LessonComment, BlogPostCategory, BlogPost, BlogComment,
-    Tag # NEW: Import the Tag model
+    Tag,
+    Mudra, Meditation, Chakra, DailyPractice,
+    KriyaSession, KriyaStep,
 )
 
 # --- Inline Classes for Course Management ---
@@ -270,12 +272,15 @@ class DiscussionPostAdmin(admin.ModelAdmin):
 
 @admin.register(Consultant)
 class ConsultantAdmin(admin.ModelAdmin):
-    list_display = ('name', 'specialty', 'is_available', 'created_at')
-    list_filter = ('specialty', 'is_available')
-    search_fields = ('name', 'specialty', 'bio')
+    list_display = ('name', 'specialty', 'is_available', 'contact_email', 'created_at')
+    list_filter = ('is_available', 'specialty')
+    search_fields = ('name', 'specialty', 'contact_email')
     fieldsets = (
         (None, {
-            'fields': ('name', 'specialty', 'profile_picture_url', 'icon_class', 'is_available'),
+            'fields': ('name', 'specialty', 'profile_picture_url', 'is_available'),
+        }),
+        ('Contact', {
+            'fields': ('contact_email', 'phone_number'),
         }),
         ('Biography', {
             'fields': ('bio',),
@@ -285,11 +290,12 @@ class ConsultantAdmin(admin.ModelAdmin):
 
 @admin.register(Testimonial)
 class TestimonialAdmin(admin.ModelAdmin):
-    list_display = ('author_name', 'rating', 'submitted_at', 'is_approved') # ADDED 'is_approved'
-    list_filter = ('is_approved', 'rating') # ADDED 'is_approved'
+    list_display = ('author_name', 'rating', 'submitted_at', 'is_approved')
+    list_filter = ('is_approved', 'rating')
+    list_editable = ('is_approved',)  # approve/reject directly from the list
     search_fields = ('author_name', 'feedback_text')
     date_hierarchy = 'submitted_at'
-    actions = ['mark_approved', 'mark_unapproved'] # NEW ACTIONS
+    actions = ['mark_approved', 'mark_unapproved']
 
     def mark_approved(self, request, queryset):
         queryset.update(is_approved=True)
@@ -301,13 +307,14 @@ class TestimonialAdmin(admin.ModelAdmin):
 
 @admin.register(Booking)
 class BookingAdmin(admin.ModelAdmin):
-    list_display = ('full_name', 'email', 'preferred_date', 'preferred_time', 'booked_at')
+    list_display = ('full_name', 'email', 'user', 'preferred_date', 'preferred_time', 'booked_at')
     list_filter = ('preferred_date', 'preferred_time')
-    search_fields = ('full_name', 'email', 'message')
+    search_fields = ('full_name', 'email', 'message', 'user__username')
+    raw_id_fields = ('user',)
     readonly_fields = ('booked_at',)
     fieldsets = (
         (None, {
-            'fields': ('full_name', 'email', 'phone_number'),
+            'fields': ('user', 'full_name', 'email', 'phone_number'),
         }),
         ('Session Details', {
             'fields': ('preferred_date', 'preferred_time', 'message'),
@@ -326,13 +333,15 @@ class NewsletterSubscriptionAdmin(admin.ModelAdmin):
 
 @admin.register(ContactMessage)
 class ContactMessageAdmin(admin.ModelAdmin):
-    list_display = ('name', 'email', 'subject', 'submitted_at')
-    list_filter = ('submitted_at',)
+    list_display = ('name', 'email', 'subject', 'submitted_at', 'is_read')
+    list_filter = ('is_read', 'submitted_at')
+    list_editable = ('is_read',)  # mark as read directly from the list
     search_fields = ('name', 'email', 'subject', 'message')
     readonly_fields = ('submitted_at',)
+    actions = ['mark_as_read', 'mark_as_unread']
     fieldsets = (
         (None, {
-            'fields': ('name', 'email', 'subject'),
+            'fields': ('name', 'email', 'subject', 'is_read'),
         }),
         ('Message Content', {
             'fields': ('message',),
@@ -342,6 +351,14 @@ class ContactMessageAdmin(admin.ModelAdmin):
             'classes': ('collapse',),
         }),
     )
+
+    def mark_as_read(self, request, queryset):
+        queryset.update(is_read=True)
+    mark_as_read.short_description = "Mark selected messages as read"
+
+    def mark_as_unread(self, request, queryset):
+        queryset.update(is_read=False)
+    mark_as_unread.short_description = "Mark selected messages as unread"
 
 @admin.register(Payment)
 class PaymentAdmin(admin.ModelAdmin):
@@ -452,3 +469,64 @@ class TagAdmin(admin.ModelAdmin):
     list_display = ('name', 'slug')
     prepopulated_fields = {'slug': ('name',)} # Automatically populate slug from name
     search_fields = ('name',)
+
+
+# ─── Wellness Models ──────────────────────────────────────────────────────────
+
+@admin.register(Mudra)
+class MudraAdmin(admin.ModelAdmin):
+    list_display = ('name', 'sanskrit_name', 'difficulty', 'associated_chakra', 'is_featured')
+    list_filter = ('difficulty', 'associated_chakra', 'is_featured')
+    search_fields = ('name', 'sanskrit_name', 'description', 'benefits')
+    list_editable = ('is_featured',)
+    ordering = ('name',)
+
+
+@admin.register(Meditation)
+class MeditationAdmin(admin.ModelAdmin):
+    list_display = ('title', 'category', 'difficulty', 'duration_minutes', 'guided_by', 'is_featured')
+    list_filter = ('category', 'difficulty', 'is_featured')
+    search_fields = ('title', 'description', 'guided_by')
+    list_editable = ('is_featured',)
+    ordering = ('title',)
+
+
+@admin.register(Chakra)
+class ChakraAdmin(admin.ModelAdmin):
+    list_display = ('number', 'name', 'sanskrit_name', 'color', 'element', 'seed_mantra')
+    filter_horizontal = ('associated_poses', 'associated_mudras', 'associated_breathing')
+    ordering = ('number',)
+
+
+@admin.register(DailyPractice)
+class DailyPracticeAdmin(admin.ModelAdmin):
+    list_display = ('user', 'date', 'mood_before', 'mood_after', 'duration_minutes')
+    list_filter = ('date', 'mood_after')
+    search_fields = ('user__username', 'notes')
+    filter_horizontal = ('poses', 'breathing_techniques', 'mudras', 'meditations')
+    ordering = ('-date',)
+    readonly_fields = ('created_at', 'updated_at')
+
+
+# ─── Kriya Session ────────────────────────────────────────────────────────────
+
+class KriyaStepInline(admin.TabularInline):
+    model = KriyaStep
+    extra = 1
+    fields = ('order', 'step_type', 'pose', 'breathing', 'mudra', 'meditation',
+              'duration_seconds', 'repetitions', 'instruction_note')
+    ordering = ('order',)
+
+
+@admin.register(KriyaSession)
+class KriyaSessionAdmin(admin.ModelAdmin):
+    list_display = ('name', 'category', 'difficulty', 'duration_minutes', 'step_count', 'is_featured')
+    list_filter = ('category', 'difficulty', 'is_featured')
+    search_fields = ('name', 'sanskrit_name', 'description')
+    list_editable = ('is_featured',)
+    inlines = [KriyaStepInline]
+    ordering = ('name',)
+
+    def step_count(self, obj):
+        return obj.steps.count()
+    step_count.short_description = 'Steps'

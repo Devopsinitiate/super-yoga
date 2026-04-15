@@ -1,0 +1,4 @@
+# file: C:\Users\Orunmila1\Documents\Projects\yoga_kailasa_project\yoga_app\views\blog_views.py
+# hypothesis_version: 6.151.12
+
+[400, '30/m', '5/m', 'POST', 'all_authors', 'author_id', 'blog_detail', 'blog_post', 'categories', 'category_slug', 'comment_form', 'comments', 'current_author', 'current_category', 'current_tag', 'date_range', 'date_range_filter', 'error', 'ip', 'is_liked_by_user', 'liked', 'likes_count', 'message', 'newest', 'page', 'post', 'posts', 'q', 'query', 'recent_posts', 'related_posts', 'sort_by', 'status', 'success', 'tag_slug', 'tags', 'user']

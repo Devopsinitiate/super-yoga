@@ -1,68 +1,292 @@
 {% extends 'yoga_app/base.html' %}
 {% load static %}
+{% load app_filters %}
 
 {% block title %}{{ pose.name }} - Yoga Kailasa{% endblock %}
 
+{% block meta_description %}Learn the {{ pose.name }} {% if pose.sanskrit_name %}({{ pose.sanskrit_name }}){% endif %} yoga pose. Detailed instructions, benefits, and video demonstration for mastering this asana.{% endblock %}
+
+{% block og_title %}{{ pose.name }} - Yoga Kailasa{% endblock %}
+{% block og_description %}Learn the {{ pose.name }} {% if pose.sanskrit_name %}({{ pose.sanskrit_name }}){% endif %} yoga pose. Detailed instructions, benefits, and video demonstration for mastering this asana.{% endblock %}
+{% block og_image %}{% if pose.image_url %}{{ pose.image_url }}{% else %}{% static 'yoga_app/images/default_pose_og_image.jpg' %}{% endif %}{% endblock %}
+
+{% block extra_css %}
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif:ital,wght@0,400;0,700;1,400&family=Manrope:wght@300;400;600;800&display=swap" rel="stylesheet">
+<style>
+    body { font-family: 'Manrope', sans-serif; }
+    .rs-headline { font-family: 'Noto Serif', serif; line-height: 1.4; }
+    
+    .rs-surface { background-color: #fff8f3; }
+    .rs-surface-container { background-color: #f7ece1; }
+    .rs-surface-container-low { background-color: #fdf2e7; }
+    .rs-surface-container-lowest { background-color: #ffffff; }
+    .rs-surface-container-high { background-color: #f1e7db; }
+    .rs-surface-container-highest { background-color: #ebe1d6; }
+    .rs-surface-dim { background-color: #e2d8cd; }
+    
+    .rs-on-surface { color: #1f1b14; }
+    .rs-on-surface-variant { color: #534434; }
+    .rs-primary { color: #855300; }
+    .rs-secondary { color: #a73a00; }
+    .rs-outline { color: #867461; }
+    .rs-outline-variant { color: #d8c3ad; }
+    .rs-primary-container { color: #f59e0b; }
+    .rs-on-primary { color: #ffffff; }
+    .rs-on-primary-container { color: #613b00; }
+    .rs-on-secondary-container { color: #571a00; }
+    .rs-secondary-fixed { background-color: #ffdbce; }
+    .rs-on-secondary-fixed { color: #370e00; }
+    .rs-tertiary-container { background-color: #f79a6c; }
+    .rs-on-tertiary-container { color: #72300a; }
+    
+    .rs-glass {
+        background-color: rgba(255, 248, 243, 0.8);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+    }
+    
+    .rs-btn-primary {
+        background: linear-gradient(135deg, #855300 0%, #f59e0b 100%);
+        color: #ffffff;
+        transition: all 0.3s ease;
+    }
+    .rs-btn-primary:hover {
+        opacity: 0.92;
+    }
+    
+    .rs-btn-secondary {
+        background-color: #f1e7db;
+        color: #855300;
+        transition: all 0.3s ease;
+    }
+    .rs-btn-secondary:hover {
+        background-color: #ebe1d6;
+    }
+    
+    /* Hide base.html elements */
+    .pose-detail-page > header,
+    .pose-detail-page > #mobile-menu,
+    .pose-detail-page > #mobile-menu-overlay,
+    .pose-detail-page > #backToTopBtn {
+        display: none !important;
+    }
+    
+    /* CKEditor content styling */
+    .rs-lesson-content h1, .rs-lesson-content h2, .rs-lesson-content h3 {
+        font-family: 'Noto Serif', serif;
+        color: #855300;
+        margin-top: 1.5rem;
+        margin-bottom: 0.75rem;
+    }
+    .rs-lesson-content p {
+        margin-bottom: 1rem;
+        line-height: 1.7;
+        color: #534434;
+    }
+    .rs-lesson-content ul, .rs-lesson-content ol {
+        margin-left: 1.5rem;
+        margin-bottom: 1rem;
+    }
+    .rs-lesson-content img {
+        border-radius: 0.75rem;
+        margin: 1rem 0;
+    }
+    
+    /* Related pose card hover */
+    .rs-related-pose:hover .rs-related-pose-img {
+        transform: scale(1.1);
+    }
+    .rs-related-pose-img {
+        transition: transform 0.7s ease;
+    }
+</style>
+{% endblock %}
+
 {% block content %}
-<section class="py-16 bg-gradient-to-r from-amber-100 to-amber-50 min-h-screen">
-    <div class="container mx-auto px-4 max-w-3xl">
-        <div class="bg-white p-8 rounded-xl shadow-lg">
-            <div class="flex flex-col md:flex-row items-start md:space-x-8">
-                <div class="md:w-1/2 mb-6 md:mb-0">
-                    {% if pose.image_url %}
-                        <img src="{{ pose.image_url }}" alt="{{ pose.name }}" class="rounded-lg shadow-md w-full h-auto object-cover max-h-96">
-                    {% else %}
-                        <div class="w-full h-72 bg-gray-200 rounded-lg shadow-md flex items-center justify-center">
-                            <i class="fas fa-hand-sparkles text-6xl text-gray-400"></i>
-                        </div>
-                    {% endif %}
-                </div>
-                <div class="md:w-1/2">
-                    <h2 class="text-3xl font-bold text-gray-800 mb-2">{{ pose.name }}</h2>
-                    {% if pose.sanskrit_name %}
-                        <p class="text-amber-600 text-lg mb-4">Sanskrit: {{ pose.sanskrit_name }}</p>
-                    {% endif %}
-
-                    <div class="flex items-center text-gray-600 text-sm mb-4">
-                        <i class="fas fa-star text-amber-500 mr-2"></i>
-                        <span>Difficulty: {{ pose.difficulty }}</span>
-                    </div>
-
-                    <h3 class="text-xl font-bold text-gray-800 mb-2">Description:</h3>
-                    <div class="prose max-w-none text-gray-700 mb-4">
-                        <p>{{ pose.description|safe }}</p>
-                    </div>
-
-                    <h3 class="text-xl font-bold text-gray-800 mb-2">Instructions:</h3>
-                    <div class="prose max-w-none text-gray-700 mb-4">
-                        <p>{{ pose.instructions|safe }}</p>
-                    </div>
-                </div>
+<div class="pose-detail-page rs-surface min-h-screen selection:bg-[#f59e0b]/30">
+    {# Top Navigation Bar #}
+    <nav class="fixed top-0 w-full z-50 rs-glass">
+        <div class="flex justify-between items-center px-6 md:px-8 py-4 w-full max-w-7xl mx-auto">
+            <a href="{% url 'home' %}" class="text-2xl rs-headline italic rs-primary">Yoga Kailasa</a>
+            <div class="hidden md:flex items-center gap-8 rs-headline text-lg tracking-wide rs-primary/60">
+                <a href="{% url 'breathing' %}" class="rs-primary/60 hover:rs-primary transition-colors duration-300">Practice</a>
+                <a href="{% url 'poses' %}" class="rs-primary font-bold border-b-2 border-[#855300]">Library</a>
+                <a href="{% url 'booking' %}" class="rs-primary/60 hover:rs-primary transition-colors duration-300">Retreats</a>
             </div>
-
-            {# NEW: Video Demonstration Section #}
-            {% if pose.video_url %}
-            <div class="mt-8 pt-8 border-t border-gray-200">
-                <h3 class="text-2xl font-bold text-gray-800 mb-4 text-center">Video Demonstration</h3>
-                <div class="relative" style="padding-bottom: 56.25%; height: 0; overflow: hidden; max-width: 100%; background: #000;">
-                    <iframe
-                        src="{{ pose.video_url }}"
-                        frameborder="0"
-                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                        allowfullscreen
-                        class="absolute top-0 left-0 w-full h-full rounded-lg shadow-md"
-                    ></iframe>
-                </div>
-                <p class="text-center text-gray-600 text-sm mt-4">Note: Ensure the video URL is an embed link (e.g., from YouTube's "Share > Embed" option).</p>
-            </div>
-            {% endif %}
-
-            <div class="mt-6 text-center">
-                <a href="{% url 'poses' %}" class="inline-block bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-full transition duration-300">
-                    Back to All Poses <i class="fas fa-arrow-left ml-2"></i>
+            <div class="flex items-center gap-4">
+                {% if user.is_authenticated %}
+                <a href="{% url 'profile_edit' %}" class="rs-on-surface-variant hover:rs-primary transition-colors">
+                    <i class="fas fa-user-circle text-xl"></i>
                 </a>
+                {% else %}
+                <a href="{% url 'login' %}" class="rs-on-surface-variant hover:rs-primary font-medium transition-all">Sign In</a>
+                {% endif %}
             </div>
         </div>
-    </div>
-</section>
+    </nav>
+
+    <main class="pt-24 pb-20 max-w-7xl mx-auto px-6">
+        {# Navigation: Return to Gallery #}
+        <div class="mb-12">
+            <a href="{% url 'poses' %}" class="inline-flex items-center gap-2 rs-secondary font-medium group">
+                <i class="fas fa-arrow-left transition-transform group-hover:-translate-x-1"></i>
+                <span class="text-sm uppercase tracking-widest">Return to Gallery</span>
+            </a>
+        </div>
+
+        {# Radiant Feature Section (Hero) #}
+        <section class="relative grid grid-cols-1 lg:grid-cols-12 gap-8 mb-24 items-end">
+            <div class="lg:col-span-7 relative z-10">
+                <div class="mb-4 rs-secondary font-semibold tracking-[0.2em] uppercase text-xs">Asana Sanctuary</div>
+                <h1 class="rs-headline text-6xl md:text-8xl leading-none rs-on-surface mb-4">{{ pose.name }}</h1>
+                {% if pose.sanskrit_name %}
+                <p class="rs-headline italic text-2xl rs-primary/70 mb-8">{{ pose.sanskrit_name }}</p>
+                {% endif %}
+                <div class="flex flex-wrap gap-4">
+                    <span class="px-4 py-2 rs-surface-container-high rounded-lg text-sm font-medium">{{ pose.difficulty }}</span>
+                    {% if pose.video_url %}
+                    <span class="px-4 py-2 rs-surface-container-high rounded-lg text-sm font-medium">Video Guide</span>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="lg:col-span-5 lg:absolute lg:right-0 lg:top-0 lg:h-full lg:w-1/2 -z-10 lg:-mr-6">
+                <div class="aspect-[4/5] rounded-xl overflow-hidden shadow-2xl">
+                    {% if pose.image_url %}
+                    <img src="{{ pose.image_url }}" alt="{{ pose.name }}" class="w-full h-full object-cover">
+                    {% else %}
+                    <div class="w-full h-full rs-surface-container flex items-center justify-center">
+                        <i class="fas fa-spa text-8xl rs-primary/10"></i>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </section>
+
+        {# Serene Content Layout: Description & Details #}
+        <section class="grid grid-cols-1 lg:grid-cols-3 gap-16 mb-24">
+            <div class="lg:col-span-2 space-y-12">
+                <div class="max-w-2xl">
+                    <h2 class="rs-headline text-3xl mb-6 rs-on-surface">The Essence</h2>
+                    <div class="rs-lesson-content rs-on-surface-variant text-lg leading-relaxed">
+                        {{ pose.description|safe }}
+                    </div>
+                </div>
+                
+                {% if pose.instructions %}
+                <div>
+                    <h2 class="rs-headline text-3xl mb-8 rs-on-surface">Step-by-Step Guidance</h2>
+                    <div class="rs-lesson-content rs-on-surface-variant leading-relaxed">
+                        {{ pose.instructions|safe }}
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+
+            {# Technical Detail Tray #}
+            <div class="rs-surface-container-low rounded-xl p-8 h-fit space-y-8">
+                <div>
+                    <h4 class="text-xs uppercase tracking-[0.2em] font-bold rs-primary mb-4">Difficulty Level</h4>
+                    <p class="rs-on-surface font-semibold">{{ pose.difficulty }}</p>
+                </div>
+                
+                {% if pose.duration_minutes %}
+                <div class="pt-8 border-t border-[#d8c3ad]/30">
+                    <h4 class="text-xs uppercase tracking-[0.2em] font-bold rs-primary mb-4">Recommended Hold</h4>
+                    <p class="rs-on-surface">{{ pose.duration_minutes }} seconds</p>
+                </div>
+                {% endif %}
+                
+                <div class="pt-8 border-t border-[#d8c3ad]/30">
+                    <h4 class="text-xs uppercase tracking-[0.2em] font-bold rs-primary mb-4">Key Benefits</h4>
+                    <ul class="space-y-3 text-sm rs-on-surface-variant">
+                        <li class="flex items-center gap-2">
+                            <i class="fas fa-check-circle text-secondary text-sm"></i>
+                            Improves Balance & Focus
+                        </li>
+                        <li class="flex items-center gap-2">
+                            <i class="fas fa-check-circle text-secondary text-sm"></i>
+                            Strengthens Core Muscles
+                        </li>
+                        <li class="flex items-center gap-2">
+                            <i class="fas fa-check-circle text-secondary text-sm"></i>
+                            Enhances Flexibility
+                        </li>
+                    </ul>
+                </div>
+                
+                <div class="pt-8 border-t border-[#d8c3ad]/30">
+                    <h4 class="text-xs uppercase tracking-[0.2em] font-bold rs-primary mb-4">Contraindications</h4>
+                    <p class="text-sm italic rs-on-surface-variant">Practice with caution if you have recent injuries. Use props or modifications as needed.</p>
+                </div>
+                
+                <div class="pt-8">
+                    <a href="{% url 'poses' %}" class="block w-full rs-btn-primary py-4 rounded-lg font-bold text-center">
+                        Explore More Poses
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        {# Cinematic Video Integration #}
+        {% if pose.video_url %}
+        <section class="mb-24">
+            <h2 class="rs-headline text-3xl mb-8 rs-on-surface text-center">Cinematic Flow</h2>
+            <div class="relative group aspect-video rounded-xl overflow-hidden rs-surface-container-highest shadow-2xl max-w-5xl mx-auto">
+                <iframe src="{{ pose.video_url|embed_url }}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen referrerpolicy="strict-origin-when-cross-origin" class="w-full h-full"></iframe>
+            </div>
+        </section>
+        {% endif %}
+
+        {# Recommended / Gallery Bento Grid #}
+        <section class="mb-24">
+            <div class="flex justify-between items-end mb-12">
+                <div>
+                    <h2 class="rs-headline text-3xl rs-on-surface">Continue Your Practice</h2>
+                    <p class="rs-on-surface-variant">Explore more poses in our asana library</p>
+                </div>
+                <a href="{% url 'poses' %}" class="rs-primary font-bold border-b border-[#855300]/30">View All Library</a>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                {% for related_pose in related_poses|default:pose_list|slice:":3" %}
+                {% if forloop.counter <= 3 %}
+                <a href="{% url 'pose_detail' related_pose.id %}" class="rs-related-pose group relative aspect-square rounded-xl overflow-hidden rs-surface-container cursor-pointer">
+                    {% if related_pose.image_url %}
+                    <img src="{{ related_pose.image_url }}" alt="{{ related_pose.name }}" class="w-full h-full object-cover rs-related-pose-img">
+                    {% else %}
+                    <div class="w-full h-full rs-surface-container-high flex items-center justify-center">
+                        <i class="fas fa-spa text-6xl rs-primary/10"></i>
+                    </div>
+                    {% endif %}
+                    <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent flex flex-col justify-end p-6">
+                        <h3 class="text-white rs-headline text-xl">{{ related_pose.name }}</h3>
+                        {% if related_pose.sanskrit_name %}
+                        <p class="text-white/70 text-sm">{{ related_pose.sanskrit_name }}</p>
+                        {% endif %}
+                    </div>
+                </a>
+                {% endif %}
+                {% empty %}
+                <div class="md:col-span-3 text-center py-12 rs-surface-container rounded-xl">
+                    <i class="fas fa-spa text-4xl rs-primary/20 mb-4"></i>
+                    <p class="rs-on-surface-variant">Explore our full pose library for more asanas.</p>
+                    <a href="{% url 'poses' %}" class="inline-block mt-4 rs-btn-primary px-6 py-3 rounded-lg font-semibold text-sm">
+                        View All Poses
+                    </a>
+                </div>
+                {% endfor %}
+            </div>
+        </section>
+    </main>
+
+    {# Footer #}
+    <footer class="w-full py-12 mt-auto rs-surface-container-high text-center px-4 flex flex-col items-center gap-4">
+        <div class="rs-headline italic text-lg rs-primary">Yoga Kailasa</div>
+        <div class="flex gap-6 rs-primary/50 text-sm font-light uppercase tracking-widest">
+            <a href="{% url 'privacy_policy' %}" class="hover:rs-primary transition-colors">Privacy</a>
+            <a href="{% url 'terms_of_service' %}" class="hover:rs-primary transition-colors">Terms</a>
+            <a href="{% url 'contact' %}" class="hover:rs-primary transition-colors">Contact</a>
+        </div>
+        <p class="text-sm font-light rs-primary/70">&copy; {% now "Y" %} Yoga Kailasa. Breath by breath.</p>
+    </footer>
+</div>
 {% endblock %}

@@ -1,0 +1,4 @@
+# file: C:\Users\Orunmila1\Documents\Projects\yoga_kailasa_project\yoga_app\migrations\0023_blogpost_likes_alter_notification_notification_type.py
+# hypothesis_version: 6.151.12
+
+['Admin Message', 'Blog Comment', 'Blog Post Like', 'Course Update', 'New Blog Post', 'New Like', 'New Reply', 'admin_message', 'blog_comment', 'blog_post_like', 'blogpost', 'course_update', 'like', 'liked_blog_posts', 'likes', 'new_blog_post', 'notification', 'notification_type', 'reply', 'yoga_app']

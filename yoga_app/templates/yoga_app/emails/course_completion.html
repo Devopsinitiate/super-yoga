@@ -1,0 +1,35 @@
+{% extends 'yoga_app/emails/base_email.html' %}
+
+{% block subject %}Congratulations — You completed {{ course_title }}!{% endblock %}
+{% block header_subtitle %}Course Completed 🎉{% endblock %}
+
+{% block body %}
+<h2 style="margin:0 0 16px;font-family:'Georgia',serif;font-size:22px;color:#1f1b14;font-weight:normal;">
+  Well done, <em style="color:#855300;">{{ username }}</em>.
+</h2>
+<p style="margin:0 0 16px;font-size:15px;color:#534434;line-height:1.7;">
+  You've completed every lesson in <strong>{{ course_title }}</strong>. That takes real dedication — be proud of what you've accomplished.
+</p>
+<table width="100%" cellpadding="0" cellspacing="0" style="background:#fdf2e7;border-radius:12px;margin:24px 0;">
+  <tr>
+    <td style="padding:20px 24px;text-align:center;">
+      <p style="margin:0 0 4px;font-size:32px;">🏆</p>
+      <p style="margin:0;font-size:16px;color:#855300;font-family:'Georgia',serif;font-style:italic;">{{ course_title }}</p>
+      <p style="margin:4px 0 0;font-size:13px;color:#867461;">Completed on {{ completed_date }}</p>
+    </td>
+  </tr>
+</table>
+<p style="margin:0;font-size:15px;color:#534434;line-height:1.7;">
+  Keep the momentum going — explore more courses in your dashboard and continue your practice.
+</p>
+{% endblock %}
+
+{% block cta %}
+<tr>
+  <td style="padding:8px 40px 32px;text-align:center;">
+    <a href="{{ courses_url }}" style="display:inline-block;background:linear-gradient(135deg,#855300 0%,#f59e0b 100%);color:#ffffff;text-decoration:none;padding:14px 36px;border-radius:50px;font-size:15px;font-weight:600;letter-spacing:0.5px;">
+      Explore More Courses
+    </a>
+  </td>
+</tr>
+{% endblock %}

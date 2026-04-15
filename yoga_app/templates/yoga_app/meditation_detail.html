@@ -1,0 +1,171 @@
+{% extends 'yoga_app/base.html' %}
+{% load static %}
+{% load app_filters %}
+{% load app_filters %}
+
+{% block title %}{{ meditation.title }} — Meditation | Yoga Kailasa{% endblock %}
+{% block meta_description %}{{ meditation.description|truncatechars:160 }}{% endblock %}
+
+{% block extra_css %}
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif:ital,wght@0,400;0,700;1,400&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+    body { font-family:'Manrope',sans-serif; background:#fff8f3; }
+    .rs-headline { font-family:'Noto Serif',serif; line-height:1.4; }
+    .rs-glass { background:rgba(255,248,243,0.85); backdrop-filter:blur(20px); }
+    .rs-btn-primary { background:linear-gradient(135deg,#855300 0%,#f59e0b 100%); color:#fff; transition:all .3s; }
+    .rs-btn-secondary { background-color:#f1e7db; color:#855300; transition:all .3s; }
+    .rs-btn-secondary:hover { background-color:#ebe1d6; }
+    .detail-page > header, .detail-page > #mobile-menu, .detail-page > #mobile-menu-overlay, .detail-page > #backToTopBtn { display:none !important; }
+    .detail-page > main { padding:0 !important; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="detail-page min-h-screen" style="background:#fff8f3;">
+
+    <nav class="fixed top-0 w-full z-50 rs-glass shadow-sm">
+        <div class="flex justify-between items-center px-6 md:px-10 py-4 max-w-7xl mx-auto">
+            <a href="{% url 'home' %}" class="rs-headline text-xl font-bold" style="color:#855300;">Yoga Kailasa</a>
+            <a href="{% url 'meditations' %}" class="text-sm font-medium" style="color:#534434;">← Back to Meditations</a>
+        </div>
+    </nav>
+
+    <main class="pt-24 pb-20">
+        <div class="max-w-4xl mx-auto px-6 md:px-12">
+
+            {# Header #}
+            <div class="mb-10">
+                <div class="flex flex-wrap gap-3 mb-4">
+                    <span class="px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider text-white" style="background:#855300;">{{ meditation.get_category_display }}</span>
+                    <span class="px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider" style="background:#f1e7db;color:#534434;">{{ meditation.difficulty }}</span>
+                    <span class="px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider" style="background:#f1e7db;color:#534434;"><i class="fas fa-clock mr-1"></i>{{ meditation.duration_minutes }} min</span>
+                </div>
+                <h1 class="rs-headline text-5xl font-bold mb-3" style="color:#1f1b14;">{{ meditation.title }}</h1>
+                {% if meditation.guided_by %}
+                <p class="text-lg italic" style="color:#867461;">Guided by {{ meditation.guided_by }}</p>
+                {% endif %}
+            </div>
+
+            {# Image #}
+            {% if meditation.image_url %}
+            <div class="aspect-[16/7] rounded-2xl overflow-hidden mb-10" style="background:#f1e7db;">
+                <img src="{{ meditation.image_url }}" alt="{{ meditation.title }}" class="w-full h-full object-cover">
+            </div>
+            {% endif %}
+
+            {# Description #}
+            <div class="p-8 rounded-2xl mb-8" style="background:#fdf2e7;">
+                <h2 class="rs-headline text-2xl font-bold mb-4" style="color:#855300;">About This Session</h2>
+                <p class="text-lg leading-relaxed" style="color:#534434;">{{ meditation.description }}</p>
+            </div>
+
+            {# Audio player #}
+            {% if meditation.audio_url %}
+            <div class="p-8 rounded-2xl mb-8" style="background:#f1e7db;">
+                <h2 class="rs-headline text-2xl font-bold mb-4" style="color:#855300;">Listen</h2>
+                <audio controls class="w-full rounded-lg" style="accent-color:#855300;">
+                    <source src="{{ meditation.audio_url }}">
+                    Your browser does not support the audio element.
+                </audio>
+            </div>
+            {% endif %}
+
+            {# Video #}
+            {% if meditation.video_url %}
+            <div class="mb-8">
+                <h2 class="rs-headline text-2xl font-bold mb-4" style="color:#855300;">Video Guide</h2>
+                <div class="aspect-video rounded-2xl overflow-hidden relative" style="background:#f1e7db;" id="video-wrapper">
+                    <div id="video-fallback" class="absolute inset-0 flex flex-col items-center justify-center gap-4 p-8 text-center" style="display:none!important;">
+                        <i class="fas fa-play-circle text-6xl" style="color:#d8c3ad;"></i>
+                        <p class="rs-headline text-xl font-bold" style="color:#855300;">Video Guide</p>
+                        <p class="text-sm" style="color:#534434;">This video cannot be embedded. Watch it on YouTube instead.</p>
+                        <a href="{{ meditation.video_url }}" target="_blank" rel="noopener noreferrer"
+                           class="inline-flex items-center gap-2 px-6 py-3 rounded-xl font-semibold text-sm text-white"
+                           style="background:linear-gradient(135deg,#855300,#f59e0b);">
+                            <i class="fab fa-youtube"></i> Watch on YouTube
+                        </a>
+                    </div>
+                    <iframe id="video-iframe"
+                            src="{{ meditation.video_url|embed_url }}"
+                            class="w-full h-full"
+                            frameborder="0"
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                            allowfullscreen
+                            referrerpolicy="strict-origin-when-cross-origin"></iframe>
+                </div>
+            </div>
+            <script>
+            (function() {
+                var iframe = document.getElementById('video-iframe');
+                var fallback = document.getElementById('video-fallback');
+                if (!iframe || !fallback) return;
+                window.addEventListener('message', function(e) {
+                    try {
+                        var data = typeof e.data === 'string' ? JSON.parse(e.data) : e.data;
+                        if (data && data.event === 'onError' && (data.info === 153 || data.info === 150 || data.info === 101)) {
+                            iframe.style.display = 'none';
+                            fallback.style.display = 'flex';
+                        }
+                    } catch(err) {}
+                });
+                iframe.addEventListener('error', function() {
+                    iframe.style.display = 'none';
+                    fallback.style.display = 'flex';
+                });
+            })();
+            </script>
+            {% endif %}
+
+            {# Instructions #}
+            {% if meditation.instructions %}
+            <div class="p-8 rounded-2xl mb-8" style="background:#fdf2e7;">
+                <h2 class="rs-headline text-2xl font-bold mb-6" style="color:#855300;">How to Prepare</h2>
+                <div class="space-y-4">
+                    {% for step in meditation.instructions|split_lines %}
+                    <div class="flex gap-4 items-start">
+                        <div class="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 font-bold text-sm text-white" style="background:linear-gradient(135deg,#855300,#f59e0b);">{{ forloop.counter }}</div>
+                        <p class="text-sm leading-relaxed pt-1" style="color:#534434;">{{ step }}</p>
+                    </div>
+                    {% empty %}
+                    <p style="color:#534434;">{{ meditation.instructions }}</p>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+
+            {# Benefits #}
+            {% if meditation.benefits %}
+            <div class="p-8 rounded-2xl mb-10" style="background:#f1e7db;">
+                <h2 class="rs-headline text-2xl font-bold mb-4" style="color:#855300;">Benefits</h2>
+                <div class="space-y-3">
+                    {% for b in meditation.benefits|split_lines %}
+                    <div class="flex gap-3 items-start">
+                        <i class="fas fa-leaf mt-1 text-sm" style="color:#f59e0b;"></i>
+                        <p class="text-sm leading-relaxed" style="color:#534434;">{{ b }}</p>
+                    </div>
+                    {% empty %}
+                    <p style="color:#534434;">{{ meditation.benefits }}</p>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+
+            {# Related #}
+            {% if related_meditations %}
+            <div>
+                <h2 class="rs-headline text-2xl font-bold mb-6" style="color:#855300;">More Like This</h2>
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    {% for m in related_meditations %}
+                    <a href="{% url 'meditation_detail' m.id %}" class="block p-4 rounded-xl transition-all hover:-translate-y-1" style="background:#fdf2e7;">
+                        <p class="rs-headline font-bold text-sm mb-1" style="color:#1f1b14;">{{ m.title }}</p>
+                        <p class="text-xs" style="color:#867461;"><i class="fas fa-clock mr-1"></i>{{ m.duration_minutes }} min</p>
+                    </a>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+
+        </div>
+    </main>
+</div>
+{% endblock %}

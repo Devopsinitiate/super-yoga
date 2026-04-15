@@ -1,0 +1,4 @@
+# file: C:\Users\Orunmila1\Documents\Projects\yoga_kailasa_project\yoga_app\migrations\0021_blogpostcategory_alter_lessoncomment_created_at_and_more.py
+# hypothesis_version: 6.151.12
+
+[100, 200, 500, '-published_date', 'Admin Message', 'Blog Categories', 'Blog Category', 'Blog Comment', 'Blog Comments', 'Blog Post', 'Blog Posts', 'BlogComment', 'BlogPost', 'BlogPostCategory', 'Course Update', 'ID', 'Like', 'New Blog Post', 'Reply', 'admin_message', 'author', 'blog_comment', 'blog_images/', 'blog_posts', 'category', 'comments', 'content', 'course_update', 'created_at', 'description', 'excerpt', 'featured_image', 'id', 'is_published', 'lessoncomment', 'like', 'link', 'name', 'new_blog_post', 'notification', 'notification_type', 'ordering', 'post', 'published_date', 'read', 'reply', 'sender', 'sent_notifications', 'slug', 'title', 'updated_at', 'user', 'verbose_name', 'verbose_name_plural', 'yoga_app', 'yoga_app.blogpost']

@@ -1,0 +1,4 @@
+# file: C:\Users\Orunmila1\Documents\Projects\yoga_kailasa_project\yoga_app\migrations\0022_tag_alter_lessoncomment_created_at_and_more.py
+# hypothesis_version: 6.151.12
+
+['Admin Message', 'Blog Comment', 'Course Update', 'ID', 'New Blog Post', 'New Like', 'New Reply', 'Tag', 'Tags', 'admin_message', 'blog_comment', 'blog_posts', 'blogpost', 'course_update', 'created_at', 'id', 'lessoncomment', 'like', 'name', 'new_blog_post', 'notification', 'notification_type', 'ordering', 'read', 'reply', 'sender', 'sent_notifications', 'slug', 'tags', 'verbose_name', 'verbose_name_plural', 'yoga_app', 'yoga_app.tag']

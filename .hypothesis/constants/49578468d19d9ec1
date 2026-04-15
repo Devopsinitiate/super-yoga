@@ -1,0 +1,4 @@
+# file: C:\Users\Orunmila1\Documents\Projects\yoga_kailasa_project\yoga_app\migrations\0015_alter_breathingtechnique_description_and_more.py
+# hypothesis_version: 6.151.12
+
+['0014_notification', 'breathingtechnique', 'consultant', 'content', 'course', 'description', 'discussionpost', 'discussiontopic', 'icon_class', 'includes', 'instructions', 'lesson', 'overview_content', 'yoga_app', 'yogapose']

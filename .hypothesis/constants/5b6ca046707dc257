@@ -1,0 +1,4 @@
+# file: C:\Users\Orunmila1\Documents\Projects\yoga_kailasa_project\yoga_app\migrations\0001_initial.py
+# hypothesis_version: 6.151.12
+
+[100, 200, 254, '1', '2', '3', '4', '5', 'Advanced', 'Afternoon (12pm-4pm)', 'Beginner', 'Booking', 'BreathingTechnique', 'Consultant', 'ContactMessage', 'Course', 'Evening (4pm-8pm)', 'Failed', 'ID', 'Intermediate', 'Morning (8am-12pm)', 'Name of the sender.', 'Payment', 'Pending', 'Refunded', 'Success', 'Testimonial', 'YogaPose', 'amount', 'author_name', 'bio', 'booked_at', 'course', 'description', 'difficulty', 'duration', 'email', 'failed', 'feedback_text', 'full_name', 'icon_class', 'id', 'includes', 'instructions', 'instructor_name', 'is_free', 'is_popular', 'message', 'name', 'paid_at', 'pending', 'preferred_date', 'preferred_time', 'price', 'rating', 'reference', 'refunded', 'sanskrit_name', 'specialty', 'status', 'submitted_at', 'subscribed_at', 'success', 'title', 'verified_at', 'yoga_app.course']

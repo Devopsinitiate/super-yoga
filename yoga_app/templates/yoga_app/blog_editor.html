@@ -1,0 +1,168 @@
+{% extends 'yoga_app/base.html' %}
+{% load static %}
+
+{% block title %}{{ page_title }} — Yoga Kailasa{% endblock %}
+
+{% block extra_css %}
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif:ital,wght@0,400;0,700;1,400&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+    body { font-family:'Manrope',sans-serif; background:#fff8f3; }
+    .rs-headline { font-family:'Noto Serif',serif; line-height:1.4; }
+    .rs-btn-primary { background:linear-gradient(135deg,#855300 0%,#f59e0b 100%); color:#fff; transition:all .3s; }
+    .rs-btn-primary:hover { opacity:.92; transform:scale(1.02); }
+    .rs-btn-secondary { background-color:#f1e7db; color:#855300; transition:all .3s; }
+    .rs-btn-secondary:hover { background-color:#ebe1d6; }
+    .editor-page > header, .editor-page > #mobile-menu, .editor-page > #mobile-menu-overlay, .editor-page > #backToTopBtn { display:none !important; }
+    .editor-page > main { padding:0 !important; }
+    .field-label { display:block; font-size:.75rem; text-transform:uppercase; letter-spacing:.05em; font-weight:600; color:#534434; margin-bottom:.4rem; }
+    .field-input { width:100%; padding:.75rem 1rem; border-radius:.5rem; border:none; outline:none; background:#fdf2e7; color:#1f1b14; font-size:.9rem; }
+    .field-input:focus { box-shadow:0 0 0 2px #855300; }
+    .tag-checkbox { display:none; }
+    .tag-label { display:inline-block; padding:.25rem .75rem; border-radius:999px; font-size:.75rem; font-weight:600; cursor:pointer; transition:all .2s; background:#f1e7db; color:#534434; }
+    .tag-checkbox:checked + .tag-label { background:#855300; color:#fff; }
+    .status-draft { background:#fef3c7; color:#92400e; }
+    .status-published { background:#d1fae5; color:#065f46; }
+    /* Make CKEditor editor area taller */
+    .ck-editor__editable { min-height: 380px !important; }
+    .ck.ck-editor { border-radius: .5rem; overflow: hidden; }
+    .ck.ck-editor__editable_inline { min-height: 380px !important; padding: 1rem 1.5rem !important; }
+    .ck.ck-editor__editable:not(.ck-editor__nested-editable) { min-height: 380px !important; }
+    /* Force full width — CKEditor 5 defaults to inline-block */
+    .django-ckeditor-widget,
+    .django-ckeditor-widget > *,
+    .ck.ck-editor,
+    .ck.ck-editor__main,
+    .ck.ck-editor__main > .ck-editor__editable,
+    .ck.ck-content {
+        width: 100% !important;
+        max-width: 100% !important;
+        box-sizing: border-box !important;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="editor-page min-h-screen" style="background:#fff8f3;">
+
+    <nav class="fixed top-0 w-full z-50 shadow-sm" style="background:rgba(255,248,243,0.92);backdrop-filter:blur(20px);">
+        <div class="flex justify-between items-center px-6 md:px-10 py-4 max-w-5xl mx-auto">
+            <a href="{% url 'home' %}" class="rs-headline text-xl font-bold" style="color:#855300;">Yoga Kailasa</a>
+            <div class="flex items-center gap-4 text-sm" style="color:#534434;">
+                <a href="{% url 'my_blog_posts' %}" class="hover:underline">My Posts</a>
+                <a href="{% url 'blog_list' %}" class="hover:underline">Blog</a>
+            </div>
+        </div>
+    </nav>
+
+    <main class="pt-24 pb-20 px-6 md:px-10 max-w-4xl mx-auto">
+
+        <div class="mb-8">
+            <p class="text-xs uppercase tracking-widest font-semibold mb-1" style="color:#867461;">
+                {% if action == 'edit' %}Editing{% else %}New Post{% endif %}
+            </p>
+            <h1 class="rs-headline text-4xl font-bold" style="color:#855300;">{{ page_title }}</h1>
+            {% if action == 'create' %}
+            <p class="mt-2 text-sm" style="color:#867461;">Your post will be submitted as a draft and published after review by our team.</p>
+            {% endif %}
+        </div>
+
+        <form method="POST" enctype="multipart/form-data" class="space-y-6">
+            {% csrf_token %}
+
+            {% if form.non_field_errors %}
+            <div class="p-4 rounded-xl" style="background:#fee2e2;color:#991b1b;">
+                {% for error in form.non_field_errors %}<p>{{ error }}</p>{% endfor %}
+            </div>
+            {% endif %}
+
+            {# Title #}
+            <div>
+                <label class="field-label">Title *</label>
+                <input type="text" name="title" value="{{ form.title.value|default:'' }}"
+                       class="field-input" placeholder="Your post title" required>
+                {% if form.title.errors %}<p class="text-xs mt-1" style="color:#991b1b;">{{ form.title.errors.0 }}</p>{% endif %}
+            </div>
+
+            {# Excerpt #}
+            <div>
+                <label class="field-label">Excerpt <span style="color:#867461;font-weight:400;text-transform:none;">(optional — shown in listing)</span></label>
+                <textarea name="excerpt" rows="3" class="field-input" placeholder="A short summary of your post...">{{ form.excerpt.value|default:'' }}</textarea>
+            </div>
+
+            {# Content — CKEditor renders via the form widget #}
+            <div>
+                <label class="field-label">Content *</label>
+                <div style="width:100%;display:block;border:2px solid #f1e7db;border-radius:.5rem;overflow:hidden;min-height:400px;">
+                    <div style="width:100%;display:block;">
+                        {{ form.content }}
+                    </div>
+                </div>
+                {% if form.content.errors %}<p class="text-xs mt-1" style="color:#991b1b;">{{ form.content.errors.0 }}</p>{% endif %}
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {# Category #}
+                <div>
+                    <label class="field-label">Category</label>
+                    <select name="category" class="field-input">
+                        <option value="">— Select a category —</option>
+                        {% for cat in form.category.field.queryset %}
+                        <option value="{{ cat.id }}" {% if form.category.value|stringformat:"s" == cat.id|stringformat:"s" %}selected{% endif %}>{{ cat.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                {# Featured image #}
+                <div>
+                    <label class="field-label">Featured Image</label>
+                    {% if post.featured_image %}
+                    <div class="mb-2">
+                        <img src="{{ post.featured_image.url }}" alt="Current image" class="h-20 rounded-lg object-cover">
+                        <p class="text-xs mt-1" style="color:#867461;">Current image — upload a new one to replace</p>
+                    </div>
+                    {% endif %}
+                    <input type="file" name="featured_image" accept="image/*" class="field-input" style="padding:.5rem;">
+                </div>
+            </div>
+
+            {# Tags #}
+            {% if form.tags.field.queryset %}
+            <div>
+                <label class="field-label">Tags</label>
+                <div class="flex flex-wrap gap-2 mt-1">
+                    {% for tag in form.tags.field.queryset %}
+                    <div>
+                        <input type="checkbox" name="tags" value="{{ tag.id }}" id="tag_{{ tag.id }}" class="tag-checkbox"
+                               {% if tag.id in form.tags.value %}checked{% endif %}>
+                        <label for="tag_{{ tag.id }}" class="tag-label">{{ tag.name }}</label>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+
+            {# Staff-only publish toggle #}
+            {% if is_staff %}
+            <div class="flex items-center gap-3 p-4 rounded-xl" style="background:#fdf2e7;">
+                <input type="checkbox" name="is_published" id="id_is_published" class="w-4 h-4"
+                       {% if post.is_published %}checked{% endif %}>
+                <label for="id_is_published" class="text-sm font-semibold" style="color:#534434;">
+                    Publish immediately (staff only)
+                </label>
+            </div>
+            {% endif %}
+
+            {# Actions #}
+            <div class="flex gap-3 pt-2">
+                <button type="submit" class="rs-btn-primary px-8 py-3 rounded-xl font-bold text-sm">
+                    {% if action == 'edit' %}Save Changes{% else %}Submit for Review{% endif %}
+                </button>
+                <a href="{% if action == 'edit' %}{% url 'blog_detail' post.slug %}{% else %}{% url 'my_blog_posts' %}{% endif %}"
+                   class="rs-btn-secondary px-8 py-3 rounded-xl font-bold text-sm">
+                    Cancel
+                </a>
+            </div>
+        </form>
+    </main>
+</div>
+{% endblock %}

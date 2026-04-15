@@ -1,0 +1,4 @@
+# file: C:\Users\Orunmila1\Documents\Projects\yoga_kailasa_project\yoga_app\api\urls.py
+# hypothesis_version: 6.151.12
+
+['api-blog', 'api-booking', 'api-breathing', 'api-consultant', 'api-contact', 'api-course', 'api-docs', 'api-notification', 'api-pose', 'api-profile', 'api-redoc', 'api-schema', 'api-search', 'api-testimonial', 'api-user', 'blog', 'bookings', 'breathing', 'consultants', 'contact', 'courses', 'notifications', 'poses', 'profile', 'search', 'testimonials', 'token_obtain_pair', 'token_refresh', 'token_verify', 'users', 'v1/', 'v1/auth/token/', 'v1/docs/', 'v1/redoc/', 'v1/schema/']

@@ -1,270 +1,373 @@
 {% extends 'yoga_app/base.html' %}
 {% load static %}
-{% load app_filters %} {# Assuming app_filters is for custom filters, keep it #}
+{% load app_filters %}
 
-{% block title %}Blog - Yoga Kailasa{% endblock %}
+{% block title %}Journal - Yoga Kailasa{% endblock %}
 
-{# NEW: Meta Description for SEO #}
 {% block meta_description %}Explore articles and insights on yoga, meditation, wellness, and healthy living from the Yoga Kailasa blog. Find tips, guides, and inspiration.{% endblock %}
 
-{# NEW: Open Graph Tags for Social Sharing #}\
-{% block og_title %}Yoga Kailasa Blog - Insights for Your Wellness Journey{% endblock %}
+{% block og_title %}Yoga Kailasa Journal - Insights for Your Wellness Journey{% endblock %}
 {% block og_description %}Explore articles and insights on yoga, meditation, wellness, and healthy living from the Yoga Kailasa blog. Find tips, guides, and inspiration.{% endblock %}
-{% block og_image %}{% static 'yoga_app/images/default_blog_og_image.jpg' %}{% endblock %} {# Placeholder for a default blog OG image #}
+{% block og_image %}{% static 'yoga_app/images/default_blog_og_image.jpg' %}{% endblock %}
 
 {% block extra_css %}
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif:ital,wght@0,400;0,600;0,700;1,400&family=Manrope:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
-    /* CSS for the fade-in-up animation, specific to blog_list.html elements */
-    @keyframes fadeInUp {
-        from {
-            opacity: 0;
-            transform: translateY(20px);
-        }
-        to {
-            opacity: 1;
-            transform: translateY(0);
-        }
+    body { font-family: 'Manrope', sans-serif; }
+    .rs-headline { font-family: 'Noto Serif', serif; line-height: 1.4; }
+    
+    .rs-surface { background-color: #fff8f3; }
+    .rs-surface-container { background-color: #f7ece1; }
+    .rs-surface-container-low { background-color: #fdf2e7; }
+    .rs-surface-container-lowest { background-color: #ffffff; }
+    .rs-surface-container-high { background-color: #f1e7db; }
+    .rs-surface-container-highest { background-color: #ebe1d6; }
+    .rs-surface-dim { background-color: #e2d8cd; }
+    
+    .rs-on-surface { color: #1f1b14; }
+    .rs-on-surface-variant { color: #534434; }
+    .rs-primary { color: #855300; }
+    .rs-primary-bg { background-color: #855300; }
+    .rs-secondary { color: #a73a00; }
+    .rs-outline { color: #867461; }
+    .rs-outline-variant { color: #d8c3ad; }
+    .rs-primary-container { color: #f59e0b; }
+    .rs-on-primary { color: #ffffff; }
+    .rs-on-primary-container { color: #613b00; }
+    .rs-on-secondary-container { color: #571a00; }
+    .rs-secondary-fixed { background-color: #ffdbce; }
+    .rs-on-secondary-fixed { color: #370e00; }
+    .rs-tertiary-container { background-color: #f79a6c; }
+    .rs-on-tertiary-container { color: #72300a; }
+    
+    .rs-glass {
+        background-color: rgba(255, 248, 243, 0.8);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
     }
-    .animate-fade-in-up {
-        opacity: 0; /* Hidden by default */
-        animation: fadeInUp 0.6s ease-out forwards;
+    
+    .rs-btn-primary {
+        background: linear-gradient(135deg, #855300 0%, #f59e0b 100%);
+        color: #ffffff;
+        transition: all 0.3s ease;
     }
-    /* Ensure card image styling is consistent */
-    .blog-card .card-image {
-        width: 100%;
-        height: 220px; /* Adjust as needed */
-        object-fit: cover;
-        border-radius: 0.75rem 0.75rem 0 0; /* rounded-xl on top corners */
+    .rs-btn-primary:hover {
+        opacity: 0.92;
+        transform: scale(1.02);
     }
-    /* Style for the filter/sort dropdowns */
-    .filter-select {
-        @apply px-4 py-2 rounded-full border border-gray-300 focus:outline-none focus:ring-1 focus:ring-amber-500 focus:border-amber-500 text-sm bg-white;
+    
+    .rs-btn-secondary {
+        background-color: #f1e7db;
+        color: #855300;
+        transition: all 0.3s ease;
+    }
+    .rs-btn-secondary:hover {
+        background-color: #ebe1d6;
+    }
+    
+    .rs-blog-card {
+        transition: all 0.5s ease;
+    }
+    .rs-blog-card:hover {
+        background-color: #ebe1d6;
+    }
+    .rs-blog-card:hover .rs-blog-image {
+        transform: scale(1.05);
+    }
+    .rs-blog-image {
+        transition: transform 0.7s ease;
+    }
+    
+    .rs-filter-btn {
+        transition: all 0.3s ease;
+    }
+    .rs-filter-btn.active {
+        background-color: #855300;
+        color: #ffffff;
+    }
+    .rs-filter-btn:hover {
+        background-color: #855300;
+        color: #ffffff;
+    }
+    
+    .rs-input {
+        background-color: transparent;
+        border: none;
+        border-bottom: 1px solid rgba(216, 195, 173, 0.3);
+        transition: all 0.3s ease;
+    }
+    .rs-input:focus {
+        border-bottom-color: #855300;
+        outline: none;
+    }
+    
+    /* Hide base.html elements */
+    .blog-list-page > header,
+    .blog-list-page > #mobile-menu,
+    .blog-list-page > #mobile-menu-overlay,
+    .blog-list-page > #backToTopBtn {
+        display: none !important;
+    }
+    .blog-list-page > main {
+        padding: 0 !important;
+    }
+    
+    /* Line clamp utility */
+    .line-clamp-3 {
+        display: -webkit-box;
+        -webkit-line-clamp: 3;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
     }
 </style>
 {% endblock %}
 
 {% block content %}
-<section class="py-16 bg-gradient-to-r from-amber-100 to-amber-50 min-h-screen">
-    <div class="container mx-auto px-4 max-w-6xl">
-        <div class="text-center mb-12">
-            <h2 class="text-3xl md:text-4xl font-bold text-gray-800 mb-2 animate-fade-in-up" style="animation-delay: 0.1s;">Our Blog & Articles</h2>
-            <p class="text-gray-600 max-w-2xl mx-auto animate-fade-in-up" style="animation-delay: 0.2s;">Dive into a wealth of knowledge on yoga, mindfulness, and holistic well-being.</p>
+<div class="blog-list-page rs-surface min-h-screen antialiased">
+    {# Top Navigation Bar #}
+    <nav class="fixed top-0 w-full z-50 rs-glass rs-headline antialiased">
+        <div class="flex justify-between items-center px-6 md:px-12 py-6 max-w-[1920px] mx-auto">
+            <a href="{% url 'home' %}" class="text-2xl font-semibold tracking-tight rs-primary">Yoga Kailasa</a>
+            <div class="hidden md:flex items-center space-x-10">
+                <a href="{% url 'home' %}" class="rs-on-surface-variant/70 hover:rs-primary transition-colors duration-300">Sanctuary</a>
+                <a href="{% url 'courses' %}" class="rs-on-surface-variant/70 hover:rs-primary transition-colors duration-300">Classes</a>
+                <a href="{% url 'blog_list' %}" class="rs-primary font-medium border-b-2 border-[#855300]/30 transition-colors duration-300">Journal</a>
+                <a href="{% url 'booking' %}" class="rs-on-surface-variant/70 hover:rs-primary transition-colors duration-300">Retreats</a>
+                <a href="{% url 'consultant_list' %}" class="rs-on-surface-variant/70 hover:rs-primary transition-colors duration-300">Teachers</a>
+            </div>
+            <div class="flex items-center gap-6">
+                <a href="{% url 'global_search' %}" class="rs-primary text-2xl hover:opacity-80 transition-all">
+                    <i class="fas fa-search"></i>
+                </a>
+                <a href="{% url 'booking' %}" class="rs-btn-primary px-6 py-2.5 rounded-lg font-medium transition-all hover:opacity-90 active:scale-95">
+                    Book a Session
+                </a>
+            </div>
         </div>
+    </nav>
 
-        {# Search and Filter Section #}
-        <div class="bg-white p-6 rounded-xl shadow-md mb-8 flex flex-col md:flex-row items-center justify-between space-y-4 md:space-y-0 md:space-x-4 animate-fade-in-up" style="animation-delay: 0.3s;">
-            <form action="{% url 'blog_list' %}" method="get" class="w-full flex flex-col md:flex-row items-center space-y-4 md:space-y-0 md:space-x-4">
-                {# Search Input #}
-                <div class="relative w-full md:w-1/3">
-                    <input type="search" name="q" placeholder="Search blog posts..."
-                           class="pl-10 pr-4 py-2 rounded-full border border-gray-300 focus:outline-none focus:ring-1 focus:ring-amber-500 focus:border-amber-500 text-sm w-full"
-                           value="{{ query|default_if_none:'' }}"> {# Pre-fill search input with current query #}
-                    <button type="submit" class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-amber-600">
+    <main class="pt-32 pb-24">
+        {# Hero Header #}
+        <header class="max-w-7xl mx-auto px-6 md:px-12 mb-20 text-center md:text-left">
+            <div class="flex flex-col md:flex-row md:items-end justify-between gap-8">
+                <div class="max-w-2xl">
+                    <h1 class="text-6xl md:text-7xl rs-headline font-bold rs-primary mb-6 leading-tight tracking-tight">Our Radiant Journal</h1>
+                    <p class="text-xl rs-on-surface-variant font-light leading-relaxed">
+                        A curated sanctuary of wisdom, mindful practices, and soulful nourishment for your holistic journey.
+                    </p>
+                </div>
+                <div class="hidden md:block pb-2">
+                    <span class="text-sm uppercase tracking-widest rs-secondary font-semibold">est. {% now "Y" %} — sanctuary records</span>
+                </div>
+            </div>
+        </header>
+
+        {# Refined Search & Filter #}
+        <section class="max-w-7xl mx-auto px-6 md:px-12 mb-16">
+            <form action="{% url 'blog_list' %}" method="get" class="flex flex-col md:flex-row gap-8 items-center justify-between rs-surface-container-low p-8 rounded-xl">
+                <div class="flex flex-wrap gap-4 justify-center md:justify-start">
+                    <a href="{% url 'blog_list' %}" class="rs-filter-btn px-6 py-2 rounded-full text-sm font-medium {% if not current_category and not current_tag and not query and not current_author and not date_range_filter %}rs-primary-bg text-white{% else %}rs-on-surface-variant hover:rs-primary-bg hover:text-white{% endif %}">
+                        All Stories
+                    </a>
+                    {% for category in categories %}
+                    <a href="?category_slug={{ category.slug }}{% if query %}&q={{ query }}{% endif %}{% if current_author %}&author_id={{ current_author.id }}{% endif %}{% if date_range_filter %}&date_range={{ date_range_filter }}{% endif %}{% if sort_by %}&sort_by={{ sort_by }}{% endif %}" 
+                       class="rs-filter-btn px-6 py-2 rounded-full text-sm font-medium {% if current_category.slug == category.slug %}rs-primary-bg text-white{% else %}rs-on-surface-variant hover:rs-primary-bg hover:text-white{% endif %}">
+                        {{ category.name }}
+                    </a>
+                    {% endfor %}
+                </div>
+                <div class="relative w-full md:w-80 group">
+                    <input type="search" name="q" 
+                           class="w-full rs-input py-2 pr-10 rs-on-surface placeholder:rs-outline/60 italic"
+                           placeholder="Search the archives..."
+                           value="{{ query|default_if_none:'' }}">
+                    <button type="submit" class="absolute right-2 top-2 rs-outline group-focus-within:rs-primary">
                         <i class="fas fa-search"></i>
                     </button>
                 </div>
-
-                {# Category Filter #}
-                <div class="w-full md:w-1/4">
-                    <select name="category_slug" class="filter-select" onchange="this.form.submit()">
-                        <option value="">All Categories</option>
-                        {% for category in categories %}
-                            <option value="{{ category.slug }}" {% if current_category.slug == category.slug %}selected{% endif %}>
-                                {{ category.name }}
-                            </option>
-                        {% endfor %}
-                    </select>
-                </div>
-
-                {# Author Filter #}
-                <div class="w-full md:w-1/4">
-                    <select name="author_id" class="filter-select" onchange="this.form.submit()">
-                        <option value="">All Authors</option>
-                        {% for author in all_authors %}
-                            <option value="{{ author.id }}" {% if current_author.id == author.id %}selected{% endif %}>
-                                {{ author.username }}
-                            </option>
-                        {% endfor %}
-                    </select>
-                </div>
-
-                {# Date Range Filter #}
-                <div class="w-full md:w-1/4">
-                    <select name="date_range" class="filter-select" onchange="this.form.submit()">
-                        <option value="">All Time</option>
-                        <option value="past_week" {% if date_range_filter == 'past_week' %}selected{% endif %}>Past Week</option>
-                        <option value="past_month" {% if date_range_filter == 'past_month' %}selected{% endif %}>Past Month</option>
-                        <option value="past_year" {% if date_range_filter == 'past_year' %}selected{% endif %}>Past Year</option>
-                    </select>
-                </div>
-
-                {# Sort By #}
-                <div class="w-full md:w-1/4">
-                    <select name="sort_by" class="filter-select" onchange="this.form.submit()">
-                        <option value="newest" {% if sort_by == 'newest' %}selected{% endif %}>Newest First</option>
-                        <option value="oldest" {% if sort_by == 'oldest' %}selected{% endif %}>Oldest First</option>
-                        <option value="title_asc" {% if sort_by == 'title_asc' %}selected{% endif %}>Title (A-Z)</option>
-                        <option value="title_desc" {% if sort_by == 'title_desc' %}selected{% endif %}>Title (Z-A)</option>
-                        <option value="most_liked" {% if sort_by == 'most_liked' %}selected{% endif %}>Most Liked</option>
-                    </select>
-                </div>
             </form>
-        </div>
+        </section>
 
-
-        <div class="grid grid-cols-1 lg:grid-cols-4 gap-8">
-            {# Blog Posts Section #}
-            <div class="lg:col-span-3">
-                {% if posts %}
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-                    {% for post in posts %}
-                    <div class="bg-white rounded-xl shadow-lg overflow-hidden blog-card transform transition duration-300 hover:shadow-xl hover:scale-105 animate-fade-in-up" style="animation-delay: {{ forloop.counter|multiply:0.1 }}s;">
-                        <a href="{% url 'blog_detail' post.slug %}" class="block">
+        {# Blog Grid (Organic Asymmetry) #}
+        <section class="max-w-7xl mx-auto px-6 md:px-12">
+            {% if posts %}
+            <div class="grid grid-cols-1 md:grid-cols-12 gap-y-20 gap-x-12">
+                {% for post in posts %}
+                {% if forloop.counter == 1 %}
+                {# Featured Article (Large) #}
+                <article class="md:col-span-8 group">
+                    <a href="{% url 'blog_detail' post.slug %}" class="block">
+                        <div class="relative overflow-hidden rounded-xl mb-8 aspect-[16/9]">
                             {% if post.featured_image %}
-                                <img src="{{ post.featured_image.url }}" alt="{{ post.title }}" class="card-image">
+                            <img src="{{ post.featured_image.url }}" alt="{{ post.title }}" class="w-full h-full object-cover rs-blog-image">
                             {% else %}
-                                <div class="w-full h-56 bg-gray-200 flex items-center justify-center rounded-t-xl">
-                                    <i class="fas fa-newspaper text-6xl text-gray-400"></i>
-                                </div>
-                            {% endif %}
-                            <div class="p-6">
-                                <span class="text-xs font-semibold text-amber-600 uppercase tracking-wider mb-2 block">
-                                    {% if post.category %}{{ post.category.name }}{% else %}Uncategorized{% endif %}
-                                </span>
-                                <h3 class="text-2xl font-bold text-gray-800 mb-3">{{ post.title }}</h3>
-                                {# Apply |safe filter here #}
-                                <p class="text-gray-600 text-sm mb-4">{{ post.excerpt|striptags|truncatechars:150|safe }}</p>
-                                <div class="flex items-center justify-between text-gray-500 text-xs">
-                                    <span><i class="fas fa-user-edit mr-1"></i> By {{ post.author.username }}</span>
-                                    <span><i class="fas fa-calendar-alt mr-1"></i> {{ post.published_date|date:"M d, Y" }}</span>
-                                </div>
-                                {# Display Tags for each post #}
-                                {% if post.tags.all %}
-                                <div class="mt-3 flex flex-wrap gap-2">
-                                    {% for tag in post.tags.all %}
-                                        {# Tag link on post card: filter by this tag, preserve current query and category #}
-                                        {% url 'blog_list' as tag_base_url %}
-                                        <a href="{{ tag_base_url }}?tag_slug={{ tag.slug }}{% if query %}&q={{ query }}{% endif %}{% if current_category %}&category_slug={{ current_category.slug }}{% endif %}{% if current_author %}&author_id={{ current_author.id }}{% endif %}{% if date_range_filter %}&date_range={{ date_range_filter }}{% endif %}{% if sort_by %}&sort_by={{ sort_by }}{% endif %}" class="inline-block bg-gray-100 text-gray-700 text-xs px-3 py-1 rounded-full hover:bg-amber-200 transition duration-200">
-                                            <i class="fas fa-tag mr-1"></i> {{ tag.name }}
-                                        </a>
-                                    {% endfor %}
-                                </div>
-                                {% endif %}
+                            <div class="w-full h-full rs-surface-container flex items-center justify-center">
+                                <i class="fas fa-newspaper text-8xl rs-primary/10"></i>
                             </div>
-                        </a>
-                    </div>
-                    {% endfor %}
-                </div>
-
-                {# Pagination Controls #}
-                {% if posts.has_other_pages %}
-                <div class="flex justify-center mt-12 space-x-2 animate-fade-in-up" style="animation-delay: {{ posts.paginator.count|add:1|multiply:0.1 }}s;">
-                    {% url 'blog_list' as base_pagination_url %}
-                    
-                    {% comment %} Previous Page Link {% endcomment %}
-                    {% if posts.has_previous %}
-                        <a href="{{ base_pagination_url }}?page={{ posts.previous_page_number }}{% if query %}&q={{ query }}{% endif %}{% if current_category %}&category_slug={{ current_category.slug }}{% endif %}{% if current_tag %}&tag_slug={{ current_tag.slug }}{% endif %}{% if current_author %}&author_id={{ current_author.id }}{% endif %}{% if date_range_filter %}&date_range={{ date_range_filter }}{% endif %}{% if sort_by %}&sort_by={{ sort_by }}{% endif %}"
-                           class="px-4 py-2 bg-amber-500 text-white rounded-full hover:bg-amber-600 transition duration-300 transform hover:scale-105">Previous</a>
-                    {% else %}
-                        <span class="px-4 py-2 bg-gray-300 text-gray-600 rounded-full cursor-not-allowed">Previous</span>
-                    {% endif %}
-
-                    {% comment %} Page Numbers {% endcomment %}
-                    {% for i in posts.paginator.page_range %}
-                        {% if posts.number == i %}
-                            <span class="px-4 py-2 bg-amber-700 text-white rounded-full">{{ i }}</span>
-                        {% else %}
-                            <a href="{{ base_pagination_url }}?page={{ i }}{% if query %}&q={{ query }}{% endif %}{% if current_category %}&category_slug={{ current_category.slug }}{% endif %}{% if current_tag %}&tag_slug={{ current_tag.slug }}{% endif %}{% if current_author %}&author_id={{ current_author.id }}{% endif %}{% if date_range_filter %}&date_range={{ date_range_filter }}{% endif %}{% if sort_by %}&sort_by={{ sort_by }}{% endif %}"
-                               class="px-4 py-2 bg-gray-200 text-gray-700 rounded-full hover:bg-gray-300 transition duration-300 transform hover:scale-105">{{ i }}</a>
+                            {% endif %}
+                            {% if post.category %}
+                            <div class="absolute top-6 left-6">
+                                <span class="rs-surface-container-lowest/90 backdrop-blur px-4 py-1 text-xs font-bold tracking-widest uppercase rs-secondary rounded">{{ post.category.name }}</span>
+                            </div>
+                            {% endif %}
+                        </div>
+                        <div class="max-w-3xl">
+                            <div class="flex items-center gap-4 mb-4 text-sm rs-secondary font-semibold">
+                                <span>{{ post.published_date|date:"F d, Y"|upper }}</span>
+                                <span class="w-1.5 h-1.5 rounded-full rs-outline-variant"></span>
+                                <span>BY {{ post.author.username|upper }}</span>
+                            </div>
+                            <h2 class="text-4xl rs-headline font-bold rs-on-surface mb-4 leading-snug group-hover:rs-primary transition-colors">{{ post.title }}</h2>
+                            <p class="text-lg rs-on-surface-variant mb-6 leading-relaxed">{{ post.excerpt|striptags|truncatechars:200|safe }}</p>
+                            <span class="inline-flex items-center gap-2 font-semibold rs-primary hover:gap-4 transition-all">
+                                Read the Journey <i class="fas fa-arrow-right"></i>
+                            </span>
+                        </div>
+                    </a>
+                </article>
+                {% elif forloop.counter == 2 %}
+                {# Sidebar Secondary Card #}
+                <article class="md:col-span-4 group flex flex-col justify-end">
+                    <a href="{% url 'blog_detail' post.slug %}" class="block rs-surface-container-high p-8 rounded-xl h-full flex flex-col rs-blog-card">
+                        {% if post.featured_image %}
+                        <div class="aspect-square rounded-lg overflow-hidden mb-6">
+                            <img src="{{ post.featured_image.url }}" alt="{{ post.title }}" class="w-full h-full object-cover rs-blog-image">
+                        </div>
                         {% endif %}
-                    {% endfor %}
-
-                    {% comment %} Next Page Link {% endcomment %}
-                    {% if posts.has_next %}
-                        <a href="{{ base_pagination_url }}?page={{ posts.next_page_number }}{% if query %}&q={{ query }}{% endif %}{% if current_category %}&category_slug={{ current_category.slug }}{% endif %}{% if current_tag %}&tag_slug={{ current_tag.slug }}{% endif %}{% if current_author %}&author_id={{ current_author.id }}{% endif %}{% if date_range_filter %}&date_range={{ date_range_filter }}{% endif %}{% if sort_by %}&sort_by={{ sort_by }}{% endif %}"
-                           class="px-4 py-2 bg-amber-500 text-white rounded-full hover:bg-amber-600 transition duration-300 transform hover:scale-105">Next</a>
-                    {% else %}
-                        <span class="px-4 py-2 bg-gray-300 text-gray-600 rounded-full cursor-not-allowed">Next</span>
-                    {% endif %}
-                </div>
-                {% endif %}
-
+                        {% if post.category %}
+                        <span class="text-xs font-bold uppercase tracking-widest rs-secondary mb-3">{{ post.category.name }}</span>
+                        {% endif %}
+                        <h3 class="text-2xl rs-headline font-bold rs-on-surface mb-4 group-hover:rs-primary transition-colors">{{ post.title }}</h3>
+                        <p class="rs-on-surface-variant mb-6 text-sm flex-grow">{{ post.excerpt|striptags|truncatechars:120|safe }}</p>
+                        <div class="pt-6 border-t border-[#d8c3ad]/30 text-sm font-medium rs-on-surface-variant">
+                            {{ post.published_date|timesince }} ago
+                        </div>
+                    </a>
+                </article>
                 {% else %}
-                <div class="text-center py-12 animate-fade-in-up" style="animation-delay: 0.4s;">
-                    <i class="fas fa-frown text-6xl text-gray-400 mb-4"></i>
-                    <p class="text-xl text-gray-700">No blog posts found.</p>
-                    <p class="text-gray-500 mt-2">Try a different search or filter!</p>
-                </div>
+                {# Regular Grid Rows #}
+                <article class="md:col-span-4 group">
+                    <a href="{% url 'blog_detail' post.slug %}" class="block">
+                        {% if post.featured_image %}
+                        <div class="aspect-[4/5] rounded-xl overflow-hidden mb-6">
+                            <img src="{{ post.featured_image.url }}" alt="{{ post.title }}" class="w-full h-full object-cover rs-blog-image">
+                        </div>
+                        {% else %}
+                        <div class="aspect-[4/5] rounded-xl overflow-hidden mb-6 rs-surface-container flex items-center justify-center">
+                            <i class="fas fa-newspaper text-6xl rs-primary/20"></i>
+                        </div>
+                        {% endif %}
+                        {% if post.category %}
+                        <span class="text-xs font-bold uppercase tracking-widest rs-secondary mb-3 block">{{ post.category.name }}</span>
+                        {% endif %}
+                        <h3 class="text-2xl rs-headline font-bold rs-on-surface mb-3 group-hover:rs-primary transition-colors">{{ post.title }}</h3>
+                        <p class="rs-on-surface-variant text-sm mb-4 leading-relaxed line-clamp-3">{{ post.excerpt|striptags|truncatechars:150|safe }}</p>
+                        <div class="text-xs rs-outline font-medium">{{ post.published_date|date:"F d, Y" }} • BY {{ post.author.username|upper }}</div>
+                    </a>
+                </article>
                 {% endif %}
+                {% endfor %}
             </div>
 
-            {# Blog Sidebar (Categories, Tags, and Recent Posts) #}
-            <div class="lg:col-span-1">
-                <div class="bg-white p-6 rounded-xl shadow-lg animate-fade-in-up" style="animation-delay: 0.3s;">
-                    <h3 class="text-xl font-bold text-gray-800 mb-4 border-b pb-2">Categories</h3>
-                    <ul class="space-y-2">
-                        <li>
-                            {# All Categories link #}
-                            {% url 'blog_list' as all_categories_url %}
-                            <a href="{{ all_categories_url }}?{% if query %}q={{ query }}&{% endif %}{% if current_tag %}&tag_slug={{ current_tag.slug }}{% endif %}{% if current_author %}&author_id={{ current_author.id }}{% endif %}{% if date_range_filter %}&date_range={{ date_range_filter }}{% endif %}{% if sort_by %}&sort_by={{ sort_by }}{% endif %}" class="block text-gray-700 hover:text-amber-600 {% if not current_category and not current_tag and not query and not current_author and not date_range_filter %}font-bold{% endif %} transition duration-200">
-                                <i class="fas fa-tags mr-2"></i> All Categories
-                            </a>
-                        </li>
-                        {% for category in categories %}
-                        <li>
-                            {# Specific Category Link #}
-                            {% url 'blog_list' as category_base_url %}
-                            <a href="{{ category_base_url }}?category_slug={{ category.slug }}{% if query %}&q={{ query }}{% endif %}{% if current_tag %}&tag_slug={{ current_tag.slug }}{% endif %}{% if current_author %}&author_id={{ current_author.id }}{% endif %}{% if date_range_filter %}&date_range={{ date_range_filter }}{% endif %}{% if sort_by %}&sort_by={{ sort_by }}{% endif %}" class="block text-gray-700 hover:text-amber-600 {% if current_category.slug == category.slug %}font-bold{% endif %} transition duration-200">
-                                <i class="fas fa-tag mr-2"></i> {{ category.name }}
-                            </a>
-                        </li>
-                        {% endfor %}
-                    </ul>
-                </div>
-
-                {# Tags Section #}
-                <div class="bg-white p-6 rounded-xl shadow-lg mt-8 animate-fade-in-up" style="animation-delay: 0.5s;">
-                    <h3 class="text-xl font-bold text-gray-800 mb-4 border-b pb-2">Tags</h3>
-                    {% if tags %}
-                    <div class="flex flex-wrap gap-2">
-                        {# All Tags link #}
-                        {% url 'blog_list' as all_tags_url %}
-                        <a href="{{ all_tags_url }}?{% if query %}&q={{ query }}{% endif %}{% if current_category %}&category_slug={{ current_category.slug }}{% endif %}{% if current_author %}&author_id={{ current_author.id }}{% endif %}{% if date_range_filter %}&date_range={{ date_range_filter }}{% endif %}{% if sort_by %}&sort_by={{ sort_by }}{% endif %}" class="inline-block bg-gray-100 text-gray-700 text-sm px-3 py-1 rounded-full hover:bg-amber-200 transition duration-200 {% if not current_tag and not current_category and not query and not current_author and not date_range_filter %}font-bold bg-amber-200{% endif %}">
-                            All Tags
-                        </a>
-
-                        {% for tag in tags %}
-                            {# Specific Tag Link #}
-                            {% url 'blog_list' as tag_base_url %}
-                            <a href="{{ tag_base_url }}?tag_slug={{ tag.slug }}{% if query %}&q={{ query }}{% endif %}{% if current_category %}&category_slug={{ current_category.slug }}{% endif %}{% if current_author %}&author_id={{ current_author.id }}{% endif %}{% if date_range_filter %}&date_range={{ date_range_filter }}{% endif %}{% if sort_by %}&sort_by={{ sort_by }}{% endif %}" class="inline-block bg-gray-100 text-gray-700 text-sm px-3 py-1 rounded-full hover:bg-amber-200 transition duration-200 {% if current_tag.slug == tag.slug %}font-bold bg-amber-200{% endif %}">
-                                {{ tag.name }}
-                            </a>
-                        {% endfor %}
-                    </div>
-                    {% else %}
-                    <p class="text-gray-500 text-sm">No tags available.</p>
+            {# Pagination #}
+            {% if posts.has_other_pages %}
+            <nav class="mt-24 flex items-center justify-center gap-4">
+                {% if posts.has_previous %}
+                <a href="?page={{ posts.previous_page_number }}{% if query %}&q={{ query }}{% endif %}{% if current_category %}&category_slug={{ current_category.slug }}{% endif %}{% if current_tag %}&tag_slug={{ current_tag.slug }}{% endif %}{% if current_author %}&author_id={{ current_author.id }}{% endif %}{% if date_range_filter %}&date_range={{ date_range_filter }}{% endif %}{% if sort_by %}&sort_by={{ sort_by }}{% endif %}"
+                   class="w-12 h-12 flex items-center justify-center rounded-full border border-[#d8c3ad] rs-outline hover:border-[#855300] hover:rs-primary transition-colors">
+                    <i class="fas fa-chevron-left"></i>
+                </a>
+                {% endif %}
+                
+                {% for i in posts.paginator.page_range %}
+                    {% if posts.number == i %}
+                    <span class="w-12 h-12 flex items-center justify-center rounded-full rs-primary-bg text-white font-bold">{{ i }}</span>
+                    {% elif i <= posts.number|add:2 and i >= posts.number|add:-2 %}
+                    <a href="?page={{ i }}{% if query %}&q={{ query }}{% endif %}{% if current_category %}&category_slug={{ current_category.slug }}{% endif %}{% if current_tag %}&tag_slug={{ current_tag.slug }}{% endif %}{% if current_author %}&author_id={{ current_author.id }}{% endif %}{% if date_range_filter %}&date_range={{ date_range_filter }}{% endif %}{% if sort_by %}&sort_by={{ sort_by }}{% endif %}"
+                       class="w-12 h-12 flex items-center justify-center rounded-full rs-on-surface-variant hover:bg-surface-container-high transition-all">{{ i }}</a>
                     {% endif %}
-                </div>
+                {% endfor %}
+                
+                {% if posts.has_next %}
+                <a href="?page={{ posts.next_page_number }}{% if query %}&q={{ query }}{% endif %}{% if current_category %}&category_slug={{ current_category.slug }}{% endif %}{% if current_tag %}&tag_slug={{ current_tag.slug }}{% endif %}{% if current_author %}&author_id={{ current_author.id }}{% endif %}{% if date_range_filter %}&date_range={{ date_range_filter }}{% endif %}{% if sort_by %}&sort_by={{ sort_by }}{% endif %}"
+                   class="w-12 h-12 flex items-center justify-center rounded-full border border-[#d8c3ad] rs-outline hover:border-[#855300] hover:rs-primary transition-colors">
+                    <i class="fas fa-chevron-right"></i>
+                </a>
+                {% endif %}
+            </nav>
+            {% endif %}
 
-                {# Recent Posts Section #}
-                <div class="bg-white p-6 rounded-xl shadow-lg mt-8 animate-fade-in-up" style="animation-delay: 0.6s;">
-                    <h3 class="text-xl font-bold text-gray-800 mb-4 border-b pb-2">Recent Posts</h3>
-                    {% if recent_posts %}
-                    <ul class="space-y-3">
-                        {% for r_post in recent_posts %}
-                        <li>
-                            <a href="{% url 'blog_detail' r_post.slug %}" class="block text-gray-700 hover:text-amber-600 transition duration-200 text-sm">
-                                <i class="fas fa-angle-right mr-2 text-amber-500"></i> {{ r_post.title|truncatechars:50 }}
-                            </a>
-                        </li>
-                        {% endfor %}
-                    </ul>
+            {% else %}
+            {# Empty State #}
+            <div class="text-center py-20">
+                <i class="fas fa-newspaper text-6xl rs-primary/20 mb-6"></i>
+                <h3 class="rs-headline text-2xl font-bold rs-on-surface mb-2">No stories found</h3>
+                <p class="rs-on-surface-variant mb-6">
+                    {% if query or current_category or current_tag %}
+                    No posts match your criteria. Try a different search or filter.
                     {% else %}
-                    <p class="text-gray-500 text-sm">No recent posts available.</p>
+                    No journal entries have been published yet.
                     {% endif %}
+                </p>
+                {% if query or current_category or current_tag %}
+                <a href="{% url 'blog_list' %}" class="rs-btn-primary px-8 py-3 rounded-lg font-semibold text-sm uppercase tracking-wider inline-block">
+                    View All Stories
+                </a>
+                {% endif %}
+            </div>
+            {% endif %}
+        </section>
+
+        {# Newsletter Subscription #}
+        <section class="mt-32 max-w-5xl mx-auto px-6 md:px-12">
+            <div class="rs-surface-container-high rounded-[2rem] p-12 md:p-20 text-center relative overflow-hidden">
+                <div class="absolute -top-24 -right-24 w-64 h-64 bg-[#855300]/5 rounded-full blur-3xl"></div>
+                <div class="absolute -bottom-24 -left-24 w-64 h-64 bg-[#a73a00]/5 rounded-full blur-3xl"></div>
+                <div class="relative z-10">
+                    <h2 class="text-4xl md:text-5xl rs-headline font-bold rs-primary mb-6">Stay Connected</h2>
+                    <p class="text-lg rs-on-surface-variant max-w-xl mx-auto mb-10 leading-relaxed">
+                        Receive weekly meditations, studio updates, and journal highlights delivered directly to your quiet space.
+                    </p>
+                    <form action="{% url 'newsletter_subscribe' %}" method="post" class="flex flex-col md:flex-row gap-4 max-w-md mx-auto">
+                        {% csrf_token %}
+                        <input type="email" name="email" placeholder="Your soulful email" required
+                               class="flex-grow rs-surface-container-lowest border-none px-6 py-4 rounded-lg focus:ring-2 focus:ring-[#855300]/20 focus:outline-none placeholder:rs-outline/50 rs-on-surface">
+                        <button type="submit" class="rs-btn-primary px-8 py-4 rounded-lg font-bold transition-all hover:scale-[1.02] active:scale-95 whitespace-nowrap shadow-xl shadow-[#855300]/10">
+                            Subscribe
+                        </button>
+                    </form>
+                    <p class="mt-6 text-xs rs-outline italic">We honor your peace. No spam, only serenity.</p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    {# Footer #}
+    <footer class="w-full relative bottom-0 rs-surface-container-high font-['Manrope'] text-sm tracking-wide">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8 px-6 md:px-12 py-16 w-full items-end max-w-7xl mx-auto">
+            <div class="space-y-6">
+                <div class="rs-headline italic text-2xl rs-primary">Yoga Kailasa</div>
+                <p class="rs-on-surface-variant/60 max-w-xs leading-relaxed">
+                    Elevating the human spirit through the intersection of ancient lineage and modern movement.
+                </p>
+                <div class="flex gap-6 rs-primary">
+                    <a href="#" class="hover:opacity-70 transition-opacity"><i class="fab fa-instagram"></i></a>
+                    <a href="#" class="hover:opacity-70 transition-opacity"><i class="fab fa-pinterest"></i></a>
+                    <a href="#" class="hover:opacity-70 transition-opacity"><i class="fab fa-spotify"></i></a>
+                </div>
+            </div>
+            <div class="flex flex-col items-start md:items-end gap-8">
+                <div class="flex flex-wrap gap-x-8 gap-y-4 md:justify-end">
+                    <a href="{% url 'privacy_policy' %}" class="rs-on-surface-variant/60 hover:rs-primary transition-all">Privacy Policy</a>
+                    <a href="{% url 'terms_of_service' %}" class="rs-on-surface-variant/60 hover:rs-primary transition-all">Terms of Service</a>
+                    <a href="{% url 'contact' %}" class="rs-on-surface-variant/60 hover:rs-primary transition-all">Studio Etiquette</a>
+                    <a href="{% url 'contact' %}" class="rs-on-surface-variant/60 hover:rs-primary transition-all">Careers</a>
+                </div>
+                <div class="rs-on-surface-variant/40">
+                    &copy; {% now "Y" %} Yoga Kailasa. Radiant Sanctuary.
                 </div>
             </div>
         </div>
-    </div>
-</section>
+    </footer>
+</div>
 {% endblock %}

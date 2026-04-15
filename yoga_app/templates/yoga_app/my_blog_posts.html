@@ -1,0 +1,71 @@
+{% extends 'yoga_app/base.html' %}
+{% load static %}
+
+{% block title %}My Blog Posts — Yoga Kailasa{% endblock %}
+
+{% block extra_css %}
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif:ital,wght@0,400;0,700;1,400&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+    body { font-family:'Manrope',sans-serif; background:#fff8f3; }
+    .rs-headline { font-family:'Noto Serif',serif; line-height:1.4; }
+    .rs-btn-primary { background:linear-gradient(135deg,#855300 0%,#f59e0b 100%); color:#fff; transition:all .3s; }
+    .rs-btn-primary:hover { opacity:.92; }
+    .rs-btn-secondary { background-color:#f1e7db; color:#855300; transition:all .3s; }
+    .status-draft { background:#fef3c7; color:#92400e; padding:.2rem .75rem; border-radius:999px; font-size:.7rem; font-weight:700; text-transform:uppercase; }
+    .status-published { background:#d1fae5; color:#065f46; padding:.2rem .75rem; border-radius:999px; font-size:.7rem; font-weight:700; text-transform:uppercase; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="min-h-screen pt-24 pb-20 px-6 md:px-10 max-w-5xl mx-auto">
+
+    <div class="flex items-end justify-between mb-8">
+        <div>
+            <p class="text-xs uppercase tracking-widest font-semibold mb-1" style="color:#867461;">Your Writing</p>
+            <h1 class="rs-headline text-4xl font-bold" style="color:#855300;">My Blog Posts</h1>
+        </div>
+        <a href="{% url 'create_blog_post' %}" class="rs-btn-primary px-6 py-3 rounded-xl font-bold text-sm flex items-center gap-2">
+            <i class="fas fa-pen text-xs"></i> Write New Post
+        </a>
+    </div>
+
+    {% if posts %}
+    <div class="space-y-4">
+        {% for post in posts %}
+        <div class="flex items-center justify-between p-5 rounded-2xl" style="background:#fdf2e7;">
+            <div class="flex-1 min-w-0 mr-4">
+                <div class="flex items-center gap-3 mb-1">
+                    <h3 class="rs-headline font-bold truncate" style="color:#1f1b14;">{{ post.title }}</h3>
+                    {% if post.is_published %}
+                    <span class="status-published flex-shrink-0">Published</span>
+                    {% else %}
+                    <span class="status-draft flex-shrink-0">Draft / Pending Review</span>
+                    {% endif %}
+                </div>
+                <p class="text-xs" style="color:#867461;">
+                    Created {{ post.created_at|date:"M j, Y" }}
+                    {% if post.published_date %} · Published {{ post.published_date|date:"M j, Y" }}{% endif %}
+                    {% if post.category %} · {{ post.category.name }}{% endif %}
+                </p>
+            </div>
+            <div class="flex gap-2 flex-shrink-0">
+                {% if post.is_published %}
+                <a href="{% url 'blog_detail' post.slug %}" class="px-4 py-2 rounded-lg text-xs font-semibold" style="background:#f1e7db;color:#534434;">View</a>
+                {% endif %}
+                <a href="{% url 'edit_blog_post' post.slug %}" class="px-4 py-2 rounded-lg text-xs font-semibold" style="background:#855300;color:#fff;">Edit</a>
+                <a href="{% url 'delete_blog_post' post.slug %}" class="px-4 py-2 rounded-lg text-xs font-semibold" style="background:#fee2e2;color:#991b1b;">Delete</a>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="text-center py-20 rounded-2xl" style="background:#fdf2e7;">
+        <i class="fas fa-feather-alt text-5xl mb-4" style="color:#d8c3ad;"></i>
+        <p class="rs-headline text-2xl mb-2" style="color:#855300;">No posts yet</p>
+        <p class="text-sm mb-6" style="color:#534434;">Share your yoga journey with the community.</p>
+        <a href="{% url 'create_blog_post' %}" class="rs-btn-primary px-8 py-3 rounded-xl font-bold text-sm inline-block">Write Your First Post</a>
+    </div>
+    {% endif %}
+
+</div>
+{% endblock %}

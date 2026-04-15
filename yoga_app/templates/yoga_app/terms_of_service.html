@@ -1,0 +1,154 @@
+{% extends 'yoga_app/base.html' %}
+{% load static %}
+
+{% block title %}Terms of Service — Yoga Kailasa{% endblock %}
+{% block meta_description %}Read the terms and conditions governing your use of the Yoga Kailasa platform and courses.{% endblock %}
+
+{% block extra_css %}
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif:ital,wght@0,400;0,700;1,400&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+    .legal-page { font-family: 'Manrope', sans-serif; background-color: #fff8f3; color: #1f1b14; }
+    .legal-page .rs-headline { font-family: 'Noto Serif', serif; line-height: 1.4; }
+    .legal-prose h2 { font-family: 'Noto Serif', serif; font-size: 1.4rem; color: #855300; margin: 2.5rem 0 0.75rem; }
+    .legal-prose h3 { font-family: 'Manrope', sans-serif; font-size: 1rem; font-weight: 700; color: #534434; margin: 1.5rem 0 0.5rem; text-transform: uppercase; letter-spacing: 0.05em; }
+    .legal-prose p { color: #534434; line-height: 1.8; margin-bottom: 1rem; }
+    .legal-prose ul { list-style: none; padding: 0; margin-bottom: 1rem; }
+    .legal-prose ul li { color: #534434; line-height: 1.8; padding-left: 1.25rem; position: relative; }
+    .legal-prose ul li::before { content: "—"; position: absolute; left: 0; color: #f59e0b; }
+    .legal-prose a { color: #855300; text-decoration: underline; text-underline-offset: 3px; }
+    .legal-page > header, .legal-page > #mobile-menu, .legal-page > #mobile-menu-overlay, .legal-page > #backToTopBtn { display: none !important; }
+    .legal-page > main { padding: 0 !important; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="legal-page min-h-screen">
+
+    {# Nav #}
+    <nav class="fixed top-0 w-full z-50 shadow-sm" style="background:rgba(255,248,243,0.9);backdrop-filter:blur(20px);">
+        <div class="flex justify-between items-center px-6 md:px-10 py-4 max-w-4xl mx-auto">
+            <a href="{% url 'home' %}" class="rs-headline text-xl font-bold" style="color:#855300;">Yoga Kailasa</a>
+            <a href="{% url 'home' %}" class="text-sm font-medium" style="color:#534434;">← Back to Home</a>
+        </div>
+    </nav>
+
+    <main class="pt-28 pb-24 px-6">
+        <div class="max-w-3xl mx-auto">
+
+            {# Header #}
+            <div class="mb-12">
+                <p class="text-xs uppercase tracking-widest font-semibold mb-3" style="color:#867461;">Legal</p>
+                <h1 class="rs-headline text-5xl font-bold mb-4" style="color:#1f1b14;">Terms of Service</h1>
+                <p style="color:#867461;" class="text-sm">Last updated: April 10, 2026</p>
+                <div class="mt-6 h-px" style="background:linear-gradient(to right,#f59e0b,transparent);"></div>
+            </div>
+
+            <div class="legal-prose">
+
+                <p>These Terms of Service ("Terms") govern your access to and use of the Yoga Kailasa platform, including all courses, content, and services offered through our website. By creating an account or purchasing a course, you agree to be bound by these Terms.</p>
+
+                <h2>1. Acceptance of Terms</h2>
+                <p>By accessing or using Yoga Kailasa, you confirm that you are at least 13 years of age, have read and understood these Terms, and agree to be bound by them. If you do not agree, please do not use our platform.</p>
+
+                <h2>2. Account Registration</h2>
+                <ul>
+                    <li>You must provide accurate and complete information when creating an account</li>
+                    <li>You are responsible for maintaining the confidentiality of your password</li>
+                    <li>You are responsible for all activity that occurs under your account</li>
+                    <li>You must notify us immediately of any unauthorised use of your account</li>
+                    <li>One person may not maintain more than one account</li>
+                </ul>
+
+                <h2>3. Course Purchases and Enrollment</h2>
+                <h3>Payment</h3>
+                <p>All course purchases are processed securely through Paystack. Prices are displayed in USD or NGN as indicated. By completing a purchase, you authorise us to charge the stated amount to your chosen payment method.</p>
+
+                <h3>Access</h3>
+                <ul>
+                    <li>Upon successful payment, you receive lifetime access to the purchased course content</li>
+                    <li>Course access is granted to the purchasing account only and is non-transferable</li>
+                    <li>We reserve the right to update, modify, or remove course content to maintain quality</li>
+                </ul>
+
+                <h3>Refund Policy</h3>
+                <p>We offer a 7-day refund policy from the date of purchase, provided you have not completed more than 20% of the course content. To request a refund, contact us at <a href="mailto:support@yogakailasa.com">support@yogakailasa.com</a> with your order reference. Refunds are processed within 5–10 business days.</p>
+
+                <h2>4. Intellectual Property</h2>
+                <p>All content on the Yoga Kailasa platform — including course videos, written materials, images, logos, and design — is owned by Yoga Kailasa or its content creators and is protected by copyright law.</p>
+                <ul>
+                    <li>You may access and use course content for your personal, non-commercial learning only</li>
+                    <li>You may not reproduce, distribute, modify, or create derivative works from our content</li>
+                    <li>You may not share your account credentials or course access with others</li>
+                    <li>Screen recording, downloading, or redistribution of course videos is strictly prohibited</li>
+                </ul>
+
+                <h2>5. User-Generated Content</h2>
+                <p>When you post content on our platform (discussion posts, reviews, comments), you grant Yoga Kailasa a non-exclusive, royalty-free licence to display and use that content in connection with our services. You retain ownership of your content.</p>
+                <p>You agree not to post content that is:</p>
+                <ul>
+                    <li>Unlawful, harmful, threatening, abusive, or harassing</li>
+                    <li>Defamatory, obscene, or invasive of another's privacy</li>
+                    <li>Spam, advertising, or promotional material without our consent</li>
+                    <li>In violation of any third party's intellectual property rights</li>
+                </ul>
+
+                <h2>6. Certificates</h2>
+                <p>Upon completing a course, you will receive a digital certificate of completion. Certificates are issued to the account holder and are for personal use only. Yoga Kailasa certificates are not accredited by any external body unless explicitly stated.</p>
+
+                <h2>7. Prohibited Conduct</h2>
+                <p>You agree not to:</p>
+                <ul>
+                    <li>Use the platform for any unlawful purpose</li>
+                    <li>Attempt to gain unauthorised access to any part of the platform</li>
+                    <li>Interfere with or disrupt the integrity or performance of the platform</li>
+                    <li>Use automated tools to scrape, crawl, or extract data from the platform</li>
+                    <li>Impersonate any person or entity</li>
+                </ul>
+
+                <h2>8. Disclaimers</h2>
+                <p>Yoga Kailasa courses are for educational and wellness purposes only. They are not a substitute for professional medical advice, diagnosis, or treatment. Always consult a qualified healthcare provider before beginning any new physical practice, particularly if you have a pre-existing medical condition.</p>
+                <p>The platform is provided "as is" without warranties of any kind, express or implied. We do not guarantee uninterrupted or error-free access to the platform.</p>
+
+                <h2>9. Limitation of Liability</h2>
+                <p>To the fullest extent permitted by law, Yoga Kailasa shall not be liable for any indirect, incidental, special, consequential, or punitive damages arising from your use of the platform or courses, even if we have been advised of the possibility of such damages.</p>
+
+                <h2>10. Termination</h2>
+                <p>We reserve the right to suspend or terminate your account at our discretion if you violate these Terms. Upon termination, your right to access the platform ceases immediately. You may also delete your account at any time from your profile settings.</p>
+
+                <h2>11. Changes to Terms</h2>
+                <p>We may update these Terms from time to time. We will notify you of material changes by posting the updated Terms on this page with a revised date. Continued use of the platform after changes constitutes acceptance of the new Terms.</p>
+
+                <h2>12. Governing Law</h2>
+                <p>These Terms are governed by and construed in accordance with the laws of the Federal Republic of Nigeria. Any disputes arising from these Terms shall be subject to the exclusive jurisdiction of the courts of Nigeria.</p>
+
+                <h2>13. Contact Us</h2>
+                <p>If you have questions about these Terms, please contact us:</p>
+                <ul>
+                    <li>Email: <a href="mailto:support@yogakailasa.com">support@yogakailasa.com</a></li>
+                    <li>Contact form: <a href="{% url 'contact' %}">yogakailasa.com/contact</a></li>
+                </ul>
+
+            </div>
+
+            {# Footer nav #}
+            <div class="mt-16 pt-8 flex flex-wrap gap-6 text-sm" style="border-top:1px solid rgba(216,195,173,0.4);color:#867461;">
+                <a href="{% url 'privacy_policy' %}" style="color:#855300;" class="font-semibold hover:underline">Privacy Policy →</a>
+                <a href="{% url 'about' %}" class="hover:underline">About Us</a>
+                <a href="{% url 'contact' %}" class="hover:underline">Contact</a>
+            </div>
+        </div>
+    </main>
+
+    <footer style="background:#f1e7db;" class="py-8 px-6">
+        <div class="max-w-4xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
+            <p class="text-xs" style="color:#867461;">© {% now "Y" %} Yoga Kailasa. All rights reserved.</p>
+            <div class="flex gap-6 text-xs" style="color:#867461;">
+                <a href="{% url 'privacy_policy' %}" class="hover:underline">Privacy Policy</a>
+                <a href="{% url 'terms_of_service' %}" style="color:#855300;" class="font-semibold">Terms of Service</a>
+                <a href="{% url 'contact' %}" class="hover:underline">Contact</a>
+            </div>
+        </div>
+    </footer>
+
+</div>
+{% endblock %}

@@ -1,0 +1,4 @@
+# file: C:\Users\Orunmila1\Documents\Projects\yoga_kailasa_project\yoga_app\migrations\0018_lesson_resources_content_and_more.py
+# hypothesis_version: 6.151.12
+
+['Afternoon (12pm-4pm)', 'Evening (4pm-8pm)', 'Morning (8am-12pm)', 'Morning (8pm-12pm)', 'booking', 'lesson', 'preferred_time', 'resources_content', 'yoga_app']

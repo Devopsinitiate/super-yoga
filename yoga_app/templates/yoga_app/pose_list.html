@@ -2,140 +2,461 @@
 {% load static %}
 {% load app_filters %}
 
-{% block title %}Yoga Poses - Yoga Kailasa{% endblock %}
+{% block title %}Sacred Postures - Yoga Kailasa{% endblock %}
 
-{# NEW: Meta Description for SEO #}
 {% block meta_description %}Explore a wide range of yoga asanas and poses at Yoga Kailasa. Filter by difficulty and search for specific poses to enhance your practice.{% endblock %}
 
-{# NEW: Open Graph Tags for Social Sharing #}
-{% block og_title %}Yoga Poses - Yoga Kailasa{% endblock %}
+{% block og_title %}Sacred Postures - Yoga Kailasa{% endblock %}
 {% block og_description %}Explore a wide range of yoga asanas and poses at Yoga Kailasa. Filter by difficulty and search for specific poses to enhance your practice.{% endblock %}
-{% block og_image %}{% static 'yoga_app/images/default_pose_og_image.jpg' %}{% endblock %} {# Assuming a default image for poses #}
+{% block og_image %}{% static 'yoga_app/images/default_pose_og_image.jpg' %}{% endblock %}
 
 {% block extra_css %}
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif:ital,wght@0,400;0,700;1,400&family=Manrope:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
-    /* CSS for the fade-in-up animation, specific to pose_list.html elements */
-    @keyframes fadeInUp {
-        from {
-            opacity: 0;
-            transform: translateY(20px);
-        }
-        to {
-            opacity: 1;
-            transform: translateY(0);
-        }
+    body { font-family: 'Manrope', sans-serif; }
+    .rs-headline { font-family: 'Noto Serif', serif; line-height: 1.4; }
+    
+    .rs-surface { background-color: #fff8f3; }
+    .rs-surface-container { background-color: #f7ece1; }
+    .rs-surface-container-low { background-color: #fdf2e7; }
+    .rs-surface-container-lowest { background-color: #ffffff; }
+    .rs-surface-container-high { background-color: #f1e7db; }
+    .rs-surface-container-highest { background-color: #ebe1d6; }
+    .rs-surface-dim { background-color: #e2d8cd; }
+    
+    .rs-on-surface { color: #1f1b14; }
+    .rs-on-surface-variant { color: #534434; }
+    .rs-primary { color: #855300; }
+    .rs-secondary { color: #a73a00; }
+    .rs-outline { color: #867461; }
+    .rs-outline-variant { color: #d8c3ad; }
+    .rs-primary-container { color: #f59e0b; }
+    .rs-on-primary { color: #ffffff; }
+    .rs-on-primary-container { color: #613b00; }
+    .rs-on-secondary-container { color: #571a00; }
+    .rs-secondary-fixed { background-color: #ffdbce; }
+    .rs-on-secondary-fixed { color: #370e00; }
+    .rs-tertiary-container { background-color: #f79a6c; }
+    .rs-on-tertiary-container { color: #72300a; }
+    
+    .rs-glass {
+        background-color: rgba(255, 248, 243, 0.8);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
     }
-    .animate-fade-in-up {
-        opacity: 0; /* Hidden by default */
-        animation: fadeInUp 0.6s ease-out forwards;
+    
+    .rs-btn-primary {
+        background: linear-gradient(135deg, #855300 0%, #f59e0b 100%);
+        color: #ffffff;
+        transition: all 0.3s ease;
     }
-    /* Ensure card image styling is consistent */
-    .pose-card .card-image {
-        width: 100%;
-        height: 192px; /* h-48 equivalent */
-        object-fit: cover; /* Ensures images cover the area without distortion */
-        border-radius: 0.75rem 0.75rem 0 0; /* rounded-xl on top corners */
+    .rs-btn-primary:hover {
+        opacity: 0.92;
+        transform: scale(1.02);
+    }
+    
+    .rs-btn-secondary {
+        background-color: #f1e7db;
+        color: #855300;
+        transition: all 0.3s ease;
+    }
+    .rs-btn-secondary:hover {
+        background-color: #ebe1d6;
+    }
+    
+    .rs-pose-card {
+        transition: all 0.5s ease;
+    }
+    .rs-pose-card:hover {
+        background-color: #ebe1d6;
+    }
+    .rs-pose-card:hover .rs-pose-image {
+        transform: scale(1.05);
+    }
+    .rs-pose-image {
+        transition: transform 0.7s ease;
+    }
+    
+    .rs-input {
+        background-color: #fdf2e7;
+        border: none;
+        border-bottom: 1px solid rgba(216, 195, 173, 0.3);
+        transition: all 0.5s ease;
+    }
+    .rs-input:focus {
+        border-bottom-color: #855300;
+        background-color: #ffffff;
+        outline: none;
+    }
+    
+    .rs-filter-btn {
+        transition: all 0.3s ease;
+    }
+    .rs-filter-btn.active {
+        background-color: #f1e7db;
+        color: #855300;
+    }
+    .rs-filter-btn:hover {
+        background-color: #855300;
+        color: #ffffff;
+    }
+    
+    /* Hide base.html elements */
+    .pose-list-page > header,
+    .pose-list-page > #backToTopBtn {
+        display: none !important;
+    }
+    .pose-list-page > main {
+        padding: 0 !important;
+    }
+    
+    /* Hide horizontal scrollbar */
+    .rs-no-scrollbar::-webkit-scrollbar {
+        display: none;
+    }
+    .rs-no-scrollbar {
+        -ms-overflow-style: none;
+        scrollbar-width: none;
     }
 </style>
 {% endblock %}
 
 {% block content %}
-<section class="py-16 bg-gradient-to-r from-amber-100 to-amber-50 min-h-screen">
-    <div class="container mx-auto px-4">
-        <div class="text-center mb-12">
-            <h2 class="text-3xl md:text-4xl font-bold text-gray-800 mb-2 animate-fade-in-up" style="animation-delay: 0.1s;">Explore Yoga Poses</h2>
-            <p class="text-gray-600 max-w-2xl mx-auto animate-fade-in-up" style="animation-delay: 0.2s;">Discover a wide range of yoga asanas for all levels.</p>
-        </div>
-
-        <!-- Search and Filter Form -->
-        <div class="bg-white p-6 rounded-lg shadow-md mb-8 flex flex-col md:flex-row items-center justify-between space-y-4 md:space-y-0 md:space-x-4 animate-fade-in-up" style="animation-delay: 0.3s;">
-            <form action="{% url 'poses' %}" method="get" class="w-full md:w-1/2 relative">
-                <input type="search" name="q" placeholder="Search poses..."
-                       class="pl-10 pr-4 py-2 rounded-full border border-gray-300 focus:outline-none focus:ring-1 focus:ring-amber-500 focus:border-amber-500 text-sm w-full"
-                       value="{{ request.GET.q }}">
-                <button type="submit" class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
-                    <i class="fas fa-search"></i>
-                </button>
-            </form>
-            <form action="{% url 'poses' %}" method="get" class="w-full md:w-auto flex items-center space-x-2">
-                <label for="difficulty" class="text-gray-700 text-sm font-medium hidden md:block">Difficulty:</label>
-                <select name="difficulty" id="difficulty"
-                        class="block w-full md:w-auto px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-amber-500 focus:border-amber-500 text-sm">
-                    <option value="">All Difficulties</option>
-                    <option value="Beginner" {% if request.GET.difficulty == 'Beginner' %}selected{% endif %}>Beginner</option>
-                    <option value="Intermediate" {% if request.GET.difficulty == 'Intermediate' %}selected{% endif %}>Intermediate</option>
-                    <option value="Advanced" {% if request.GET.difficulty == 'Advanced' %}selected{% endif %}>Advanced</option>
-                </select>
-                <button type="submit" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-md transition duration-300 transform hover:scale-105">
-                    Apply
-                </button>
-                {% if request.GET.q or request.GET.difficulty %}
-                    <a href="{% url 'poses' %}" class="bg-gray-200 hover:bg-gray-300 text-gray-800 px-4 py-2 rounded-md transition duration-300 transform hover:scale-105">Clear</a>
-                {% endif %}
-            </form>
-        </div>
-
-        {% if yoga_poses %}
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {% for pose in yoga_poses %}
-            <div class="bg-white rounded-xl shadow-lg overflow-hidden pose-card transform transition duration-300 hover:shadow-xl hover:scale-105 animate-fade-in-up" style="animation-delay: {{ forloop.counter|multiply:0.1 }}s;"> {# Added hover effects and animation #}
-                <a href="{% url 'pose_detail' pose.id %}" class="block">
-                    {% if pose.image_url %}
-                        <img src="{{ pose.image_url }}" alt="{{ pose.name }}" class="card-image">
-                    {% else %}
-                        <div class="w-full h-48 bg-gray-200 flex items-center justify-center rounded-t-xl">
-                            <i class="fas fa-hand-sparkles text-6xl text-gray-400"></i>
-                        </div>
-                    {% endif %}
-                    <div class="p-6">
-                        <h3 class="text-xl font-bold text-gray-800 mb-2">{{ pose.name }}</h3>
-                        <p class="text-amber-600 text-sm mb-2">{{ pose.sanskrit_name }}</p>
-                        <p class="text-gray-600 text-sm mb-4">{{ pose.description|striptags|truncatechars:100 }}</p>
-                        <div class="flex items-center text-sm text-gray-600">
-                            <i class="fas fa-star text-amber-500 mr-2"></i>
-                            <span>Difficulty: {{ pose.difficulty }}</span>
-                        </div>
-                    </div>
+<div class="pose-list-page rs-surface min-h-screen selection:bg-[#f59e0b]/30">
+    {# Top Navigation Bar #}
+    <header class="rs-glass fixed top-0 left-0 right-0 z-50">
+        <div class="flex justify-between items-center w-full px-6 md:px-8 py-4 max-w-screen-2xl mx-auto">
+            <a href="{% url 'home' %}" class="text-2xl rs-headline rs-primary tracking-wide">Yoga Kailasa</a>
+            <nav class="hidden md:flex gap-10">
+                <a href="{% url 'breathing' %}" class="rs-on-surface-variant/70 font-medium hover:rs-secondary transition-colors duration-300">Practice</a>
+                <a href="{% url 'poses' %}" class="rs-primary font-bold border-b-2 border-[#855300] pb-1">Poses</a>
+                <a href="{% url 'booking' %}" class="rs-on-surface-variant/70 font-medium hover:rs-secondary transition-colors duration-300">Retreats</a>
+                <a href="{% url 'about' %}" class="rs-on-surface-variant/70 font-medium hover:rs-secondary transition-colors duration-300">Philosophy</a>
+            </nav>
+            <div class="flex items-center gap-4 md:gap-6">
+                {% if user.is_authenticated %}
+                <a href="{% url 'booking' %}" class="hidden md:inline-block rs-btn-primary px-6 py-2.5 rounded-lg font-semibold hover:opacity-90 transition-all">
+                    Book a Class
                 </a>
+                <button id="mobile-notification-bell" class="md:hidden text-[#534434] hover:text-[#855300] text-xl relative">
+                    <i class="fas fa-bell"></i>
+                    {% if unread_notifications_count > 0 %}
+                        <span class="notification-count" id="mobile-notification-count">{{ unread_notifications_count }}</span>
+                    {% endif %}
+                </button>
+                {% endif %}
+                <button type="button" id="mobile-menu-button-page" class="md:hidden text-[#534434] text-2xl focus:outline-none">
+                    <i class="fas fa-bars"></i>
+                </button>
             </div>
-            {% endfor %}
+        </div>
+        <div class="bg-[#f1e7db] h-[1px] w-full block"></div>
+    </header>
+
+    {# Mobile Menu Overlay #}
+    <div id="mobile-menu-overlay-page" class="fixed inset-0 bg-black/50 z-40 hidden" style="transition: opacity 0.3s ease-out, visibility 0.3s ease-out; opacity: 0; visibility: hidden;"></div>
+
+    {# Mobile Menu Sidebar #}
+    <div id="mobile-menu-page" class="fixed top-0 right-0 w-64 h-full bg-white shadow-lg z-50 p-6 pb-20 transform translate-x-full md:hidden overflow-y-auto" style="transition: transform 0.3s ease-out;">
+        <div class="flex justify-end mb-6">
+            <button id="close-mobile-menu-page" class="text-[#534434] text-2xl focus:outline-none">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <nav class="flex flex-col space-y-4">
+            <a href="{% url 'home' %}" class="text-[#534434] hover:text-[#855300] font-medium text-lg">Home</a>
+            <a href="{% url 'courses' %}" class="text-[#534434] hover:text-[#855300] font-medium text-lg">Courses</a>
+            <a href="{% url 'poses' %}" class="text-[#855300] font-bold text-lg">Poses</a>
+            <a href="{% url 'breathing' %}" class="text-[#534434] hover:text-[#855300] font-medium text-lg">Breathing</a>
+            <a href="{% url 'consultant_list' %}" class="text-[#534434] hover:text-[#855300] font-medium text-lg">Consultants</a>
+            <a href="{% url 'blog_list' %}" class="text-[#534434] hover:text-[#855300] font-medium text-lg">Blog</a>
+            <a href="{% url 'booking' %}" class="text-[#534434] hover:text-[#855300] font-medium text-lg">Booking</a>
+            <a href="{% url 'contact' %}" class="text-[#534434] hover:text-[#855300] font-medium text-lg">Contact</a>
+            <a href="{% url 'about' %}" class="text-[#534434] hover:text-[#855300] font-medium text-lg">About</a>
+
+            {% if user.is_authenticated %}
+                <div class="border-t border-[#d8c3ad]/30 pt-4 mt-4">
+                    <a href="{% url 'profile_edit' %}" class="flex items-center text-[#534434] hover:text-[#855300] font-medium text-lg mb-2">
+                        {% if user_profile.profile_picture %}
+                            <img src="{{ user_profile.profile_picture.url }}" alt="Profile Picture" class="w-8 h-8 rounded-full object-cover mr-2">
+                        {% else %}
+                            <div class="w-8 h-8 rounded-full bg-[#f7ece1] flex items-center justify-center mr-2">
+                                <i class="fas fa-user text-[#855300] text-sm"></i>
+                            </div>
+                        {% endif %}
+                        {{ user.username }}
+                    </a>
+                    <a href="{% url 'all_notifications' %}" class="block px-2 py-1 text-[#534434] hover:bg-[#fdf2e7] rounded-md relative">
+                        <i class="fas fa-bell mr-2 text-[#855300]"></i> Notifications
+                        {% if unread_notifications_count > 0 %}
+                            <span class="notification-count">{{ unread_notifications_count }}</span>
+                        {% endif %}
+                    </a>
+                    <a href="{% url 'dashboard' %}" class="block px-2 py-1 text-[#534434] hover:bg-[#fdf2e7] rounded-md"><i class="fas fa-tachometer-alt mr-2 text-[#855300]"></i> Dashboard</a>
+                    <a href="{% url 'profile_edit' %}" class="block px-2 py-1 text-[#534434] hover:bg-[#fdf2e7] rounded-md"><i class="fas fa-user mr-2 text-[#855300]"></i> My Profile</a>
+                    <form action="{% url 'logout' %}" method="post" class="block w-full mt-2">
+                        {% csrf_token %}
+                        <button type="submit" class="w-full text-left py-2 text-white bg-[#a73a00] hover:bg-[#855300] font-bold text-lg flex items-center justify-center rounded">
+                            <i class="fas fa-sign-out-alt mr-2"></i> Logout
+                        </button>
+                    </form>
+                </div>
+            {% else %}
+                <div class="border-t border-[#d8c3ad]/30 pt-4 mt-4">
+                    <a href="{% url 'login' %}" class="block text-[#534434] hover:text-[#855300] font-medium text-lg">Login</a>
+                    <a href="{% url 'register' %}" class="block rs-btn-primary px-5 py-2 rounded-lg shadow-md transition duration-300 text-center mt-3">Sign Up</a>
+                </div>
+            {% endif %}
+        </nav>
+    </div>
+
+    <main>
+        {# Back to Home #}
+        <div class="max-w-7xl mx-auto px-6 md:px-12 pt-6">
+            <a href="{% url 'home' %}" class="inline-flex items-center gap-2 rs-on-surface-variant hover:rs-primary font-medium transition-colors">
+                <i class="fas fa-arrow-left"></i>
+                <span class="text-sm uppercase tracking-widest">Back to Home</span>
+            </a>
         </div>
 
-        <!-- Pagination Controls -->
-        {% if yoga_poses.has_other_pages %}
-        <div class="flex justify-center mt-12 space-x-2 animate-fade-in-up" style="animation-delay: {{ yoga_poses.count|add:1|multiply:0.1 }}s;">
-            {% if yoga_poses.has_previous %}
-                <a href="?page={{ yoga_poses.previous_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}{% if request.GET.difficulty %}&difficulty={{ request.GET.difficulty }}{% endif %}"
-                   class="px-4 py-2 bg-amber-500 text-white rounded-full hover:bg-amber-600 transition duration-300 transform hover:scale-105">Previous</a>
-            {% else %}
-                <span class="px-4 py-2 bg-gray-300 text-gray-600 rounded-full cursor-not-allowed">Previous</span>
-            {% endif %}
+        {# Hero Section #}
+        <section class="relative overflow-hidden pt-24 pb-20 px-6 md:px-12">
+            <div class="max-w-7xl mx-auto flex flex-col md:flex-row items-center gap-16">
+                <div class="w-full md:w-1/2 space-y-8">
+                    <h1 class="text-6xl md:text-7xl rs-headline leading-[1.2] rs-primary">Sacred Postures</h1>
+                    <p class="text-xl rs-headline italic rs-on-surface-variant max-w-md leading-relaxed">
+                        A curated sanctuary of movement. Discover the profound geometry of the breath and the stillness of the spirit through our digital asana library.
+                    </p>
+                </div>
+                <div class="w-full md:w-1/2 relative">
+                    <div class="aspect-[4/5] rounded-xl overflow-hidden rs-surface-container-low">
+                        <img src="https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=800&h=1000&fit=crop" alt="Yoga practice" class="w-full h-full object-cover opacity-90 mix-blend-multiply">
+                    </div>
+                    {# Organic Asymmetric Element #}
+                    <div class="absolute -bottom-8 -left-8 rs-surface-container p-8 rounded-lg max-w-xs shadow-sm">
+                        <span class="rs-secondary font-bold text-xs tracking-widest uppercase mb-2 block">Essence</span>
+                        <p class="text-sm rs-on-surface-variant leading-relaxed italic">"Your posture is a prayer without words. Find your center in the geometry of grace."</p>
+                    </div>
+                </div>
+            </div>
+        </section>
 
-            {% for i in yoga_poses.paginator.page_range %}
-                {% if yoga_poses.number == i %}
-                    <span class="px-4 py-2 bg-amber-700 text-white rounded-full">{{ i }}</span>
+        {# Search & Filter Bar #}
+        <section class="sticky top-[73px] z-40 rs-surface/90 backdrop-blur-md py-4 px-6 md:px-12 border-b border-[#d8c3ad]/10">
+            <div class="max-w-7xl mx-auto">
+                {# Mobile: Search + Toggle Filters Button #}
+                <div class="flex gap-3 items-center lg:hidden mb-3">
+                    <form action="{% url 'poses' %}" method="get" class="flex-1 relative group">
+                        <i class="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 rs-outline"></i>
+                        <input type="search" name="q" 
+                               class="w-full rs-input px-12 py-3 rounded-lg rs-on-surface placeholder:rs-outline text-sm"
+                               placeholder="Seek a posture..."
+                               value="{{ request.GET.q }}">
+                    </form>
+                    <button type="button" id="mobileFilterToggle" class="rs-btn-secondary px-4 py-3 rounded-lg text-sm font-semibold whitespace-nowrap flex items-center gap-2">
+                        <i class="fas fa-sliders-h"></i> Filters
+                    </button>
+                </div>
+                
+                <div class="flex flex-col md:flex-row gap-6 justify-between items-center">
+                    {# Desktop Search #}
+                    <form action="{% url 'poses' %}" method="get" class="hidden lg:block relative w-full md:w-1/3 group">
+                        <i class="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 rs-outline"></i>
+                        <input type="search" name="q" 
+                               class="w-full rs-input px-12 py-3 rounded-lg rs-on-surface placeholder:rs-outline"
+                               placeholder="Seek a posture..."
+                               value="{{ request.GET.q }}">
+                    </form>
+                    {# Filter Pills #}
+                    <div id="mobileFilters" class="hidden w-full lg:flex items-center gap-4 overflow-x-auto pb-2 lg:pb-0 rs-no-scrollbar">
+                        <span class="text-xs uppercase tracking-widest rs-outline-variant font-bold px-2">Path:</span>
+                        <a href="{% url 'poses' %}" class="rs-filter-btn px-6 py-2 rounded-full text-sm font-medium whitespace-nowrap {% if not request.GET.difficulty %}rs-surface-container-high rs-primary{% else %}rs-surface-container-low rs-on-surface-variant border border-[#d8c3ad]/10{% endif %}">
+                            All
+                        </a>
+                        {% for difficulty in difficulty_choices %}
+                        <a href="?difficulty={{ difficulty.0 }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}" 
+                           class="rs-filter-btn px-6 py-2 rounded-full text-sm font-medium whitespace-nowrap {% if request.GET.difficulty == difficulty.0 %}rs-surface-container-high rs-primary{% else %}rs-surface-container-low rs-on-surface-variant border border-[#d8c3ad]/10{% endif %}">
+                            {{ difficulty.0 }}
+                        </a>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        {# Posture Gallery - Bento-ish Grid #}
+        {% if yoga_poses %}
+        <section class="py-16 px-6 md:px-12 max-w-7xl mx-auto">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-12">
+                {% for pose in yoga_poses %}
+                {% if forloop.counter == 1 or forloop.counter == 5 %}
+                {# Large Focus Card #}
+                <div class="group cursor-pointer lg:col-span-2">
+                    <a href="{% url 'pose_detail' pose.id %}" class="block">
+                        <div class="relative rounded-xl overflow-hidden aspect-[16/9] mb-6 rs-surface-container-low">
+                            {% if pose.image_url %}
+                            <img src="{{ pose.image_url }}" alt="{{ pose.name }}" class="w-full h-full object-cover rs-pose-image">
+                            {% else %}
+                            <div class="w-full h-full rs-surface-container flex items-center justify-center">
+                                <i class="fas fa-spa text-8xl rs-primary/10"></i>
+                            </div>
+                            {% endif %}
+                            <div class="absolute top-4 right-4 {% if pose.difficulty == 'Advanced' %}rs-primary rs-on-primary{% elif pose.difficulty == 'Intermediate' %}rs-surface-container-high rs-on-surface-variant{% else %}rs-secondary-fixed rs-on-secondary-fixed{% endif %} text-[10px] uppercase tracking-widest px-3 py-1 rounded-full">
+                                {{ pose.difficulty }}
+                            </div>
+                        </div>
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <h3 class="text-3xl rs-headline rs-on-surface mb-1">{{ pose.name }}</h3>
+                                {% if pose.sanskrit_name %}
+                                <p class="text-lg italic rs-headline rs-secondary mb-4">{{ pose.sanskrit_name }}</p>
+                                {% endif %}
+                                <p class="rs-on-surface-variant max-w-lg leading-relaxed mb-6">{{ pose.description|striptags|truncatechars:200 }}</p>
+                                <span class="inline-flex items-center gap-2 rs-primary font-bold uppercase text-xs tracking-widest group-hover:gap-4 transition-all">
+                                    Explore Alignment <i class="fas fa-arrow-right text-sm"></i>
+                                </span>
+                            </div>
+                        </div>
+                    </a>
+                </div>
                 {% else %}
-                    <a href="?page={{ i }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}{% if request.GET.difficulty %}&difficulty={{ request.GET.difficulty }}{% endif %}"
-                       class="px-4 py-2 bg-gray-200 text-gray-700 rounded-full hover:bg-gray-300 transition duration-300 transform hover:scale-105">{{ i }}</a>
+                {# Standard Card #}
+                <div class="group cursor-pointer">
+                    <a href="{% url 'pose_detail' pose.id %}" class="block">
+                        <div class="relative rounded-xl overflow-hidden aspect-[4/5] mb-6 rs-surface-container-low">
+                            {% if pose.image_url %}
+                            <img src="{{ pose.image_url }}" alt="{{ pose.name }}" class="w-full h-full object-cover rs-pose-image">
+                            {% else %}
+                            <div class="w-full h-full rs-surface-container flex items-center justify-center">
+                                <i class="fas fa-spa text-6xl rs-primary/20"></i>
+                            </div>
+                            {% endif %}
+                            <div class="absolute top-4 right-4 {% if pose.difficulty == 'Advanced' %}rs-primary rs-on-primary{% elif pose.difficulty == 'Intermediate' %}rs-surface-container-high rs-on-surface-variant{% else %}rs-secondary-fixed rs-on-secondary-fixed{% endif %} text-[10px] uppercase tracking-widest px-3 py-1 rounded-full">
+                                {{ pose.difficulty }}
+                            </div>
+                        </div>
+                        <div>
+                            <h3 class="text-2xl rs-headline rs-on-surface mb-1">{{ pose.name }}</h3>
+                            {% if pose.sanskrit_name %}
+                            <p class="text-md italic rs-headline rs-secondary mb-3">{{ pose.sanskrit_name }}</p>
+                            {% endif %}
+                            <p class="text-sm rs-on-surface-variant leading-relaxed mb-4">{{ pose.description|striptags|truncatechars:120 }}</p>
+                            <span class="inline-flex items-center gap-2 rs-primary font-bold uppercase text-xs tracking-widest">
+                                View Pose <i class="fas fa-arrow-right text-sm"></i>
+                            </span>
+                        </div>
+                    </a>
+                </div>
                 {% endif %}
-            {% endfor %}
+                {% endfor %}
+            </div>
+        </section>
 
-            {% if yoga_poses.has_next %}
+        {# Pagination / Load More #}
+        {% if yoga_poses.has_other_pages %}
+        <div class="mt-20 flex flex-col items-center gap-4 px-6">
+            <div class="h-[1px] w-24 bg-[#d8c3ad]/30"></div>
+            <div class="flex items-center gap-3">
+                {% if yoga_poses.has_previous %}
+                <a href="?page={{ yoga_poses.previous_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}{% if request.GET.difficulty %}&difficulty={{ request.GET.difficulty }}{% endif %}"
+                   class="rs-btn-secondary px-6 py-3 rounded-lg font-bold tracking-widest uppercase text-sm flex items-center gap-2">
+                    <i class="fas fa-chevron-left text-xs"></i> Previous
+                </a>
+                {% endif %}
+                
+                {% for i in yoga_poses.paginator.page_range %}
+                    {% if yoga_poses.number == i %}
+                    <span class="rs-primary font-bold tracking-widest uppercase text-sm px-4 py-3">{{ i }}</span>
+                    {% elif i <= yoga_poses.number|add:2 and i >= yoga_poses.number|add:-2 %}
+                    <a href="?page={{ i }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}{% if request.GET.difficulty %}&difficulty={{ request.GET.difficulty }}{% endif %}"
+                       class="rs-on-surface-variant hover:rs-primary font-medium tracking-widest uppercase text-sm px-4 py-3 transition-colors">{{ i }}</a>
+                    {% endif %}
+                {% endfor %}
+                
+                {% if yoga_poses.has_next %}
                 <a href="?page={{ yoga_poses.next_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}{% if request.GET.difficulty %}&difficulty={{ request.GET.difficulty }}{% endif %}"
-                   class="px-4 py-2 bg-amber-500 text-white rounded-full hover:bg-amber-600 transition duration-300 transform hover:scale-105">Next</a>
-            {% else %}
-                <span class="px-4 py-2 bg-gray-300 text-gray-600 rounded-full cursor-not-allowed">Next</span>
-            {% endif %}
+                   class="rs-btn-secondary px-6 py-3 rounded-lg font-bold tracking-widest uppercase text-sm flex items-center gap-2">
+                    Next <i class="fas fa-chevron-right text-xs"></i>
+                </a>
+                {% endif %}
+            </div>
         </div>
         {% endif %}
 
         {% else %}
-        <div class="text-center py-12 animate-fade-in-up" style="animation-delay: 0.4s;">
-            <i class="fas fa-frown text-6xl text-gray-400 mb-4"></i>
-            <p class="text-xl text-gray-700">No yoga poses found matching your criteria.</p>
-            <p class="text-gray-500 mt-2">Try adjusting your search or filters.</p>
+        {# Empty State #}
+        <div class="text-center py-20 px-6">
+            <i class="fas fa-spa text-6xl rs-primary/20 mb-6"></i>
+            <h3 class="rs-headline text-2xl font-bold rs-on-surface mb-2">No postures found</h3>
+            <p class="rs-on-surface-variant mb-6">
+                {% if request.GET.q or request.GET.difficulty %}
+                No poses match your criteria. Try adjusting your search or filters.
+                {% else %}
+                No yoga poses have been added yet.
+                {% endif %}
+            </p>
+            {% if request.GET.q or request.GET.difficulty %}
+            <a href="{% url 'poses' %}" class="rs-btn-primary px-8 py-3 rounded-lg font-semibold text-sm uppercase tracking-wider inline-block">
+                View All Poses
+            </a>
+            {% endif %}
         </div>
         {% endif %}
-    </div>
-</section>
+
+        {# Newsletter / CTA #}
+        <section class="rs-surface-container-high py-24 px-6 md:px-12 mt-16">
+            <div class="max-w-3xl mx-auto text-center space-y-8">
+                <h2 class="text-4xl md:text-5xl rs-headline rs-primary">Deeper into the Practice</h2>
+                <p class="text-lg rs-on-surface-variant leading-relaxed">Join our weekly journal for sequences, meditation guides, and philosophical insights delivered with quiet intentionality.</p>
+                <form action="{% url 'newsletter_subscribe' %}" method="post" class="flex flex-col sm:flex-row gap-4 mt-8">
+                    {% csrf_token %}
+                    <input type="email" name="email" placeholder="Email address" required
+                           class="flex-1 rs-surface-container-lowest border-none px-6 py-4 rounded-lg focus:ring-2 focus:ring-[#855300] transition-all rs-on-surface">
+                    <button type="submit" class="rs-btn-primary px-8 py-4 rounded-lg font-bold uppercase text-xs tracking-widest">
+                        Subscribe
+                    </button>
+                </form>
+            </div>
+        </section>
+    </main>
+
+    {# Footer #}
+    <footer class="rs-surface-dim w-full py-12 px-6 md:px-12">
+        <div class="flex flex-col md:flex-row justify-between items-center gap-6 max-w-7xl mx-auto">
+            <div class="rs-headline text-lg rs-primary">Yoga Kailasa</div>
+            <div class="flex flex-wrap justify-center gap-8 font-['Manrope'] text-sm tracking-tight">
+                <a href="{% url 'privacy_policy' %}" class="rs-on-surface-variant/60 hover:rs-primary transition-all">Privacy Policy</a>
+                <a href="{% url 'about' %}" class="rs-on-surface-variant/60 hover:rs-primary transition-all">Terms of Service</a>
+                <a href="{% url 'blog_list' %}" class="rs-on-surface-variant/60 hover:rs-primary transition-all">Journal</a>
+                <a href="{% url 'contact' %}" class="rs-on-surface-variant/60 hover:rs-primary transition-all">Contact</a>
+            </div>
+            <div class="rs-on-surface-variant/60 text-xs">
+                &copy; {% now "Y" %} Yoga Kailasa. Crafted for Radiant Sanctuaries.
+            </div>
+        </div>
+    </footer>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+{{ block.super }}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    /* Mobile Filter Toggle */
+    const mobileFilterToggle = document.getElementById('mobileFilterToggle');
+    const mobileFilters = document.getElementById('mobileFilters');
+    
+    if (mobileFilterToggle && mobileFilters) {
+        mobileFilterToggle.addEventListener('click', function() {
+            mobileFilters.classList.toggle('hidden');
+            mobileFilters.classList.toggle('lg:flex');
+            if (mobileFilters.classList.contains('hidden')) {
+                this.innerHTML = '<i class="fas fa-sliders-h"></i> Filters';
+            } else {
+                this.innerHTML = '<i class="fas fa-times"></i> Close';
+            }
+        });
+    }
+});
+</script>
 {% endblock %}

@@ -1,133 +1,364 @@
 {% extends 'yoga_app/base.html' %}
 {% load static %}
 
-{% block title %}Book a Session - Yoga Kailasa{% endblock %}
+{% block title %}Sanctuary Booking - Yoga Kailasa{% endblock %}
 
 {% block meta_description %}Schedule a personalized yoga or wellness consultation with our expert team. Book your session easily online.{% endblock %}
 
 {% block og_title %}Book Your Consultation - Yoga Kailasa{% endblock %}
 {% block og_description %}Schedule a personalized yoga or wellness consultation with our expert team. Book your session easily online.{% endblock %}
-{% block og_image %}{% static 'yoga_app/images/default_booking_og_image.jpg' %}{% endblock %} {# Placeholder for a default booking OG image #}
+{% block og_image %}{% static 'yoga_app/images/default_booking_og_image.jpg' %}{% endblock %}
 
 {% block extra_css %}
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif:ital,wght@0,400;0,700;1,400&family=Manrope:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
-    /* CSS for the fade-in-up animation, specific to booking_page.html elements */
-    @keyframes fadeInUp {
-        from {
-            opacity: 0;
-            transform: translateY(20px);
-        }
-        to {
-            opacity: 1;
-            transform: translateY(0);
-        }
+    /* Override base.html styles for booking page */
+    body.booking-active > header,
+    body.booking-active #mobile-menu,
+    body.booking-active #mobile-menu-overlay,
+    body.booking-active #backToTopBtn,
+    body.booking-active > footer {
+        display: none !important;
     }
-    .animate-fade-in-up {
-        opacity: 0; /* Hidden by default */
-        animation: fadeInUp 0.6s ease-out forwards;
+    body.booking-active > main {
+        padding: 0 !important;
     }
+    body.booking-active {
+        background-color: #fff8f3 !important;
+    }
+    
+    .booking-page {
+        font-family: 'Manrope', sans-serif;
+        background-color: #fff8f3;
+        color: #1f1b14;
+        min-height: 100vh;
+    }
+    .booking-page .rs-headline {
+        font-family: 'Noto Serif', serif;
+        line-height: 1.4;
+    }
+    .booking-page .rs-glass {
+        background-color: rgba(255, 248, 243, 0.8);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+    }
+    .booking-page .rs-btn-primary {
+        background: linear-gradient(135deg, #855300 0%, #f59e0b 100%);
+        color: #ffffff;
+        transition: all 0.3s ease;
+    }
+    .booking-page .rs-btn-primary:hover {
+        opacity: 0.92;
+        transform: scale(1.02);
+    }
+    .booking-page .rs-text-primary { color: #855300; }
+    .booking-page .rs-text-secondary { color: #a73a00; }
+    .booking-page .rs-text-on-surface { color: #1f1b14; }
+    .booking-page .rs-text-on-surface-variant { color: #534434; }
+    .booking-page .rs-text-outline { color: #867461; }
+    .booking-page .rs-text-outline-variant { color: #d8c3ad; }
+    .booking-page .rs-text-amber-950 { color: #451a03; }
+    .booking-page .rs-text-stone-600 { color: #57534e; }
+    .booking-page .rs-text-stone-500 { color: #78716c; }
+    .booking-page .rs-text-stone-800 { color: #292524; }
+    .booking-page .rs-bg-surface { background-color: #fff8f3; }
+    .booking-page .rs-bg-surface-container { background-color: #f7ece1; }
+    .booking-page .rs-bg-surface-container-low { background-color: #fdf2e7; }
+    .booking-page .rs-bg-surface-container-lowest { background-color: #ffffff; }
+    .booking-page .rs-bg-surface-container-high { background-color: #f1e7db; }
+    .booking-page .rs-bg-surface-container-highest { background-color: #ebe1d6; }
+    .booking-page .rs-bg-surface-dim { background-color: #e2d8cd; }
+    .booking-page .rs-bg-primary { background-color: #855300; }
+    .booking-page .rs-bg-primary-container { background-color: #f59e0b; }
+    .booking-page .rs-border-outline-variant { border-color: rgba(216, 195, 173, 0.2); }
+    .booking-page .rs-border-primary { border-color: rgba(133, 83, 0, 0.3); }
+    .booking-page .rs-input-field {
+        background-color: #fdf2e7;
+        border: none;
+        border-bottom: 2px solid rgba(216, 195, 173, 0.2);
+        transition: all 0.3s ease;
+        border-radius: 0;
+    }
+    .booking-page .rs-input-field:focus {
+        outline: none;
+        border-bottom-color: #855300;
+        background-color: #ffffff;
+    }
+    .booking-page .rs-input-field option {
+        background-color: #fdf2e7;
+        color: #1f1b14;
+    }
+    .booking-page .guide-card:hover .guide-image {
+        filter: grayscale(0%);
+    }
+    .booking-page .guide-image {
+        filter: grayscale(100%);
+        transition: all 0.5s ease;
+    }
+    .booking-page .editorial-leading { line-height: 1.4; }
+    .booking-page .rs-trust-card {
+        background-color: rgba(241, 231, 219, 0.5);
+    }
+    .booking-page .rs-ring { box-shadow: 0 0 0 2px #f1e7db; }
 </style>
 {% endblock %}
 
 {% block content %}
-<section class="py-16 bg-gradient-to-r from-amber-100 to-amber-50 min-h-screen">
-    <div class="container mx-auto px-4 max-w-4xl">
-        <div class="bg-white p-8 rounded-xl shadow-lg">
-            <h2 class="text-3xl md:text-4xl font-bold text-gray-800 mb-6 text-center animate-fade-in-up" style="animation-delay: 0.1s;">Book Your Personalized Session</h2>
-            <p class="text-gray-600 text-center mb-8 animate-fade-in-up" style="animation-delay: 0.2s;">Fill out the form below to schedule a session with one of our expert consultants. We'll get back to you to confirm the details.</p>
-
-            <div class="booking-form-container animate-fade-in-up" style="animation-delay: 0.3s;">
-                <form method="post" action="{% url 'booking' %}" class="space-y-6">
-                    {% csrf_token %}
-                    
-                    {# Display non-field errors #}
-                    {% if form.non_field_errors %}
-                        <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
-                            <strong class="font-bold">Error!</strong>
-                            <span class="block sm:inline">{{ form.non_field_errors }}</span>
-                        </div>
-                    {% endif %}
-
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div class="form-field-wrapper">
-                            {{ form.full_name.label_tag }}
-                            {{ form.full_name }}
-                            {% if form.full_name.help_text %}<p class="helptext">{{ form.full_name.help_text }}</p>{% endif %}
-                            {% for error in form.full_name.errors %}<p class="errorlist">{{ error }}</p>{% endfor %}
-                        </div>
-                        <div class="form-field-wrapper">
-                            {{ form.email.label_tag }}
-                            {{ form.email }}
-                            {% if form.email.help_text %}<p class="helptext">{{ form.email.help_text }}</p>{% endif %}
-                            {% for error in form.email.errors %}<p class="errorlist">{{ error }}</p>{% endfor %}
-                        </div>
-                    </div>
-
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div class="form-field-wrapper">
-                            {{ form.phone_number.label_tag }}
-                            {{ form.phone_number }}
-                            {% if form.phone_number.help_text %}<p class="helptext">{{ form.phone_number.help_text }}</p>{% endif %}
-                            {% for error in form.phone_number.errors %}<p class="errorlist">{{ error }}</p>{% endfor %}
-                        </div>
-                        <div class="form-field-wrapper">
-                            {{ form.consultant.label_tag }}
-                            {{ form.consultant }}
-                            {% if form.consultant.help_text %}<p class="helptext">{{ form.consultant.help_text }}</p>{% endif %}
-                            {% for error in form.consultant.errors %}<p class="errorlist">{{ error }}</p>{% endfor %}
-                        </div>
-                    </div>
-
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div class="form-field-wrapper">
-                            {{ form.preferred_date.label_tag }}
-                            {{ form.preferred_date }}
-                            {% if form.preferred_date.help_text %}<p class="helptext">{{ form.preferred_date.help_text }}</p>{% endif %}
-                            {% for error in form.preferred_date.errors %}<p class="errorlist">{{ error }}</p>{% endfor %}
-                        </div>
-                        <div class="form-field-wrapper">
-                            {{ form.preferred_time.label_tag }}
-                            {{ form.preferred_time }}
-                            {% if form.preferred_time.help_text %}<p class="helptext">{{ form.preferred_time.help_text }}</p>{% endif %}
-                            {% for error in form.preferred_time.errors %}<p class="errorlist">{{ error }}</p>{% endfor %}
-                        </div>
-                    </div>
-
-                    <div class="form-field-wrapper">
-                        {{ form.message.label_tag }}
-                        {{ form.message }}
-                        {% if form.message.help_text %}<p class="helptext">{{ form.message.help_text }}</p>{% endif %}
-                        {% for error in form.message.errors %}<p class="errorlist">{{ error }}</p>{% endfor %}
-                    </div>
-
-                    <button type="submit" class="w-full bg-amber-500 hover:bg-amber-600 text-white font-bold py-3 px-6 rounded-full shadow-lg transition duration-300 transform hover:scale-105 flex items-center justify-center">
-                        <i class="fas fa-calendar-alt mr-2"></i> Submit Booking Request
-                    </button>
-                </form>
+<script>document.body.classList.add('booking-active');</script>
+<div class="booking-page">
+    {# Top Navigation Shell #}
+    <nav class="fixed top-0 w-full z-50 rs-glass shadow-[0_8px_30px_rgb(0,0,0,0.04)] h-20">
+        <div class="flex justify-between items-center px-6 md:px-8 h-full w-full max-w-screen-2xl mx-auto">
+            <a href="{% url 'home' %}" class="rs-headline text-2xl font-medium rs-text-amber-950">Yoga Kailasa</a>
+            <div class="hidden md:flex items-center space-x-8">
+                <a href="{% url 'courses' %}" class="rs-text-stone-600 font-medium hover:rs-text-primary transition-all duration-300">Classes</a>
+                <a href="{% url 'booking' %}" class="rs-text-primary font-medium hover:rs-text-primary transition-all duration-300">Workshops</a>
+                <a href="{% url 'consultant_list' %}" class="rs-text-stone-600 font-medium hover:rs-text-primary transition-all duration-300">Retreats</a>
+                <a href="{% url 'consultant_list' %}" class="rs-text-stone-600 font-medium hover:rs-text-primary transition-all duration-300">Teachers</a>
             </div>
+            <div class="flex items-center space-x-6">
+                <a href="{% url 'booking' %}" class="rs-btn-primary px-6 py-2.5 rounded-lg font-medium text-sm hover:scale-[1.02] active:scale-[0.98] transition-all">Book a Mat</a>
+                {% if user.is_authenticated %}
+                {% if user_profile.profile_picture %}
+                <img src="{{ user_profile.profile_picture.url }}" alt="Yogi Profile" class="w-10 h-10 rounded-full object-cover rs-ring">
+                {% else %}
+                <div class="w-10 h-10 rounded-full rs-bg-surface-container flex items-center justify-center rs-ring">
+                    <i class="fas fa-user rs-text-primary"></i>
+                </div>
+                {% endif %}
+                {% else %}
+                <a href="{% url 'login' %}" class="rs-text-stone-600 hover:rs-text-primary font-medium transition-all">Sign In</a>
+                {% endif %}
+            </div>
+        </div>
+    </nav>
 
-            {% if consultants %}
-            <div class="mt-12 text-center animate-fade-in-up" style="animation-delay: 0.4s;">
-                <h3 class="text-2xl font-bold text-gray-800 mb-6">Our Available Consultants</h3>
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {% for consultant in consultants %}
-                    <div class="bg-gray-50 border border-gray-200 rounded-lg p-4 shadow-sm flex flex-col items-center text-center">
-                        {% if consultant.profile_picture_url %}
-                            <img src="{{ consultant.profile_picture_url }}" alt="{{ consultant.name }}" class="w-24 h-24 rounded-full object-cover mb-3 border-2 border-amber-300">
-                        {% else %}
-                            <div class="w-24 h-24 rounded-full bg-gray-200 flex items-center justify-center text-gray-400 text-5xl mb-3 border-2 border-amber-300">
-                                <i class="fas fa-user-circle"></i>
+    <main class="pt-20">
+        {# Back to Home #}
+        <div class="max-w-screen-2xl mx-auto px-6 md:px-8 pt-6">
+            <a href="{% url 'home' %}" class="inline-flex items-center gap-2 rs-text-stone-600 hover:rs-text-primary font-medium transition-all duration-300">
+                <i class="fas fa-arrow-left"></i>
+                <span class="text-sm uppercase tracking-widest">Back to Home</span>
+            </a>
+        </div>
+
+        {# Radiant Hero Section #}
+        <section class="relative h-[400px] md:h-[500px] flex items-center justify-center overflow-hidden">
+            <div class="absolute inset-0 z-0">
+                <div class="absolute inset-0 bg-gradient-to-b from-transparent to-[#fff8f3]/90 z-10"></div>
+                <img src="https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=1920&h=800&fit=crop" alt="Sanctuary Environment" class="w-full h-full object-cover grayscale-[20%] sepia-[10%]">
+            </div>
+            <div class="relative z-20 text-center max-w-3xl px-6">
+                <span class="rs-text-primary font-label tracking-[0.2em] uppercase text-xs mb-4 block">Begin Your Journey</span>
+                <h1 class="text-5xl md:text-7xl rs-headline rs-text-on-surface leading-tight mb-6">Step Toward Sanctuary</h1>
+                <p class="rs-text-on-surface-variant font-body text-lg leading-relaxed max-w-xl mx-auto">
+                    Reserve your space in our sacred halls. Every session is an intentional step toward inner radiance and quiet strength.
+                </p>
+            </div>
+        </section>
+
+        {# Booking & Expert Guidance Section #}
+        <section class="max-w-screen-xl mx-auto px-6 -mt-20 relative z-30 pb-24">
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-12">
+                {# Left: Expert Guidance (The Guides) #}
+                <div class="lg:col-span-4 space-y-8">
+                    <div class="rs-bg-surface-container-low p-10 rounded-xl">
+                        <h2 class="text-2xl rs-headline rs-text-amber-950 mb-8">Your Divine Guides</h2>
+                        {% if consultants %}
+                        <div class="space-y-10">
+                            {% for consultant in consultants|slice:":2" %}
+                            <div class="guide-card group flex gap-5 items-start">
+                                <div class="relative flex-shrink-0">
+                                    {% if consultant.profile_picture_url %}
+                                    <img src="{{ consultant.profile_picture_url }}" alt="{{ consultant.name }}" class="w-16 h-16 rounded-lg object-cover guide-image">
+                                    {% else %}
+                                    <div class="w-16 h-16 rounded-lg rs-bg-surface-container flex items-center justify-center guide-image">
+                                        <i class="fas fa-user rs-text-primary/50"></i>
+                                    </div>
+                                    {% endif %}
+                                    <div class="absolute -bottom-1 -right-1 w-5 h-5 rs-bg-primary-container rounded-full border-4 rs-bg-surface-container-low"></div>
+                                </div>
+                                <div>
+                                    <h4 class="rs-headline text-lg rs-text-on-surface">{{ consultant.name }}</h4>
+                                    <p class="text-xs rs-text-primary font-label uppercase tracking-widest mb-2">{{ consultant.specialty }}</p>
+                                    <p class="text-sm rs-text-on-surface-variant leading-relaxed">{{ consultant.bio|striptags|truncatechars:80 }}</p>
+                                    <a href="{% url 'consultant_detail' consultant.id %}" class="text-xs rs-text-primary hover:underline mt-1 inline-block">View Profile</a>
+                                </div>
                             </div>
+                            {% endfor %}
+                        </div>
+                        {% else %}
+                        <p class="text-sm rs-text-on-surface-variant">Our guides are being selected with care. Check back soon!</p>
                         {% endif %}
-                        <h4 class="text-lg font-semibold text-gray-800">{{ consultant.name }}</h4>
-                        <p class="text-amber-600 text-sm">{{ consultant.specialty }}</p>
-                        <a href="{% url 'consultant_detail' consultant.id %}" class="mt-3 text-blue-600 hover:underline text-sm">View Profile</a>
+                        <div class="mt-12 pt-12 rs-border-outline-variant border-t">
+                            <h3 class="text-sm font-label uppercase tracking-widest rs-text-on-surface-variant mb-4">Why Kailasa?</h3>
+                            <ul class="space-y-4">
+                                <li class="flex items-start gap-3 text-sm rs-text-on-surface-variant">
+                                    <i class="fas fa-leaf rs-text-primary text-lg mt-0.5"></i>
+                                    <span>Sustainable materials and eco-conscious studio practices.</span>
+                                </li>
+                                <li class="flex items-start gap-3 text-sm rs-text-on-surface-variant">
+                                    <i class="fas fa-spa rs-text-primary text-lg mt-0.5"></i>
+                                    <span>Limited class sizes to ensure personalized attention and breath.</span>
+                                </li>
+                            </ul>
+                        </div>
                     </div>
-                    {% endfor %}
+                </div>
+
+                {# Right: Booking Form #}
+                <div class="lg:col-span-8">
+                    <div class="rs-bg-surface-container-lowest p-8 md:p-16 rounded-xl shadow-[0_32px_64px_-12px_rgba(31,27,20,0.06)] rs-border-outline-variant border">
+                        <div class="mb-12">
+                            <h2 class="text-3xl rs-headline rs-text-amber-950 mb-2">Sanctuary Booking</h2>
+                            <p class="rs-text-on-surface-variant font-body">Please share your intentions so we may prepare your space.</p>
+                        </div>
+                        <form method="post" action="{% url 'booking' %}" class="space-y-10" id="bookingForm">
+                            {% csrf_token %}
+                            
+                            {# Display non-field errors #}
+                            {% if form.non_field_errors %}
+                            <div class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg" role="alert">
+                                {% for error in form.non_field_errors %}
+                                <p>{{ error }}</p>
+                                {% endfor %}
+                            </div>
+                            {% endif %}
+
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                                <div class="group">
+                                    <label class="block text-xs font-label uppercase tracking-widest rs-text-on-surface-variant mb-2 group-focus-within:rs-text-primary transition-colors" for="{{ form.full_name.id_for_label }}">{{ form.full_name.label }}</label>
+                                    <input type="text" name="{{ form.full_name.html_name }}" id="{{ form.full_name.id_for_label }}"
+                                           class="w-full rs-input-field px-0 py-3 rs-text-on-surface placeholder:rs-text-outline-variant/60 transition-all"
+                                           placeholder="Your name"
+                                           value="{{ form.full_name.value|default_if_none:'' }}"
+                                           {% if form.full_name.field.required %}required{% endif %}>
+                                    {% if form.full_name.errors %}
+                                    <p class="text-red-500 text-xs mt-1">{{ form.full_name.errors.0 }}</p>
+                                    {% endif %}
+                                </div>
+                                <div class="group">
+                                    <label class="block text-xs font-label uppercase tracking-widest rs-text-on-surface-variant mb-2 group-focus-within:rs-text-primary transition-colors" for="{{ form.email.id_for_label }}">{{ form.email.label }}</label>
+                                    <input type="email" name="{{ form.email.html_name }}" id="{{ form.email.id_for_label }}"
+                                           class="w-full rs-input-field px-0 py-3 rs-text-on-surface placeholder:rs-text-outline-variant/60 transition-all"
+                                           placeholder="Your email"
+                                           value="{{ form.email.value|default_if_none:'' }}"
+                                           {% if form.email.field.required %}required{% endif %}>
+                                    {% if form.email.errors %}
+                                    <p class="text-red-500 text-xs mt-1">{{ form.email.errors.0 }}</p>
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                                <div class="group">
+                                    <label class="block text-xs font-label uppercase tracking-widest rs-text-on-surface-variant mb-2 group-focus-within:rs-text-primary transition-colors" for="{{ form.phone_number.id_for_label }}">{{ form.phone_number.label }}</label>
+                                    <input type="text" name="{{ form.phone_number.html_name }}" id="{{ form.phone_number.id_for_label }}"
+                                           class="w-full rs-input-field px-0 py-3 rs-text-on-surface placeholder:rs-text-outline-variant/60 transition-all"
+                                           placeholder="Phone number"
+                                           value="{{ form.phone_number.value|default_if_none:'' }}">
+                                    {% if form.phone_number.errors %}
+                                    <p class="text-red-500 text-xs mt-1">{{ form.phone_number.errors.0 }}</p>
+                                    {% endif %}
+                                </div>
+                                <div class="group">
+                                    <label class="block text-xs font-label uppercase tracking-widest rs-text-on-surface-variant mb-2 group-focus-within:rs-text-primary transition-colors" for="{{ form.preferred_time.id_for_label }}">{{ form.preferred_time.label }}</label>
+                                    <select name="{{ form.preferred_time.html_name }}" id="{{ form.preferred_time.id_for_label }}"
+                                            class="w-full rs-input-field px-0 py-3 rs-text-on-surface transition-all"
+                                            {% if form.preferred_time.field.required %}required{% endif %}>
+                                        {% for choice in form.preferred_time.field.choices %}
+                                        <option value="{{ choice.0 }}" {% if form.preferred_time.value == choice.0 %}selected{% endif %}>{{ choice.1 }}</option>
+                                        {% endfor %}
+                                    </select>
+                                    {% if form.preferred_time.errors %}
+                                    <p class="text-red-500 text-xs mt-1">{{ form.preferred_time.errors.0 }}</p>
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                                <div class="group">
+                                    <label class="block text-xs font-label uppercase tracking-widest rs-text-on-surface-variant mb-2 group-focus-within:rs-text-primary transition-colors" for="{{ form.preferred_date.id_for_label }}">{{ form.preferred_date.label }}</label>
+                                    <input type="date" name="{{ form.preferred_date.html_name }}" id="{{ form.preferred_date.id_for_label }}"
+                                           class="w-full rs-input-field px-0 py-3 rs-text-on-surface transition-all"
+                                           value="{{ form.preferred_date.value|default_if_none:'' }}"
+                                           {% if form.preferred_date.field.required %}required{% endif %}>
+                                    {% if form.preferred_date.errors %}
+                                    <p class="text-red-500 text-xs mt-1">{{ form.preferred_date.errors.0 }}</p>
+                                    {% endif %}
+                                </div>
+                                <div class="group">
+                                    <label class="block text-xs font-label uppercase tracking-widest rs-text-on-surface-variant mb-2 group-focus-within:rs-text-primary transition-colors">Preferred Consultant</label>
+                                    <select name="consultant" id="id_consultant"
+                                            class="w-full rs-input-field px-0 py-3 rs-text-on-surface transition-all">
+                                        <option value="">No Preference</option>
+                                        {% for consultant in consultants %}
+                                        <option value="{{ consultant.id }}">{{ consultant.name }} — {{ consultant.specialty }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="group">
+                                <label class="block text-xs font-label uppercase tracking-widest rs-text-on-surface-variant mb-2 group-focus-within:rs-text-primary transition-colors" for="{{ form.message.id_for_label }}">{{ form.message.label }}</label>
+                                <textarea name="{{ form.message.html_name }}" id="{{ form.message.id_for_label }}"
+                                          class="w-full rs-input-field px-0 py-3 rs-text-on-surface placeholder:rs-text-outline-variant/60 transition-all resize-none"
+                                          placeholder="Injuries, meditation goals, or specific needs..."
+                                          rows="3">{{ form.message.value|default_if_none:'' }}</textarea>
+                                {% if form.message.errors %}
+                                <p class="text-red-500 text-xs mt-1">{{ form.message.errors.0 }}</p>
+                                {% endif %}
+                            </div>
+
+                            <div class="flex flex-col md:flex-row items-center justify-between gap-6 pt-6">
+                                <div class="flex items-center gap-2 text-sm rs-text-on-surface-variant">
+                                    <i class="fas fa-lock rs-text-primary text-xl"></i>
+                                    Secure booking via Yoga Kailasa
+                                </div>
+                                <button type="submit" class="w-full md:w-auto rs-btn-primary px-10 py-4 rounded-lg font-bold text-lg hover:opacity-90 active:scale-95 transition-all shadow-xl shadow-[#855300]/10">
+                                    Confirm Session Request
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+
+                    {# Trust Indicators #}
+                    <div class="mt-12 grid grid-cols-1 sm:grid-cols-3 gap-6">
+                        <div class="rs-trust-card p-6 rounded-lg text-center">
+                            <i class="fas fa-shield-alt rs-text-secondary text-3xl mb-3 block"></i>
+                            <h4 class="text-xs font-label uppercase tracking-widest mb-1 rs-text-on-surface">Private</h4>
+                            <p class="text-[11px] rs-text-on-surface-variant">Your journey is confidential.</p>
+                        </div>
+                        <div class="rs-trust-card p-6 rounded-lg text-center">
+                            <i class="fas fa-calendar-check rs-text-secondary text-3xl mb-3 block"></i>
+                            <h4 class="text-xs font-label uppercase tracking-widest mb-1 rs-text-on-surface">Flexible</h4>
+                            <p class="text-[11px] rs-text-on-surface-variant">Easy rescheduling up to 12h.</p>
+                        </div>
+                        <div class="rs-trust-card p-6 rounded-lg text-center">
+                            <i class="fas fa-spa rs-text-secondary text-3xl mb-3 block"></i>
+                            <h4 class="text-xs font-label uppercase tracking-widest mb-1 rs-text-on-surface">Radiant</h4>
+                            <p class="text-[11px] rs-text-on-surface-variant">Premium mats provided.</p>
+                        </div>
+                    </div>
                 </div>
             </div>
-            {% endif %}
+        </section>
+    </main>
+
+    {# Footer Shell #}
+    <footer class="w-full mt-24 rs-bg-surface-dim">
+        <div class="flex flex-col md:flex-row justify-between items-center px-6 md:px-12 py-16 w-full max-w-screen-2xl mx-auto">
+            <div class="rs-headline italic text-xl rs-text-primary mb-8 md:mb-0">Yoga Kailasa</div>
+            <div class="flex flex-wrap justify-center gap-8 font-sans text-sm uppercase tracking-widest rs-text-stone-500">
+                <a href="{% url 'privacy_policy' %}" class="hover:rs-text-primary underline underline-offset-4 decoration-[#855300]/30 transition-opacity">Privacy</a>
+                <a href="{% url 'about' %}" class="hover:rs-text-primary underline underline-offset-4 decoration-[#855300]/30 transition-opacity">Sustainability</a>
+                <a href="{% url 'contact' %}" class="hover:rs-text-primary underline underline-offset-4 decoration-[#855300]/30 transition-opacity">Studio Policies</a>
+                <a href="{% url 'contact' %}" class="hover:rs-text-primary underline underline-offset-4 decoration-[#855300]/30 transition-opacity">Contact</a>
+            </div>
+            <div class="mt-8 md:mt-0 rs-text-stone-500 font-sans text-xs uppercase tracking-widest">
+                &copy; {% now "Y" %} Yoga Kailasa. Radiant Sanctuary.
+            </div>
         </div>
-    </div>
-</section>
+    </footer>
+</div>
 {% endblock %}

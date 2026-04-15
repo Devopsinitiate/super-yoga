@@ -1,0 +1,4 @@
+# file: C:\Users\Orunmila1\Documents\Projects\yoga_kailasa_project\yoga_app\migrations\0004_userprofile.py
+# hypothesis_version: 6.151.12
+
+['0003_payment_user', 'ID', 'UserProfile', 'enrolled_courses', 'enrolled_users', 'id', 'user', 'yoga_app', 'yoga_app.course']

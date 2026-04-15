@@ -1,86 +1,300 @@
 {% extends 'yoga_app/base.html' %}
 {% load static %}
-{% load app_filters %}
 
-{% block title %}Our Consultants - Yoga Kailasa{% endblock %}
+{% block title %}Teacher Sanctuary - Yoga Kailasa{% endblock %}
 
 {% block meta_description %}Meet our experienced yoga and wellness consultants. Book a personalized session to deepen your practice and address specific needs.{% endblock %}
 
 {% block og_title %}Our Consultants - Yoga Kailasa{% endblock %}
 {% block og_description %}Meet our experienced yoga and wellness consultants. Book a personalized session to deepen your practice and address specific needs.{% endblock %}
-{% block og_image %}{% static 'yoga_app/images/default_consultant_og_image.jpg' %}{% endblock %} {# Placeholder for a default consultant OG image #}
+{% block og_image %}{% static 'yoga_app/images/default_consultant_og_image.jpg' %}{% endblock %}
 
 {% block extra_css %}
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif:ital,wght@0,400;0,700;1,400&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
-    /* CSS for the fade-in-up animation, specific to consultant_list.html elements */
-    @keyframes fadeInUp {
-        from {
-            opacity: 0;
-            transform: translateY(20px);
-        }
-        to {
-            opacity: 1;
-            transform: translateY(0);
-        }
+    body { font-family: 'Manrope', sans-serif; }
+    .rs-headline { font-family: 'Noto Serif', serif; line-height: 1.4; }
+    
+    .rs-surface { background-color: #fff8f3; }
+    .rs-surface-container { background-color: #f7ece1; }
+    .rs-surface-container-low { background-color: #fdf2e7; }
+    .rs-surface-container-lowest { background-color: #ffffff; }
+    .rs-surface-container-high { background-color: #f1e7db; }
+    .rs-surface-container-highest { background-color: #ebe1d6; }
+    .rs-surface-dim { background-color: #e2d8cd; }
+    
+    .rs-on-surface { color: #1f1b14; }
+    .rs-on-surface-variant { color: #534434; }
+    .rs-primary { color: #855300; }
+    .rs-primary-bg { background-color: #855300; }
+    .rs-secondary { color: #a73a00; }
+    .rs-outline { color: #867461; }
+    .rs-outline-variant { color: #d8c3ad; }
+    .rs-primary-container { color: #f59e0b; }
+    .rs-primary-container-bg { background-color: #f59e0b; }
+    .rs-on-primary { color: #ffffff; }
+    .rs-on-primary-container { color: #613b00; }
+    .rs-on-secondary-container { color: #571a00; }
+    .rs-secondary-fixed { background-color: #ffdbce; }
+    .rs-on-secondary-fixed { color: #370e00; }
+    
+    .rs-glass {
+        background-color: rgba(255, 248, 243, 0.8);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
     }
-    .animate-fade-in-up {
-        opacity: 0; /* Hidden by default */
-        animation: fadeInUp 0.6s ease-out forwards;
+    
+    .rs-btn-primary {
+        background: linear-gradient(135deg, #855300 0%, #f59e0b 100%);
+        color: #ffffff;
+        transition: all 0.3s ease;
     }
-    .consultant-card-image {
-        width: 100%;
-        height: 250px; /* Fixed height for consistent card appearance */
-        object-fit: cover;
-        border-radius: 0.75rem 0.75rem 0 0; /* rounded-xl on top corners */
+    .rs-btn-primary:hover {
+        opacity: 0.92;
+        transform: scale(1.02);
+    }
+    
+    .rs-btn-secondary {
+        background-color: #f1e7db;
+        color: #855300;
+        transition: all 0.3s ease;
+    }
+    .rs-btn-secondary:hover {
+        background-color: #ebe1d6;
+    }
+    
+    .rs-consultant-card {
+        transition: all 0.5s ease;
+    }
+    .rs-consultant-card:hover {
+        background-color: #ebe1d6;
+    }
+    .rs-consultant-card:hover .rs-consultant-image {
+        transform: scale(1.05);
+    }
+    .rs-consultant-image {
+        transition: transform 0.7s ease;
+    }
+    
+    .rs-input {
+        background-color: #ffffff;
+        border: none;
+        transition: all 0.3s ease;
+    }
+    .rs-input:focus {
+        outline: none;
+        box-shadow: 0 0 0 2px rgba(133, 83, 0, 0.2);
+    }
+    
+    /* Hide base.html elements */
+    .consultant-list-page > header,
+    .consultant-list-page > #mobile-menu,
+    .consultant-list-page > #mobile-menu-overlay,
+    .consultant-list-page > #backToTopBtn {
+        display: none !important;
+    }
+    .consultant-list-page > main {
+        padding: 0 !important;
+    }
+    
+    /* Line clamp utility */
+    .line-clamp-2 {
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+    
+    /* Asymmetric offset for second card */
+    .rs-offset-card {
+        transform: translateY(3rem);
+    }
+    @media (min-width: 1024px) {
+        .rs-offset-card {
+            transform: translateY(3rem);
+        }
     }
 </style>
 {% endblock %}
 
 {% block content %}
-<section class="py-16 bg-gradient-to-r from-amber-100 to-amber-50 min-h-screen">
-    <div class="container mx-auto px-4 max-w-6xl">
-        <div class="text-center mb-12">
-            <h2 class="text-3xl md:text-4xl font-bold text-gray-800 mb-2 animate-fade-in-up" style="animation-delay: 0.1s;">Our Expert Consultants</h2>
-            <p class="text-gray-600 max-w-2xl mx-auto animate-fade-in-up" style="animation-delay: 0.2s;">Connect with our highly experienced yoga and wellness consultants for personalized guidance and support.</p>
+<div class="consultant-list-page rs-surface min-h-screen">
+    {# Top Navigation Shell #}
+    <header class="rs-glass fixed top-0 z-50 w-full shadow-[0_32px_64px_-15px_rgba(31,27,20,0.06)]">
+        <div class="flex justify-between items-center w-full px-6 md:px-8 py-4 max-w-screen-2xl mx-auto">
+            <a href="{% url 'home' %}" class="text-2xl rs-headline italic tracking-wide rs-primary">Yoga Kailasa</a>
+            <nav class="hidden md:flex items-center gap-10">
+                <a href="{% url 'home' %}" class="rs-on-surface/60 font-medium hover:rs-primary transition-colors">Sanctuary</a>
+                <a href="{% url 'consultant_list' %}" class="rs-primary font-bold border-b-2 border-[#855300]/30">Consultants</a>
+                <a href="{% url 'courses' %}" class="rs-on-surface/60 font-medium hover:rs-primary transition-colors">Classes</a>
+                <a href="{% url 'booking' %}" class="rs-on-surface/60 font-medium hover:rs-primary transition-colors">Retreats</a>
+            </nav>
+            <div class="flex items-center gap-6">
+                <a href="{% url 'all_notifications' %}" class="rs-primary hover:bg-[#f1e7db]/50 p-2 rounded-xl transition-all">
+                    <i class="fas fa-bell"></i>
+                </a>
+                <a href="{% url 'booking' %}" class="rs-btn-primary hidden md:inline-block px-6 py-2.5 rounded-lg font-semibold tracking-tight hover:opacity-90 transition-all scale-95 active:opacity-80">
+                    Book Session
+                </a>
+                {% if user.is_authenticated %}
+                {% if user_profile.profile_picture %}
+                <img src="{{ user_profile.profile_picture.url }}" alt="User profile" class="w-10 h-10 rounded-full object-cover border-2 border-[#f59e0b]/20">
+                {% else %}
+                <div class="w-10 h-10 rounded-full rs-surface-container-high flex items-center justify-center border-2 border-[#f59e0b]/20">
+                    <i class="fas fa-user rs-primary"></i>
+                </div>
+                {% endif %}
+                {% else %}
+                <a href="{% url 'login' %}" class="rs-on-surface-variant hover:rs-primary font-medium transition-all">Sign In</a>
+                {% endif %}
+            </div>
         </div>
+    </header>
 
-        {% if consultants %}
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {% for consultant in consultants %}
-            <div class="bg-white rounded-xl shadow-lg overflow-hidden transform transition duration-300 hover:shadow-xl hover:scale-105 animate-fade-in-up" style="animation-delay: {{ forloop.counter|multiply:0.1 }}s;">
-                <a href="{% url 'consultant_detail' consultant.id %}" class="block">
-                    {% if consultant.profile_picture_url %}
-                        <img src="{{ consultant.profile_picture_url }}" alt="{{ consultant.name }}" class="consultant-card-image">
-                    {% else %}
-                        <div class="w-full h-64 bg-gray-200 flex items-center justify-center rounded-t-xl">
-                            <i class="fas fa-user-circle text-6xl text-gray-400"></i>
+    <main class="pt-24 pb-32">
+        {# Hero Section #}
+        <section class="relative px-6 md:px-8 pt-20 pb-16 overflow-hidden">
+            <div class="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+                <div class="lg:col-span-7 z-10">
+                    <span class="rs-secondary font-semibold uppercase tracking-[0.2em] text-sm mb-4 block">Professional Guidance</span>
+                    <h1 class="text-6xl md:text-8xl rs-headline rs-primary leading-[1.1] mb-8">The Teacher <br/><span class="italic">Sanctuary</span></h1>
+                    <p class="text-xl rs-on-surface-variant max-w-xl leading-relaxed mb-10 font-body">Connect with our world-class practitioners. Each guide is hand-selected to support your journey toward inner radiance and physical mastery.</p>
+                    <div class="flex flex-wrap gap-4">
+                        <div class="rs-surface-container-high px-6 py-3 rounded-xl flex items-center gap-3">
+                            <i class="fas fa-users rs-primary"></i>
+                            <span class="font-semibold rs-primary">{{ consultants|length }}+ Experts</span>
                         </div>
-                    {% endif %}
-                    <div class="p-6">
-                        <h3 class="text-2xl font-bold text-gray-800 mb-2">{{ consultant.name }}</h3>
-                        <p class="text-amber-600 font-semibold mb-3">{{ consultant.specialty }}</p>
-                        {# Apply |safe filter to bio excerpt #}
-                        <p class="text-gray-700 text-sm mb-4">{{ consultant.bio|striptags|truncatechars:120|safe }}</p>
-                        <div class="flex items-center justify-between text-gray-500 text-sm mt-4">
-                            {% if consultant.is_available %}
-                                <span class="text-green-600"><i class="fas fa-check-circle mr-1"></i> Available</span>
-                            {% else %}
-                                <span class="text-red-600"><i class="fas fa-times-circle mr-1"></i> Not Available</span>
-                            {% endif %}
-                            <span class="text-blue-600 hover:underline">View Profile <i class="fas fa-arrow-right ml-1"></i></span>
+                        <div class="rs-surface-container-high px-6 py-3 rounded-xl flex items-center gap-3">
+                            <i class="fas fa-certificate rs-primary"></i>
+                            <span class="font-semibold rs-primary">Certified Practitioners</span>
                         </div>
                     </div>
-                </a>
+                </div>
+                <div class="lg:col-span-5 relative">
+                    <div class="aspect-[4/5] rounded-[2rem] overflow-hidden shadow-2xl relative z-0">
+                        <img src="https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=800&h=1000&fit=crop" alt="Yoga studio" class="w-full h-full object-cover">
+                    </div>
+                    {# Organic Asymmetric Element #}
+                    <div class="absolute -bottom-8 -left-8 md:-left-12 rs-primary-container-bg p-8 rounded-2xl shadow-xl max-w-[240px] hidden md:block">
+                        <p class="rs-headline italic rs-on-primary text-lg">"The breath is the bridge which connects life to consciousness."</p>
+                    </div>
+                </div>
             </div>
-            {% endfor %}
-        </div>
+        </section>
+
+        {# Search & Filter Area #}
+        <section class="px-6 md:px-8 mb-20">
+            <form action="{% url 'consultant_list' %}" method="get" class="max-w-7xl mx-auto rs-surface-container-low rounded-[2rem] p-4 flex flex-col md:flex-row gap-4 items-center shadow-sm">
+                <div class="w-full md:flex-1 relative">
+                    <i class="fas fa-search absolute left-6 top-1/2 -translate-y-1/2 rs-outline"></i>
+                    <input type="search" name="q" 
+                           class="w-full rs-input rounded-2xl py-4 pl-16 pr-6 font-body transition-all rs-on-surface placeholder:rs-outline/60"
+                           placeholder="Search by name, specialty, or focus..."
+                           value="{{ query|default_if_none:'' }}">
+                </div>
+                <div class="flex gap-4 w-full md:w-auto">
+                    <button type="submit" class="rs-btn-primary flex-1 md:flex-none px-8 py-4 rounded-2xl font-semibold hover:opacity-90 transition-all shadow-lg shadow-[#855300]/10">
+                        Find Guide
+                    </button>
+                </div>
+            </form>
+        </section>
+
+        {# Consultant Profile Bento Grid #}
+        {% if consultants %}
+        <section class="px-6 md:px-8 max-w-7xl mx-auto">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
+                {% for consultant in consultants %}
+                {% if forloop.counter <= 9 %}
+                <div class="group rs-surface-container-low rounded-[2.5rem] p-4 rs-consultant-card {% if forloop.counter == 2 or forloop.counter == 5 or forloop.counter == 8 %}rs-offset-card{% endif %}">
+                    <a href="{% url 'consultant_detail' consultant.id %}" class="block">
+                        <div class="aspect-[4/3] rounded-[2rem] overflow-hidden mb-6 relative">
+                            {% if consultant.profile_picture_url %}
+                            <img src="{{ consultant.profile_picture_url }}" alt="{{ consultant.name }}" class="w-full h-full object-cover rs-consultant-image">
+                            {% else %}
+                            <div class="w-full h-full rs-surface-container flex items-center justify-center">
+                                <i class="fas fa-user-circle text-8xl rs-primary/20"></i>
+                            </div>
+                            {% endif %}
+                            <div class="absolute top-4 right-4 rs-surface-container-lowest/90 backdrop-blur px-4 py-2 rounded-full text-xs font-bold tracking-widest rs-secondary flex items-center gap-2 uppercase">
+                                {% if consultant.is_available %}
+                                <span class="w-2 h-2 rounded-full bg-green-500"></span> Available
+                                {% else %}
+                                <span class="w-2 h-2 rounded-full bg-amber-400"></span> Unavailable
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="px-4 pb-4">
+                            <div class="flex justify-between items-start mb-2">
+                                <h3 class="text-3xl rs-headline rs-primary">{{ consultant.name }}</h3>
+                            </div>
+                            <p class="rs-secondary font-semibold text-sm uppercase tracking-wider mb-4">{{ consultant.specialty }}</p>
+                            <p class="rs-on-surface-variant line-clamp-2 mb-6 leading-relaxed">{{ consultant.bio|striptags|truncatechars:150|safe }}</p>
+                            <div class="flex items-center justify-between pt-6 border-t border-[#d8c3ad]/30">
+                                <div>
+                                    <p class="text-xs rs-outline uppercase font-bold tracking-tighter">Specialty</p>
+                                    <p class="rs-on-surface font-semibold">{{ consultant.specialty|truncatechars:20 }}</p>
+                                </div>
+                                <span class="rs-surface-container-lowest rs-primary px-6 py-3 rounded-xl font-bold border border-[#855300]/10 group-hover:rs-primary-bg group-hover:text-white transition-all">
+                                    Profile
+                                </span>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+                {% endif %}
+                {% endfor %}
+            </div>
+        </section>
         {% else %}
-        <div class="text-center py-12 animate-fade-in-up" style="animation-delay: 0.4s;">
-            <i class="fas fa-frown text-6xl text-gray-400 mb-4"></i>
-            <p class="text-xl text-gray-700">No consultants found at the moment.</p>
-            <p class="text-gray-500 mt-2">Please check back later!</p>
+        {# Empty State #}
+        <div class="text-center py-20 px-6">
+            <i class="fas fa-user-friends text-6xl rs-primary/20 mb-6"></i>
+            <h3 class="rs-headline text-2xl font-bold rs-on-surface mb-2">No consultants found</h3>
+            <p class="rs-on-surface-variant mb-6">
+                {% if query %}
+                No consultants match "{{ query }}". Try a different search.
+                {% else %}
+                Our consultant network is growing. Check back soon!
+                {% endif %}
+            </p>
+            {% if query %}
+            <a href="{% url 'consultant_list' %}" class="rs-btn-primary px-8 py-3 rounded-lg font-semibold text-sm uppercase tracking-wider inline-block">
+                View All Consultants
+            </a>
+            {% endif %}
         </div>
         {% endif %}
-    </div>
-</section>
+
+        {# CTA Section #}
+        <section class="mt-40 px-6 md:px-8">
+            <div class="max-w-4xl mx-auto text-center rs-surface-container rounded-[3rem] p-16 relative overflow-hidden">
+                <div class="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-[#f59e0b]/10 to-transparent"></div>
+                <div class="relative z-10">
+                    <h2 class="text-4xl md:text-5xl rs-headline rs-primary mb-6">Unsure where to begin?</h2>
+                    <p class="text-lg rs-on-surface-variant mb-10 max-w-xl mx-auto">Book a consultation to find the teacher who resonates most with your current energetic needs.</p>
+                    <a href="{% url 'booking' %}" class="rs-btn-primary inline-block px-10 py-5 rounded-2xl font-bold text-lg shadow-2xl shadow-[#855300]/20 hover:scale-[1.02] transition-all">
+                        Book a Session
+                    </a>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    {# Footer Shell #}
+    <footer class="rs-surface-container-high py-12 px-6 md:px-8">
+        <div class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-8 items-center">
+            <div class="rs-headline italic text-lg rs-primary">Yoga Kailasa.</div>
+            <div class="flex justify-center gap-8">
+                <a href="{% url 'privacy_policy' %}" class="rs-on-surface/50 hover:rs-primary font-sans text-sm tracking-normal transition-colors">Privacy</a>
+                <a href="{% url 'about' %}" class="rs-on-surface/50 hover:rs-primary font-sans text-sm tracking-normal transition-colors">Ethics</a>
+                <a href="{% url 'contact' %}" class="rs-on-surface/50 hover:rs-primary font-sans text-sm tracking-normal transition-colors">Contact</a>
+                <a href="{% url 'home' %}" class="rs-on-surface/50 hover:rs-primary font-sans text-sm tracking-normal transition-colors">Careers</a>
+            </div>
+            <div class="text-right rs-on-surface/50 font-sans text-sm tracking-normal">
+                &copy; {% now "Y" %} Yoga Kailasa. The Radiant Sanctuary.
+            </div>
+        </div>
+    </footer>
+</div>
 {% endblock %}

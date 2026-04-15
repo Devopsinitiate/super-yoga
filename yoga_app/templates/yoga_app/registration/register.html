@@ -4,51 +4,346 @@
 
 {% block title %}Register - Yoga Kailasa{% endblock %}
 
+{% block extra_css %}
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif:wght@400;500;600;700&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+    :root {
+        --surface: #fff8f3;
+        --surface-container-lowest: #ffffff;
+        --surface-container-low: #fdf2e7;
+        --surface-container: #f7ece1;
+        --surface-container-high: #f1e7db;
+        --surface-container-highest: #ebe1d6;
+        --surface-dim: #e2d8cd;
+        --on-surface: #1f1b14;
+        --on-surface-variant: #534434;
+        --outline-variant: #d8c3ad;
+        --primary: #855300;
+        --primary-container: #f59e0b;
+        --primary-fixed: #ffddb8;
+        --secondary: #a73a00;
+        --on-primary: #ffffff;
+    }
+
+    body {
+        font-family: 'Manrope', sans-serif;
+        background-color: var(--surface);
+    }
+
+    .rs-headline {
+        font-family: 'Noto Serif', serif;
+        line-height: 1.4;
+    }
+
+    .rs-input {
+        background-color: var(--surface-container-low);
+        border: none;
+        border-bottom: 2px solid var(--outline-variant);
+        border-radius: 0.5rem;
+        padding: 1rem;
+        width: 100%;
+        color: var(--on-surface);
+        font-family: 'Manrope', sans-serif;
+        transition: all 0.3s ease;
+        outline: none;
+    }
+
+    .rs-input::placeholder {
+        color: var(--outline-variant);
+    }
+
+    .rs-input:focus {
+        background-color: var(--surface-container-lowest);
+        border-bottom-color: var(--primary);
+    }
+
+    .rs-btn-primary {
+        background: linear-gradient(135deg, var(--primary) 0%, var(--primary-container) 100%);
+        color: var(--on-primary);
+        border-radius: 0.75rem;
+        font-weight: 600;
+        transition: all 0.3s ease;
+    }
+
+    .rs-btn-primary:hover {
+        opacity: 0.92;
+        transform: scale(1.02);
+        box-shadow: 0 8px 32px rgba(133, 83, 0, 0.12);
+    }
+
+    .rs-btn-primary:active {
+        transform: scale(0.98);
+    }
+
+    .rs-glass {
+        background-color: rgba(255, 255, 255, 0.85);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+    }
+
+    .rs-editorial-offset {
+        transform: translate(-8%, 15%);
+    }
+
+    .register-page header,
+    .register-page footer,
+    .register-page #backToTopBtn,
+    .register-page #toast-container,
+    .register-page #mobile-menu,
+    .register-page #mobile-menu-overlay {
+        display: none !important;
+    }
+
+    .register-page {
+        min-height: 100vh;
+    }
+
+    .rs-feature-card {
+        background-color: var(--surface-container-lowest);
+        border-radius: 0.75rem;
+        padding: 1.25rem;
+        transition: all 0.3s ease;
+        box-shadow: 0 2px 8px rgba(31, 27, 20, 0.04);
+    }
+
+    .rs-feature-card:hover {
+        transform: translateX(4px);
+        box-shadow: 0 4px 16px rgba(31, 27, 20, 0.08);
+    }
+
+    .rs-feature-icon {
+        width: 2.5rem;
+        height: 2.5rem;
+        border-radius: 50%;
+        background: linear-gradient(135deg, var(--primary) 0%, var(--primary-container) 100%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+    }
+
+    .rs-feature-icon svg {
+        width: 1.25rem;
+        height: 1.25rem;
+        color: var(--on-primary);
+    }
+
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .rs-animate-in {
+        animation: fadeInUp 0.6s ease-out forwards;
+        opacity: 0;
+    }
+
+    .rs-animate-in:nth-child(1) { animation-delay: 0.1s; }
+    .rs-animate-in:nth-child(2) { animation-delay: 0.2s; }
+    .rs-animate-in:nth-child(3) { animation-delay: 0.3s; }
+
+    .rs-zen-tray {
+        animation: fadeInUp 0.8s ease-out 0.4s forwards;
+        opacity: 0;
+    }
+</style>
+{% endblock %}
+
 {% block content %}
-<section class="py-16 bg-gradient-to-r from-amber-100 to-amber-50 min-h-screen flex items-center justify-center">
-    <div class="bg-white p-8 rounded-lg shadow-xl text-center max-w-md w-full">
-        <h2 class="text-2xl font-bold text-gray-800 mb-6">Create Your Account</h2>
+<div class="register-page">
+    <main class="min-h-screen flex flex-col lg:flex-row">
+        {# Left Side: Brand & Serenity #}
+        <section class="relative w-full lg:w-1/2 min-h-[320px] lg:min-h-screen flex items-center justify-center p-8 lg:p-12 xl:p-16 overflow-hidden bg-gradient-to-br from-[#855300] via-[#a76900] to-[#f59e0b]">
+            {# Decorative background pattern #}
+            <div class="absolute inset-0 z-0 opacity-10">
+                <svg class="w-full h-full" viewBox="0 0 800 800" preserveAspectRatio="xMidYMid slice">
+                    <circle cx="100" cy="100" r="150" fill="white"/>
+                    <circle cx="700" cy="200" r="100" fill="white"/>
+                    <circle cx="400" cy="600" r="200" fill="white"/>
+                    <circle cx="150" cy="400" r="80" fill="white"/>
+                    <circle cx="650" cy="650" r="120" fill="white"/>
+                    <circle cx="500" cy="100" r="60" fill="white"/>
+                </svg>
+            </div>
 
-        <form method="post" action="{% url 'register' %}">
-            {% csrf_token %}
-            {% if form.errors %}
-                {# Adjusted error message block to match login.html #}
-                <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4" role="alert">
-                    <p class="font-bold">Error!</p> {# Concise error heading #}
-                    <ul>
-                        {% for field in form %}
-                            {% if field.errors %}
-                                {% for error in field.errors %}<li>{{ field.label }}: {{ error }}</li>{% endfor %}
-                            {% endif %}
-                        {% endfor %}
-                        {% if form.non_field_errors %}
-                            {% for error in form.non_field_errors %}<li>{{ error }}</li>{% endfor %}
-                        {% endif %}
-                    </ul>
+            {# Brand Content #}
+            <div class="relative z-10 max-w-lg w-full">
+                <span class="inline-block px-4 py-1.5 mb-6 text-xs font-bold tracking-widest text-[#ffddb8] uppercase bg-white/20 rounded-full backdrop-blur-sm">
+                    Your Inner Light Awaits
+                </span>
+                <h1 class="rs-headline text-4xl md:text-5xl xl:text-6xl leading-tight mb-10 text-white">
+                    Find Your <span class="italic text-[#ffddb8]">Sanctuary</span>
+                </h1>
+                <div class="space-y-4">
+                    <div class="rs-feature-card rs-animate-in">
+                        <div class="flex items-start gap-4">
+                            <div class="rs-feature-icon">
+                                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1 -8.313 -12.454z"/>
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17 4a2 2 0 0 0 2 2a2 2 0 0 0 -2 2a2 2 0 0 0 -2 -2a2 2 0 0 0 2 -2"/>
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M21 12h-6"/>
+                                </svg>
+                            </div>
+                            <div>
+                                <h3 class="font-bold text-lg text-[#1f1b14]">Expert-Led Courses</h3>
+                                <p class="text-[#534434] leading-relaxed text-sm mt-1">Deepen your practice with world-renowned instructors guiding every breath.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="rs-feature-card rs-animate-in">
+                        <div class="flex items-start gap-4">
+                            <div class="rs-feature-icon">
+                                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 0 1 3 19.875v-6.75ZM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 0 1-1.125-1.125V8.625ZM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 0 1-1.125-1.125V4.125Z"/>
+                                </svg>
+                            </div>
+                            <div>
+                                <h3 class="font-bold text-lg text-[#1f1b14]">Progress Tracking</h3>
+                                <p class="text-[#534434] leading-relaxed text-sm mt-1">Visualize your journey through mindfulness and physical endurance metrics.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="rs-feature-card rs-animate-in">
+                        <div class="flex items-start gap-4">
+                            <div class="rs-feature-icon">
+                                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M18 18.72a9.094 9.094 0 0 0 3.741-.479 3 3 0 0 0-4.682-2.72m.94 3.198.001.031c0 .225-.012.447-.037.666A11.944 11.944 0 0 1 12 21c-2.17 0-4.207-.576-5.963-1.584A6.062 6.062 0 0 1 6 18.719m12 0a5.971 5.971 0 0 0-.941-3.197m0 0A5.995 5.995 0 0 0 12 12.75a5.995 5.995 0 0 0-5.058 2.772m0 0a3 3 0 0 0-4.681 2.72 8.986 8.986 0 0 0 3.74.477m.94-3.197a5.971 5.971 0 0 0-.94 3.197M15 6.75a3 3 0 1 1-6 0 3 3 0 0 1 6 0Zm6 3a2.25 2.25 0 1 1-4.5 0 2.25 2.25 0 0 1 4.5 0Zm-13.5 0a2.25 2.25 0 1 1-4.5 0 2.25 2.25 0 0 1 4.5 0Z"/>
+                                </svg>
+                            </div>
+                            <div>
+                                <h3 class="font-bold text-lg text-[#1f1b14]">Supportive Community</h3>
+                                <p class="text-[#534434] leading-relaxed text-sm mt-1">Join a collective of seekers dedicated to growth, peace, and shared presence.</p>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-            {% endif %}
+            </div>
 
-            {# This loop will now correctly render all fields with styling from forms.py #}
-            {% for field in form %}
-                <div class="mb-4"> {# Use mb-4 for all fields for consistent spacing #}
-                    <label for="{{ field.id_for_label }}" class="block text-gray-700 text-sm font-medium mb-2 text-left">{{ field.label }}</label>
-                    {{ field }}
-                    {% if field.help_text %}
-                        <p class="text-xs text-gray-500 mt-1 text-left">{{ field.help_text }}</p>
+            {# Floating Zen Tray #}
+            <div class="hidden xl:block absolute bottom-12 right-8 rs-editorial-offset w-64 rs-glass rounded-2xl shadow-xl p-6 rs-zen-tray">
+                <div class="flex items-center gap-3 mb-4">
+                    <div class="w-10 h-10 rounded-full bg-gradient-to-br from-[#855300] to-[#f59e0b] flex items-center justify-center">
+                        <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z"/>
+                        </svg>
+                    </div>
+                    <span class="text-xs font-bold uppercase tracking-tighter text-[#534434]">Daily Intention</span>
+                </div>
+                <p class="rs-headline text-lg leading-snug text-[#1f1b14]">"The soul is dyed with the color of its thoughts."</p>
+                <div class="mt-4 pt-4 flex justify-between items-center" style="border-top: 1px solid rgba(216, 195, 173, 0.3);">
+                    <span class="text-xs text-[#a73a00] font-semibold">12.4k Meditating Now</span>
+                    <div class="flex -space-x-2">
+                        <div class="w-6 h-6 rounded-full bg-[#e2d8cd] border-2 border-white"></div>
+                        <div class="w-6 h-6 rounded-full bg-[#ffddb8] border-2 border-white"></div>
+                        <div class="w-6 h-6 rounded-full bg-[#f59e0b] border-2 border-white"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        {# Right Side: Registration Form #}
+        <section class="w-full lg:w-1/2 flex items-center justify-center p-8 sm:p-12 lg:p-16 xl:p-24 bg-[#fff8f3]">
+            <div class="w-full max-w-md">
+                <div class="mb-10">
+                    <a href="{% url 'home' %}" class="inline-flex items-center gap-3 mb-8">
+                        <img src="{% static 'yoga_app/images/logo.jpg' %}" alt="Yoga Kailasa Logo" class="h-10 w-10 rounded-full object-cover">
+                        <span class="rs-headline text-2xl font-bold text-[#855300]">Yoga Kailasa</span>
+                    </a>
+                    <h2 class="rs-headline text-3xl text-[#1f1b14] mb-2">Create Your Account</h2>
+                    <p class="text-[#534434]">Begin your journey to mindfulness today.</p>
+                </div>
+
+                <form method="post" action="{% url 'register' %}" class="space-y-5">
+                    {% csrf_token %}
+
+                    {% if form.errors %}
+                    <div class="bg-[#ffdad6] border-l-4 border-[#ba1a1a] p-4 rounded-r-lg" role="alert">
+                        <div class="flex">
+                            <svg class="w-5 h-5 text-[#ba1a1a] mt-0.5 mr-3 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
+                            </svg>
+                            <div>
+                                <p class="text-sm font-medium text-[#ba1a1a]">Please correct the following errors:</p>
+                                <ul class="mt-1 text-sm text-[#ba1a1a] list-disc list-inside">
+                                    {% for field in form %}
+                                        {% for error in field.errors %}
+                                            <li>{{ error }}</li>
+                                        {% endfor %}
+                                    {% endfor %}
+                                    {% for error in form.non_field_errors %}
+                                        <li>{{ error }}</li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
                     {% endif %}
-                    {% for error in field.errors %}
-                        <p class="text-red-500 text-xs italic text-left">{{ error }}</p>
+
+                    {% for field in form %}
+                    <div>
+                        <label for="{{ field.id_for_label }}" class="block text-sm font-semibold text-[#534434] ml-1 mb-1.5">{{ field.label }}</label>
+                        <div class="relative group">
+                            <input type="{{ field.field.widget.input_type|default:'text' }}"
+                                   name="{{ field.html_name }}"
+                                   id="{{ field.id_for_label }}"
+                                   class="rs-input"
+                                   placeholder="{% if field.field.widget.input_type == 'password' %}••••••••{% else %}{{ field.label }}{% endif %}"
+                                   {% if field.field.required %}required{% endif %}
+                                   {% if field.value %}value="{{ field.value }}"{% endif %}
+                                   autocomplete="{% if 'username' in field.name %}username{% elif 'email' in field.name %}email{% elif 'password1' in field.name %}new-password{% elif 'password2' in field.name %}new-password{% endif %}">
+                        </div>
+                        {% if field.help_text %}
+                            <p class="mt-1.5 text-xs text-[#534434]">{{ field.help_text }}</p>
+                        {% endif %}
+                        {% for error in field.errors %}
+                            <p class="mt-1 text-xs text-[#ba1a1a]">{{ error }}</p>
+                        {% endfor %}
+                    </div>
                     {% endfor %}
+
+                    <div class="pt-2">
+                        <button type="submit" class="rs-btn-primary w-full py-4 px-6 text-lg">
+                            Create Your Account
+                        </button>
+                    </div>
+                </form>
+
+                <div class="mt-8 text-center">
+                    <p class="text-[#534434]">
+                        Already have an account?
+                        <a href="{% url 'login' %}" class="text-[#855300] font-bold hover:underline ml-1">Sign In</a>
+                    </p>
                 </div>
-            {% endfor %}
 
-            <button type="submit" class="w-full bg-amber-500 hover:bg-amber-600 text-white font-medium py-3 px-4 rounded-lg transition duration-300">
-                Register
-            </button>
-        </form>
+                <div class="mt-12 flex justify-center gap-6 text-[#d8c3ad]/40">
+                    <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                    </svg>
+                    <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/>
+                    </svg>
+                    <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
+                    </svg>
+                </div>
+            </div>
+        </section>
+    </main>
 
-        <p class="mt-6 text-gray-600 text-sm">Already have an account? <a href="{% url 'login' %}" class="text-amber-500 hover:text-amber-600 font-semibold">Log In here</a></p>
-        <p class="mt-2 text-gray-600 text-sm">Forgot your password? <a href="{% url 'password_reset' %}" class="text-blue-500 hover:text-blue-600 font-semibold">Reset it</a></p>
-    </div>
-</section>
+    <footer class="bg-[#e2d8cd] py-6 px-8 flex flex-col md:flex-row justify-between items-center gap-4">
+        <div class="rs-headline text-xl text-[#855300] opacity-60">Yoga Kailasa</div>
+        <div class="flex gap-6 text-sm font-medium text-[#534434]/70">
+            <a href="{% url 'home' %}" class="hover:text-[#855300] transition-colors">Home</a>
+            <a href="{% url 'about' %}" class="hover:text-[#855300] transition-colors">Philosophy</a>
+            <a href="{% url 'contact' %}" class="hover:text-[#855300] transition-colors">Support</a>
+        </div>
+        <div class="text-xs text-[#534434]/50">&copy; {% now "Y" %} Yoga Kailasa Sanctuary. All rights reserved.</div>
+    </footer>
+</div>
 {% endblock %}

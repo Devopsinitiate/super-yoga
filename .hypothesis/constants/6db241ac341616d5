@@ -1,0 +1,4 @@
+# file: C:\Users\Orunmila1\Documents\Projects\yoga_kailasa_project\yoga_app\services\notification_service.py
+# hypothesis_version: 6.151.12
+
+['%b %d, %Y %I:%M %p', '-created_at', 'blog_comment', 'blog_detail', 'blog_post', 'blog_post_like', 'created_at', 'get_absolute_url', 'id', 'like', 'link', 'message', 'post', 'read', 'reply', 'sender', 'sender_username', 'topic', 'type', 'updated_at']

@@ -1,5 +1,6 @@
 {% extends 'yoga_app/base.html' %}
 {% load static %}
+{% load app_filters %}
 
 {% block title %}
     {% if current_lesson %}
@@ -9,7 +10,6 @@
     {% endif %}
 {% endblock %}
 
-{# NEW: Dynamic Meta Description for SEO #}
 {% block meta_description %}
     {% if current_lesson %}
         Learn about "{{ current_lesson.title }}" in the "{{ course.title }}" course. {{ current_lesson.content|striptags|truncatechars:160 }}
@@ -18,7 +18,6 @@
     {% endif %}
 {% endblock %}
 
-{# NEW: Dynamic Open Graph Tags for Social Sharing #}
 {% block og_title %}
     {% if current_lesson %}
         {{ current_lesson.title }} - {{ course.title }} Content
@@ -37,207 +36,491 @@
 
 {% block og_image %}{% if course.image_url %}{{ course.image_url }}{% else %}{% static 'yoga_app/images/default_course_og_image.jpg' %}{% endif %}{% endblock %}
 
+{% block extra_css %}
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif:ital,wght@0,400;0,600;0,700;1,600&family=Manrope:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+    body { font-family: 'Manrope', sans-serif; }
+    .rs-headline { font-family: 'Noto Serif', serif; line-height: 1.4; }
+    
+    .rs-surface { background-color: #fff8f3; }
+    .rs-surface-container { background-color: #f7ece1; }
+    .rs-surface-container-low { background-color: #fdf2e7; }
+    .rs-surface-container-lowest { background-color: #ffffff; }
+    .rs-surface-container-high { background-color: #f1e7db; }
+    .rs-surface-container-highest { background-color: #ebe1d6; }
+    .rs-surface-dim { background-color: #e2d8cd; }
+    
+    .rs-on-surface { color: #1f1b14; }
+    .rs-on-surface-variant { color: #534434; }
+    .rs-primary { color: #855300; }
+    .rs-secondary { color: #a73a00; }
+    .rs-outline-variant { color: #d8c3ad; }
+    .rs-primary-container { color: #f59e0b; }
+    .rs-on-primary { color: #ffffff; }
+    .rs-on-primary-container { color: #613b00; }
+    .rs-on-secondary-container { color: #571a00; }
+    
+    .rs-glass {
+        background-color: rgba(255, 248, 243, 0.8);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+    }
+    
+    .rs-btn-primary {
+        background: linear-gradient(135deg, #855300 0%, #f59e0b 100%);
+        color: #ffffff;
+        transition: all 0.3s ease;
+    }
+    .rs-btn-primary:hover {
+        opacity: 0.92;
+        transform: scale(1.02);
+    }
+    
+    .rs-btn-secondary {
+        background-color: #f1e7db;
+        color: #855300;
+        transition: all 0.3s ease;
+    }
+    .rs-btn-secondary:hover {
+        background-color: #ebe1d6;
+    }
+    
+    .rs-progress-bg {
+        background-color: rgba(216, 195, 173, 0.3);
+    }
+    .rs-progress-fill {
+        background-color: #855300;
+    }
+    
+    .rs-lesson-item {
+        transition: all 0.2s ease;
+    }
+    .rs-lesson-item:hover {
+        background-color: #f1e7db;
+        transform: translateX(4px);
+    }
+    .rs-lesson-item.active {
+        background-color: #f1e7db;
+        color: #855300;
+        font-weight: 600;
+        border-right: 3px solid #855300;
+    }
+    
+    .rs-comment-item {
+        transition: background-color 0.2s ease;
+    }
+    .rs-comment-item:hover {
+        background-color: #f1e7db;
+    }
+    
+    .rs-input {
+        background-color: #fdf2e7;
+        border: none;
+        border-bottom: 2px solid rgba(216, 195, 173, 0.2);
+        transition: all 0.3s ease;
+    }
+    .rs-input:focus {
+        border-bottom-color: #855300;
+        outline: none;
+        background-color: #ffffff;
+    }
+    
+    /* Hide base.html elements */
+    .course-content-page > header,
+    .course-content-page > #mobile-menu,
+    .course-content-page > #mobile-menu-overlay,
+    .course-content-page > #backToTopBtn {
+        display: none !important;
+    }
+    
+    /* CKEditor content styling */
+    .rs-lesson-content h1, .rs-lesson-content h2, .rs-lesson-content h3 {
+        font-family: 'Noto Serif', serif;
+        color: #855300;
+        margin-top: 1.5rem;
+        margin-bottom: 0.75rem;
+    }
+    .rs-lesson-content p {
+        margin-bottom: 1rem;
+        line-height: 1.7;
+        color: #534434;
+    }
+    .rs-lesson-content ul, .rs-lesson-content ol {
+        margin-left: 1.5rem;
+        margin-bottom: 1rem;
+    }
+    .rs-lesson-content img {
+        border-radius: 0.75rem;
+        margin: 1rem 0;
+    }
+    
+    /* Hide horizontal scrollbar for sidebar */
+    .rs-sidebar-scroll::-webkit-scrollbar {
+        width: 4px;
+    }
+    .rs-sidebar-scroll::-webkit-scrollbar-track {
+        background: transparent;
+    }
+    .rs-sidebar-scroll::-webkit-scrollbar-thumb {
+        background: #d8c3ad;
+        border-radius: 2px;
+    }
+</style>
+{% endblock %}
 
 {% block content %}
-<section class="py-16 bg-gradient-to-r from-amber-100 to-amber-50 min-h-screen">
-    <div class="container mx-auto px-4 max-w-6xl">
-        <div class="bg-white p-8 rounded-xl shadow-lg">
-            <h2 class="text-3xl font-bold text-gray-800 mb-4 text-center">{{ course.title }}</h2>
-            <p class="text-gray-600 text-center mb-8">Structured Course Content</p>
-
-            {# Course Progress Bar #}
-            <div class="mb-8 p-4 bg-blue-50 rounded-lg shadow-inner">
-                <h3 class="text-xl font-semibold text-blue-800 mb-2">Your Progress</h3>
-                <div class="w-full bg-gray-200 rounded-full h-4">
-                    <div class="bg-blue-600 h-4 rounded-full transition-all duration-500 ease-out" style="width: {{ progress_percentage }}%"></div>
+<div class="course-content-page rs-surface min-h-screen">
+    {# Top Navigation Bar #}
+    <header class="rs-glass fixed top-0 left-0 right-0 z-50 border-b border-[#d8c3ad]/10">
+        <nav class="flex justify-between items-center px-6 md:px-8 h-20 max-w-screen-2xl mx-auto">
+            <div class="flex items-center gap-8">
+                <a href="{% url 'home' %}" class="rs-headline text-2xl font-semibold italic rs-primary">Yoga Kailasa</a>
+                <nav class="hidden md:flex gap-6 rs-headline text-lg tracking-tight">
+                    <a href="{% url 'dashboard' %}" class="rs-on-surface-variant hover:rs-primary transition-colors duration-300">My Practice</a>
+                    <a href="{% url 'course_discussion_list' course.id %}" class="rs-on-surface-variant hover:rs-primary transition-colors duration-300">Community</a>
+                </nav>
+            </div>
+            <div class="flex items-center gap-4">
+                <a href="{% url 'dashboard' %}" class="rs-on-surface-variant hover:rs-primary transition-colors duration-300">
+                    <i class="fas fa-arrow-left text-lg"></i>
+                </a>
+                {% if user_profile.profile_picture %}
+                <img src="{{ user_profile.profile_picture.url }}" alt="Profile" class="w-10 h-10 rounded-full object-cover">
+                {% else %}
+                <div class="w-10 h-10 rounded-full rs-surface-container flex items-center justify-center">
+                    <i class="fas fa-user rs-on-surface-variant"></i>
                 </div>
-                <p class="text-blue-700 text-sm mt-2">{{ completed_lessons_count }} of {{ total_lessons }} lessons completed ({{ progress_percentage }}%)</p>
-                {# Mark Course Complete Button #}
-                {% if progress_percentage == 100 and not course_is_completed_by_user %}
-                    <form action="{% url 'mark_course_complete' course.id %}" method="post" class="mt-4 text-center">
-                        {% csrf_token %}
-                        <button type="submit" class="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-full font-bold shadow-lg transition duration-300">
-                            Mark Course as Complete <i class="fas fa-award ml-2"></i>
-                        </button>
-                    </form>
-                {% elif progress_percentage == 100 and course_is_completed_by_user %}
-                    <p class="text-center text-green-700 font-semibold mt-4"><i class="fas fa-check-double mr-2"></i> You have completed this course!</p>
                 {% endif %}
             </div>
+        </nav>
+    </header>
 
-            {# Navigation to Dashboard and Discussion Forum #}
-            <div class="flex flex-wrap justify-center gap-4 mb-8">
-                <a href="{% url 'dashboard' %}" class="inline-flex items-center bg-gray-200 hover:bg-gray-300 text-gray-800 px-6 py-3 rounded-full transition duration-300">
-                    <i class="fas fa-arrow-left mr-2"></i> Back to Dashboard
-                </a>
-                <a href="{% url 'course_discussion_list' course.id %}" class="inline-flex items-center bg-purple-600 hover:bg-purple-700 text-white px-6 py-3 rounded-full transition duration-300">
-                    <i class="fas fa-comments mr-2"></i> Course Discussion Forum
+    <div class="flex pt-20">
+        {# Side Navigation Bar #}
+        <aside class="h-screen w-80 fixed left-0 rs-surface flex flex-col gap-4 py-8 pl-6 pr-4 overflow-y-auto hidden md:flex rs-sidebar-scroll z-40 border-r border-[#d8c3ad]/10">
+            <div class="mb-6 px-2">
+                <h2 class="rs-headline text-xl font-bold rs-primary">{{ course.title }}</h2>
+                {% if current_lesson %}
+                <p class="text-xs font-medium tracking-wide rs-on-surface-variant opacity-70">{{ current_lesson.module.title }}</p>
+                {% endif %}
+            </div>
+            
+            {# Progress Summary #}
+            <div class="px-2 mb-4">
+                <div class="flex justify-between text-xs rs-on-surface-variant mb-1">
+                    <span>Progress</span>
+                    <span class="rs-primary font-semibold">{{ progress_percentage }}%</span>
+                </div>
+                <div class="w-full rs-progress-bg h-1.5 rounded-full overflow-hidden">
+                    <div class="rs-progress-fill h-full rounded-full transition-all duration-500" style="width: {{ progress_percentage }}%"></div>
+                </div>
+            </div>
+            
+            <nav class="flex flex-col gap-1">
+                {% for module in modules %}
+                <div class="mb-2">
+                    <h4 class="text-xs font-bold uppercase tracking-widest rs-on-surface-variant px-3 py-2">{{ module.order }}. {{ module.title }}</h4>
+                    {% with lessons=module.lessons.all %}
+                    {% if lessons %}
+                    {% for lesson in lessons %}
+                    <a href="{% url 'course_content' course.id lesson.id %}"
+                       class="flex items-center gap-3 p-3 rs-lesson-item rounded-r-lg text-sm font-medium tracking-wide
+                              {% if current_lesson and lesson.id == current_lesson.id %}active{% else %}rs-on-surface-variant{% endif %}">
+                        {% if lesson.id in completed_lesson_ids %}
+                        <i class="fas fa-check-circle text-emerald-600 text-sm"></i>
+                        {% else %}
+                        <i class="far fa-circle text-sm rs-outline-variant"></i>
+                        {% endif %}
+                        <span>{{ lesson.order }}. {{ lesson.title }}</span>
+                    </a>
+                    {% endfor %}
+                    {% else %}
+                    <p class="text-xs rs-on-surface-variant px-3 py-2">No lessons yet</p>
+                    {% endif %}
+                    {% endwith %}
+                </div>
+                {% empty %}
+                <p class="text-sm rs-on-surface-variant px-3">No lessons found for this course yet.</p>
+                {% endfor %}
+            </nav>
+            
+            <div class="mt-auto p-4 rs-surface-container-low rounded-xl">
+                <p class="text-xs rs-on-surface-variant mb-3">Stuck in your practice?</p>
+                <a href="{% url 'course_discussion_list' course.id %}" class="block w-full rs-btn-primary text-center py-2 rounded-lg text-sm font-semibold">
+                    Ask the Community
                 </a>
             </div>
+        </aside>
 
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-                {# Left Sidebar: Modules & Lessons Navigation #}
-                <div class="md:col-span-1 bg-gray-50 p-6 rounded-lg shadow-md">
-                    <h3 class="text-2xl font-bold text-gray-800 mb-6">Course Outline</h3>
-                    <nav>
-                        {% for module in modules %}
-                            <div class="mb-6">
-                                <h4 class="text-xl font-semibold text-amber-700 mb-3 flex items-center">
-                                    <i class="fas fa-folder-open mr-2"></i> {{ module.order }}. {{ module.title }}
-                                </h4>
-                                {% if module.description %}
-                                    <p class="text-gray-600 text-sm mb-3">{{ module.description|safe }}</p>
-                                {% endif %}
-                                <ul class="space-y-2 pl-4 border-l-2 border-amber-200">
-                                    {% for lesson in module.lessons.all %}
-                                        <li>
-                                            <a href="{% url 'course_content' course.id lesson.id %}"
-                                               class="flex items-center p-2 rounded-md transition duration-200
-                                                      {% if current_lesson and lesson.id == current_lesson.id %}
-                                                          bg-amber-100 text-amber-800 font-bold shadow
-                                                      {% else %}
-                                                          text-gray-700 hover:bg-amber-50 hover:text-amber-700
-                                                      {% endif %}">
-                                                {% if lesson.id in completed_lesson_ids %}
-                                                    <i class="fas fa-check-circle text-green-500 mr-2"></i>
-                                                {% else %}
-                                                    <i class="far fa-circle text-gray-400 mr-2"></i>
-                                                {% endif %}
-                                                {{ module.order }}.{{ lesson.order }} {{ lesson.title }}
-                                            </a>
-                                        </li>
-                                    {% endfor %}
-                                </ul>
-                            </div>
-                        {% empty %}
-                            <p class="text-gray-600">No modules or lessons found for this course yet.</p>
-                        {% endfor %}
-                    </nav>
+        {# Main Content Area #}
+        <main class="flex-1 md:ml-80 min-h-screen">
+            <div class="max-w-5xl mx-auto px-6 py-10">
+                {% if current_lesson %}
+                {# Video Section #}
+                {% if current_lesson.video_url %}
+                <div class="relative group aspect-video rs-surface-container-high rounded-xl overflow-hidden mb-10 shadow-sm">
+                    <iframe src="{{ current_lesson.video_url|embed_url }}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen referrerpolicy="strict-origin-when-cross-origin" class="w-full h-full"></iframe>
                 </div>
-
-                {# Right Main Content: Current Lesson Display #}
-                <div class="md:col-span-2 bg-white p-6 rounded-lg shadow-md border border-gray-100">
-                    {% if current_lesson %}
-                        <h3 class="text-2xl font-bold text-gray-800 mb-4">{{ current_lesson.title }}</h3>
-                        <p class="text-gray-600 text-sm mb-6">Module: {{ current_lesson.module.title }}</p>
-
-                        {% if current_lesson.video_url %}
-                            <div class="aspect-w-16 aspect-h-9 mb-6 rounded-lg overflow-hidden shadow-md">
-                                <iframe src="{{ current_lesson.video_url }}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen class="w-full h-full"></iframe>
-                            </div>
-                        {% endif %}
-
-                        <div class="prose max-w-none text-gray-700 leading-relaxed mb-8">
-                            {{ current_lesson.content|safe }}
+                {% else %}
+                <div class="relative group aspect-video rs-surface-container-high rounded-xl overflow-hidden mb-10 shadow-sm flex items-center justify-center">
+                    {% if course.image_url %}
+                    <img src="{{ course.image_url }}" alt="{{ course.title }}" class="w-full h-full object-cover">
+                    {% else %}
+                    <div class="w-full h-full rs-surface-container flex items-center justify-center">
+                        <i class="fas fa-spa text-6xl rs-primary/20"></i>
+                    </div>
+                    {% endif %}
+                    <div class="absolute inset-0 bg-black/20 flex items-center justify-center">
+                        <div class="w-20 h-20 rs-primary/90 rs-on-primary rounded-full flex items-center justify-center backdrop-blur-md transform transition-transform hover:scale-110">
+                            <i class="fas fa-play text-2xl ml-1"></i>
                         </div>
-
-                        {# Mark Lesson Complete Button #}
+                    </div>
+                </div>
+                {% endif %}
+                
+                {# Lesson Header & Progress #}
+                <div class="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12">
+                    <div>
+                        <div class="flex items-center gap-2 rs-secondary font-medium text-sm mb-2">
+                            <i class="fas fa-bookmark text-sm"></i>
+                            <span>MODULE {{ current_lesson.module.order }}: {{ current_lesson.module.title|upper }}</span>
+                        </div>
+                        <h1 class="rs-headline text-4xl md:text-5xl font-bold rs-on-surface leading-tight">{{ current_lesson.title }}</h1>
+                    </div>
+                    <div class="flex items-center gap-4">
+                        <div class="text-right">
+                            <p class="text-xs font-bold rs-on-surface-variant uppercase tracking-widest mb-1">Your Progress</p>
+                            <div class="flex items-center gap-3">
+                                <div class="w-32 h-1.5 rs-surface-container-high rounded-full overflow-hidden">
+                                    <div class="w-[{{ progress_percentage }}%] h-full rs-primary rounded-full"></div>
+                                </div>
+                                <span class="text-sm font-semibold rs-primary">{{ progress_percentage }}%</span>
+                            </div>
+                        </div>
                         {% if current_lesson.id not in completed_lesson_ids %}
-                            <form action="{% url 'mark_lesson_complete' course.id current_lesson.id %}" method="post" class="text-center mt-6">
+                        <form action="{% url 'mark_lesson_complete' course.id current_lesson.id %}" method="post">
+                            {% csrf_token %}
+                            <button type="submit" class="rs-btn-primary px-6 py-3 rounded-lg font-bold flex items-center gap-2">
+                                <i class="fas fa-check-circle text-lg"></i>
+                                Mark as Complete
+                            </button>
+                        </form>
+                        {% else %}
+                        <span class="rs-primary font-bold flex items-center gap-2">
+                            <i class="fas fa-check-double text-lg"></i>
+                            Completed
+                        </span>
+                        {% endif %}
+                    </div>
+                </div>
+                
+                {# Lesson Content Bento Grid #}
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16">
+                    {# Text Content #}
+                    <div class="md:col-span-2 space-y-8">
+                        <div class="rs-surface-container-low p-8 rounded-xl">
+                            {% if current_lesson.content %}
+                            <div class="rs-lesson-content">
+                                {{ current_lesson.content|safe }}
+                            </div>
+                            {% else %}
+                            <h3 class="rs-headline text-2xl font-semibold mb-4 rs-primary">Lesson Content</h3>
+                            <p class="rs-on-surface-variant leading-relaxed">Content for this lesson will be available soon. Check back later or explore other lessons in this course.</p>
+                            {% endif %}
+                        </div>
+                        
+                        {# Resources #}
+                        {% if current_lesson.resources_content %}
+                        <div class="space-y-6">
+                            <h3 class="rs-headline text-2xl font-semibold rs-primary">Additional Resources</h3>
+                            <div class="rs-lesson-content">
+                                {{ current_lesson.resources_content|safe }}
+                            </div>
+                        </div>
+                        {% endif %}
+                    </div>
+                    
+                    {# Sidebar Info #}
+                    <div class="space-y-6">
+                        {# Lesson Info #}
+                        <div class="rs-surface-container p-6 rounded-xl">
+                            <h4 class="font-bold text-sm uppercase tracking-wider mb-4">Lesson Details</h4>
+                            <ul class="space-y-3">
+                                <li class="flex items-center gap-2 text-sm rs-on-surface-variant">
+                                    <i class="fas fa-clock rs-primary"></i>
+                                    {% if current_lesson.duration_minutes %}{{ current_lesson.duration_minutes }} minutes{% else %}Self-paced{% endif %}
+                                </li>
+                                <li class="flex items-center gap-2 text-sm rs-on-surface-variant">
+                                    <i class="fas fa-layer-group rs-primary"></i>
+                                    Module {{ current_lesson.module.order }} of {{ modules|length }}
+                                </li>
+                                <li class="flex items-center gap-2 text-sm rs-on-surface-variant">
+                                    <i class="fas fa-list-ol rs-primary"></i>
+                                    Lesson {{ current_lesson.order }} of {{ current_lesson.module.lessons.count }}
+                                </li>
+                            </ul>
+                        </div>
+                        
+                        {# Navigation #}
+                        <div class="rs-surface-container-highest p-6 rounded-xl space-y-3">
+                            <h4 class="font-bold text-sm uppercase tracking-wider mb-4">Navigate</h4>
+                            {% if previous_lesson %}
+                            <a href="{% url 'course_content' course.id previous_lesson.id %}" class="flex items-center justify-between p-3 rs-surface rounded-lg hover:translate-x-1 transition-transform group">
+                                <div class="flex items-center gap-3">
+                                    <i class="fas fa-chevron-left rs-secondary text-sm"></i>
+                                    <span class="text-xs font-semibold">Previous</span>
+                                </div>
+                                <span class="text-xs rs-on-surface-variant truncate max-w-[120px]">{{ previous_lesson.title }}</span>
+                            </a>
+                            {% endif %}
+                            {% if next_lesson %}
+                            <a href="{% url 'course_content' course.id next_lesson.id %}" class="flex items-center justify-between p-3 rs-surface rounded-lg hover:translate-x-1 transition-transform group">
+                                <div class="flex items-center gap-3">
+                                    <i class="fas fa-chevron-right rs-primary text-sm"></i>
+                                    <span class="text-xs font-semibold">Next</span>
+                                </div>
+                                <span class="text-xs rs-on-surface-variant truncate max-w-[120px]">{{ next_lesson.title }}</span>
+                            </a>
+                            {% endif %}
+                        </div>
+                        
+                        {# Mark Course Complete #}
+                        {% if progress_percentage == 100 and not course_is_completed_by_user %}
+                        <div class="rs-primary p-6 rounded-xl text-center">
+                            <i class="fas fa-award text-3xl rs-on-primary mb-3"></i>
+                            <p class="rs-on-primary font-bold text-sm mb-3">All lessons completed!</p>
+                            <form action="{% url 'mark_course_complete' course.id %}" method="post">
                                 {% csrf_token %}
-                                <button type="submit" class="bg-amber-500 hover:bg-amber-600 text-white px-6 py-3 rounded-full transition duration-300">
-                                    Mark as Complete <i class="fas fa-check ml-2"></i>
+                                <button type="submit" class="w-fit rs-surface-container-lowest rs-primary px-6 py-2 rounded-lg font-bold text-sm hover:bg-[#f59e0b] transition-colors">
+                                    Mark Course Complete
                                 </button>
                             </form>
-                        {% else %}
-                            <p class="text-center text-green-600 font-semibold mt-6">
-                                <i class="fas fa-check-circle mr-2"></i> This lesson is complete!
-                            </p>
+                        </div>
+                        {% elif course_is_completed_by_user %}
+                        <div class="rs-surface-container p-6 rounded-xl text-center">
+                            <i class="fas fa-check-double text-3xl text-emerald-600 mb-3"></i>
+                            <p class="rs-on-surface font-bold text-sm">Course Completed!</p>
+                        </div>
                         {% endif %}
-
-                        {# Next/Previous Lesson Navigation #}
-                        <div class="flex justify-between mt-8 pt-4 border-t border-gray-200">
-                            {% if previous_lesson %}
-                                <a href="{% url 'course_content' course.id previous_lesson.id %}"
-                                   class="inline-flex items-center bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-full transition duration-300">
-                                    <i class="fas fa-chevron-left mr-2"></i> Previous Lesson
-                                </a>
-                            {% else %}
-                                <span class="inline-flex items-center bg-gray-300 text-gray-600 px-4 py-2 rounded-full cursor-not-allowed">
-                                    <i class="fas fa-chevron-left mr-2"></i> Previous Lesson
-                                </span>
-                            {% endif %}
-
-                            {% if next_lesson %}
-                                <a href="{% url 'course_content' course.id next_lesson.id %}"
-                                   class="inline-flex items-center bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-full transition duration-300">
-                                    Next Lesson <i class="fas fa-chevron-right ml-2"></i>
-                                </a>
-                            {% else %}
-                                <span class="inline-flex items-center bg-gray-300 text-gray-600 px-4 py-2 rounded-full cursor-not-allowed">
-                                    Next Lesson <i class="fas fa-chevron-right ml-2"></i>
-                                </span>
-                            {% endif %}
+                    </div>
+                </div>
+                
+                {# Comments Section #}
+                <section class="border-t border-[#d8c3ad]/20 pt-16">
+                    <div class="flex items-center justify-between mb-10">
+                        <h2 class="rs-headline text-3xl font-semibold rs-on-surface">Community Reflection</h2>
+                        <span class="text-sm font-medium rs-on-surface-variant">{{ lesson_comments|length }} Comments</span>
+                    </div>
+                    
+                    {# Input Form #}
+                    {% if user.is_authenticated %}
+                    <div class="flex gap-4 mb-12">
+                        {% if user_profile.profile_picture %}
+                        <img src="{{ user_profile.profile_picture.url }}" alt="Profile" class="w-12 h-12 rounded-full object-cover flex-shrink-0">
+                        {% else %}
+                        <div class="w-12 h-12 rounded-full rs-surface-container flex items-center justify-center flex-shrink-0">
+                            <i class="fas fa-user rs-on-surface-variant"></i>
                         </div>
-
-                        {# Lesson Comments Section #}
-                        <div class="mt-10 pt-8 border-t border-gray-200">
-                            <h3 class="text-2xl font-bold text-gray-800 mb-6">Lesson Comments</h3>
-
-                            {# Display existing comments #}
-                            {% if lesson_comments %}
-                                <div class="space-y-6">
-                                    {% for comment in lesson_comments %}
-                                        <div class="bg-gray-50 p-5 rounded-lg shadow-sm border border-gray-100">
-                                            <div class="flex items-center mb-3">
-                                                {# Profile Picture for Commenter #}
-                                                {% if comment.user.profile.profile_picture %}
-                                                    <img src="{{ comment.user.profile.profile_picture.url }}" alt="{{ comment.user.username }} Profile" class="w-10 h-10 rounded-full object-cover mr-3 border border-gray-300">
-                                                {% else %}
-                                                    <div class="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center text-gray-400 text-xl mr-3 border border-gray-300">
-                                                        <i class="fas fa-user-circle"></i>
-                                                    </div>
-                                                {% endif %}
-                                                <div>
-                                                    <p class="font-semibold text-gray-800">{{ comment.user.username }}</p>
-                                                    <p class="text-gray-500 text-xs">{{ comment.created_at|date:"M d, Y H:i" }}</p>
-                                                </div>
-                                            </div>
-                                            <p class="text-gray-700 leading-relaxed">{{ comment.content }}</p>
-                                        </div>
-                                    {% endfor %}
+                        {% endif %}
+                        <div class="flex-1">
+                            <form action="{% url 'course_content' course.id current_lesson.id %}" method="post">
+                                {% csrf_token %}
+                                <div class="rs-input rounded-t-xl p-4 text-sm resize-none transition-all min-h-[96px]">
+                                    {{ comment_form.content }}
                                 </div>
-                            {% else %}
-                                <p class="text-gray-600 text-center mb-6">No comments yet. Be the first to share your thoughts!</p>
-                            {% endif %}
-
-                            {# Comment Submission Form #}
-                            {% if user.is_authenticated %}
-                                <div class="mt-8 p-6 bg-gray-100 rounded-lg shadow-inner border border-gray-200">
-                                    <h4 class="text-xl font-bold text-gray-800 mb-4">Add Your Comment</h4>
-                                    <form action="{% url 'course_content' course.id current_lesson.id %}" method="post" class="space-y-4">
-                                        {% csrf_token %}
-                                        <div>
-                                            {{ comment_form.content.label_tag }}
-                                            {{ comment_form.content }}
-                                            {% if comment_form.content.errors %}<p class="text-red-500 text-xs italic mt-1">{{ comment_form.content.errors }}</p>{% endif %}
-                                        </div>
-                                        <button type="submit" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 px-6 rounded-full shadow-lg transition duration-300">
-                                            Post Comment <i class="fas fa-paper-plane ml-2"></i>
-                                        </button>
-                                    </form>
+                                <div class="flex justify-end mt-2">
+                                    <button type="submit" class="rs-btn-primary px-6 py-2 rounded-lg text-sm font-bold">
+                                        Post Comment
+                                    </button>
                                 </div>
-                            {% else %}
-                                <p class="text-center text-gray-600 mt-8">Please <a href="{% url 'login' %}" class="text-amber-500 hover:underline">log in</a> to post a comment.</p>
-                            {% endif %}
+                            </form>
                         </div>
-
-                    {% else %}
-                        {# Original placeholder content #}
-                        <div class="text-center text-gray-600 p-10">
-                            <i class="fas fa-info-circle text-5xl mb-4 text-gray-400"></i>
-                            <p class="text-lg">Select a lesson from the left sidebar to begin.</p>
-                            {% if course.overview_content %}
-                                <div class="prose max-w-none text-gray-700 mt-6">
-                                    <h4 class="font-semibold text-gray-800 mb-2">Course Overview:</h4>
-                                    {{ course.overview_content|safe }}
-                                </div>
+                    </div>
+                    {% endif %}
+                    
+                    {# Comment List #}
+                    <div class="space-y-10">
+                        {% if lesson_comments %}
+                        {% for comment in lesson_comments %}
+                        <div class="flex gap-4">
+                            {% if comment.user.profile.profile_picture %}
+                            <img src="{{ comment.user.profile.profile_picture.url }}" alt="{{ comment.user.username }}" class="w-10 h-10 rounded-full object-cover flex-shrink-0">
+                            {% else %}
+                            <div class="w-10 h-10 rounded-full rs-surface-container flex items-center justify-center flex-shrink-0">
+                                <i class="fas fa-user rs-on-surface-variant text-sm"></i>
+                            </div>
                             {% endif %}
+                            <div>
+                                <div class="flex items-center gap-3 mb-1">
+                                    <span class="font-bold text-sm rs-on-surface">{{ comment.user.username }}</span>
+                                    <span class="text-[10px] rs-on-surface-variant uppercase tracking-widest">{{ comment.created_at|timesince }} ago</span>
+                                </div>
+                                <p class="text-sm rs-on-surface-variant leading-relaxed">{{ comment.content }}</p>
+                            </div>
                         </div>
+                        {% endfor %}
+                        {% else %}
+                        <div class="text-center py-12">
+                            <i class="fas fa-comments text-4xl rs-primary/20 mb-4"></i>
+                            <p class="rs-on-surface-variant">No comments yet. Be the first to share your thoughts!</p>
+                        </div>
+                        {% endif %}
+                    </div>
+                </section>
+                
+                {% else %}
+                {# No lesson selected - Show course overview #}
+                <div class="text-center py-20">
+                    <i class="fas fa-book-open text-6xl rs-primary/20 mb-6"></i>
+                    <h2 class="rs-headline text-3xl font-bold rs-on-surface mb-4">Welcome to {{ course.title }}</h2>
+                    <p class="rs-on-surface-variant max-w-lg mx-auto mb-8">Select a lesson from the sidebar to begin your journey. Use the navigation to move between lessons at your own pace.</p>
+                    {% if course.overview_content %}
+                    <div class="rs-surface-container-low p-8 rounded-xl max-w-3xl mx-auto text-left">
+                        <div class="rs-lesson-content">
+                            {{ course.overview_content|safe }}
+                        </div>
+                    </div>
+                    {% endif %}
+                    {% if modules and modules.first.lessons.first %}
+                    <a href="{% url 'course_content' course.id modules.first.lessons.first.id %}" class="inline-flex items-center gap-2 rs-btn-primary px-8 py-4 rounded-lg font-semibold text-lg mt-8">
+                        Start First Lesson <i class="fas fa-arrow-right"></i>
+                    </a>
                     {% endif %}
                 </div>
+                {% endif %}
             </div>
-        </div>
+            
+            {# Footer #}
+            <footer class="rs-surface-dim mt-24 py-12 px-8 text-center">
+                <p class="rs-headline italic rs-primary text-xl mb-4">Yoga Kailasa</p>
+                <div class="flex justify-center gap-8 text-xs font-bold rs-on-surface-variant tracking-widest uppercase mb-8">
+                    <a href="{% url 'dashboard' %}" class="hover:rs-primary transition-colors">Dashboard</a>
+                    <a href="{% url 'course_discussion_list' course.id %}" class="hover:rs-primary transition-colors">Community</a>
+                    <a href="{% url 'courses' %}" class="hover:rs-primary transition-colors">All Courses</a>
+                </div>
+                <p class="text-[10px] rs-on-surface-variant/60">&copy; {% now "Y" %} Yoga Kailasa. Built for the modern practitioner.</p>
+            </footer>
+        </main>
     </div>
-</section>
+    
+    {# Mobile Navigation #}
+    <nav class="md:hidden fixed bottom-0 left-0 right-0 rs-glass border-t border-[#d8c3ad]/10 flex justify-around items-center py-3 z-50">
+        <a href="{% url 'dashboard' %}" class="flex flex-col items-center gap-1 rs-on-surface-variant">
+            <i class="fas fa-home"></i>
+            <span class="text-[10px] font-bold uppercase">Home</span>
+        </a>
+        <button onclick="document.querySelector('aside').classList.toggle('hidden'); document.querySelector('aside').classList.toggle('fixed'); document.querySelector('aside').classList.toggle('z-50');" class="flex flex-col items-center gap-1 rs-primary">
+            <i class="fas fa-list"></i>
+            <span class="text-[10px] font-bold uppercase">Lessons</span>
+        </button>
+        <a href="{% url 'course_discussion_list' course.id %}" class="flex flex-col items-center gap-1 rs-on-surface-variant">
+            <i class="fas fa-comments"></i>
+            <span class="text-[10px] font-bold uppercase">Community</span>
+        </a>
+        <a href="{% url 'profile_edit' %}" class="flex flex-col items-center gap-1 rs-on-surface-variant">
+            <i class="fas fa-user"></i>
+            <span class="text-[10px] font-bold uppercase">Profile</span>
+        </a>
+    </nav>
+</div>
 {% endblock %}

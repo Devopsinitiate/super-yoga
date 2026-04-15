@@ -1,0 +1,4 @@
+# file: C:\Users\Orunmila1\Documents\Projects\yoga_kailasa_project\yoga_app\services\__init__.py
+# hypothesis_version: 6.151.12
+
+['BlogService', 'DiscussionService', 'EnrollmentService', 'NotificationService', 'PaymentService', 'ProgressService', 'ReportService', 'ReviewService', 'SearchService']

@@ -1,0 +1,4 @@
+# file: C:\Users\Orunmila1\Documents\Projects\yoga_kailasa_project\yoga_app\migrations\0002_remove_breathingtechnique_icon_class_and_more.py
+# hypothesis_version: 6.151.12
+
+[500, '0001_initial', 'breathingtechnique', 'course', 'icon_class', 'image_url', 'yoga_app', 'yogapose']

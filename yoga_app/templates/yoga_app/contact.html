@@ -1,108 +1,358 @@
 {% extends 'yoga_app/base.html' %}
 {% load static %}
 
-
 {% block title %}Contact Us - Yoga Kailasa{% endblock %}
 
-{# NEW: Meta Description for SEO #}
 {% block meta_description %}Have questions or feedback for Yoga Kailasa? Contact us via our online form, email, or phone. We're here to help you on your yoga journey.{% endblock %}
 
-{# NEW: Open Graph Tags for Social Sharing #}
 {% block og_title %}Contact Us - Yoga Kailasa{% endblock %}
 {% block og_description %}Have questions or feedback for Yoga Kailasa? Contact us via our online form, email, or phone. We're here to help you on your yoga journey.{% endblock %}
-{% block og_image %}{% static 'yoga_app/images/default_contact_og_image.jpg' %}{% endblock %} {# Using a static default image for OG #}
+{% block og_image %}{% static 'yoga_app/images/default_contact_og_image.jpg' %}{% endblock %}
 
 {% block extra_css %}
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif:ital,wght@0,400;0,700;1,400&family=Manrope:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
-    /* CSS for the fade-in-up animation, specific to contact.html elements */
-    @keyframes fadeInUp {
-        from {
-            opacity: 0;
-            transform: translateY(20px);
-        }
-        to {
-            opacity: 1;
-            transform: translateY(0);
-        }
+    .contact-page {
+        font-family: 'Manrope', sans-serif;
+        background-color: #fff8f3;
+        color: #1f1b14;
+        min-height: 100vh;
     }
-    .animate-fade-in-up {
-        opacity: 0; /* Hidden by default */
-        animation: fadeInUp 0.6s ease-out forwards;
+    .contact-page .rs-headline {
+        font-family: 'Noto Serif', serif;
+        line-height: 1.4;
     }
-    /* Ensure form fields have consistent styling */
-    .contact-form input[type="text"],
-    .contact-form input[type="email"],
-    .contact-form textarea {
-        @apply w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500;
+    .contact-page .rs-glass {
+        background-color: rgba(255, 248, 243, 0.8);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
     }
-    .contact-form textarea {
-        @apply resize-y;
+    .contact-page .rs-btn-primary {
+        background: linear-gradient(135deg, #855300 0%, #f59e0b 100%);
+        color: #ffffff;
+        transition: all 0.3s ease;
+    }
+    .contact-page .rs-btn-primary:hover {
+        opacity: 0.92;
+        transform: scale(1.02);
+    }
+    .contact-page .rs-text-primary { color: #855300; }
+    .contact-page .rs-text-secondary { color: #a73a00; }
+    .contact-page .rs-text-on-surface { color: #1f1b14; }
+    .contact-page .rs-text-on-surface-variant { color: #534434; }
+    .contact-page .rs-text-outline { color: #867461; }
+    .contact-page .rs-text-outline-variant { color: #d8c3ad; }
+    .contact-page .rs-text-stone-500 { color: #78716c; }
+    .contact-page .rs-text-stone-800 { color: #292524; }
+    .contact-page .rs-bg-surface { background-color: #fff8f3; }
+    .contact-page .rs-bg-surface-container { background-color: #f7ece1; }
+    .contact-page .rs-bg-surface-container-low { background-color: #fdf2e7; }
+    .contact-page .rs-bg-surface-container-lowest { background-color: #ffffff; }
+    .contact-page .rs-bg-surface-container-high { background-color: #f1e7db; }
+    .contact-page .rs-bg-surface-container-highest { background-color: #ebe1d6; }
+    .contact-page .rs-bg-surface-dim { background-color: #e2d8cd; }
+    .contact-page .rs-bg-primary { background-color: #855300; }
+    .contact-page .rs-bg-primary-container { background-color: #f59e0b; }
+    .contact-page .rs-border-outline-variant { border-color: rgba(216, 195, 173, 0.2); }
+    .contact-page .rs-border-primary { border-color: rgba(133, 83, 0, 0.3); }
+    .contact-page .rs-input-field {
+        background-color: transparent;
+        border: none;
+        border-bottom: 1px solid rgba(216, 195, 173, 0.3);
+        transition: all 0.3s ease;
+    }
+    .contact-page .rs-input-field:focus {
+        outline: none;
+        border-bottom-color: #855300;
+    }
+    .contact-page .rs-input-field option {
+        background-color: #fdf2e7;
+        color: #1f1b14;
+    }
+    .contact-page .rs-contact-card {
+        background-color: rgba(235, 225, 214, 0.4);
+        transition: all 0.3s ease;
+    }
+    .contact-page .rs-contact-card:hover {
+        background-color: #ebe1d6;
+    }
+    .contact-page .rs-contact-card:hover .rs-contact-icon {
+        transform: scale(1.1);
+    }
+    .contact-page .rs-contact-icon {
+        transition: transform 0.3s ease;
+    }
+    .contact-page .rs-social-icon {
+        transition: all 0.3s ease;
+    }
+    .contact-page .rs-social-icon:hover {
+        background-color: #855300;
+        border-color: #855300;
+    }
+    .contact-page .rs-social-icon:hover i {
+        color: #ffffff;
+    }
+    .contact-page .rs-overlay-glass {
+        background-color: rgba(255, 255, 255, 0.9);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+    }
+    .contact-page .editorial-leading { line-height: 1.4; }
+    
+    /* Hide base.html elements */
+    .contact-page > header,
+    .contact-page > #mobile-menu,
+    .contact-page > #mobile-menu-overlay,
+    .contact-page > #backToTopBtn {
+        display: none !important;
+    }
+    .contact-page > main {
+        padding: 0 !important;
+    }
+    
+    /* Mobile menu */
+    .mobile-menu { transition: transform 0.3s ease-out; }
+    .mobile-menu-overlay {
+        background-color: rgba(0, 0, 0, 0.5); position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+        z-index: 40; opacity: 0; visibility: hidden;
+        transition: opacity 0.3s ease-out, visibility 0.3s ease-out;
     }
 </style>
 {% endblock %}
 
 {% block content %}
-<section class="py-16 bg-gradient-to-r from-amber-100 to-amber-50 min-h-screen flex items-center justify-center">
-    <div class="container mx-auto px-4 max-w-2xl">
-        <div class="bg-white p-8 rounded-xl shadow-lg animate-fade-in-up">
-            <h2 class="text-3xl font-bold text-gray-800 mb-6 text-center animate-fade-in-up" style="animation-delay: 0.1s;">Get in Touch</h2>
-            <p class="text-gray-600 text-center mb-8 animate-fade-in-up" style="animation-delay: 0.2s;">Have a question, feedback, or just want to say hello? Fill out the form below and we'll get back to you as soon as possible.</p>
-
-            {# Display Messages (handled by base.html toast system) #}
-            {% if messages %}
-                <div class="mb-6 animate-fade-in-up" style="animation-delay: 0.3s;">
-                    {% for message in messages %}
-                        <div class="p-3 rounded-md mb-2 text-sm {% if message.tags == 'success' %}bg-green-100 text-green-800{% elif message.tags == 'error' %}bg-red-100 text-red-800{% elif message.tags == 'info' %}bg-blue-100 text-blue-800{% endif %}">
-                            {{ message }}
-                        </div>
-                    {% endfor %}
-                </div>
-            {% endif %}
-
-            <form method="post" action="{% url 'contact' %}" class="space-y-6 animate-fade-in-up contact-form" style="animation-delay: 0.4s;">
-                {% csrf_token %}
-                {# Render the form fields. Use |crispy if you have crispy forms installed. #}
-                {# Otherwise, use form.as_p, form.as_table, or form.as_ul for basic rendering. #}
-                {# IMPORTANT: Ensure your forms.py widgets apply Tailwind classes like TAILWIND_INPUT_CLASSES #}
-                {{ form.as_p }} 
-                
-                <button type="submit" class="w-full bg-amber-500 hover:bg-amber-600 text-white px-6 py-3 rounded-full shadow-lg transition duration-300 mt-6 transform hover:scale-105">
-                    Send Message <i class="fas fa-paper-plane ml-2"></i>
+<div class="contact-page">
+    {# Top Navigation #}
+    <nav class="fixed top-0 w-full z-50 rs-glass transition-colors duration-300">
+        <div class="flex justify-between items-center px-6 md:px-8 py-6 max-w-7xl mx-auto">
+            <a href="{% url 'home' %}" class="text-2xl rs-headline tracking-tight rs-text-primary">Yoga Kailasa</a>
+            <div class="hidden md:flex items-center gap-8">
+                <a href="{% url 'courses' %}" class="rs-text-on-surface/60 hover:rs-text-primary transition-colors duration-300 font-body">Classes</a>
+                <a href="{% url 'booking' %}" class="rs-text-on-surface/60 hover:rs-text-primary transition-colors duration-300 font-body">Retreats</a>
+                <a href="{% url 'consultant_list' %}" class="rs-text-on-surface/60 hover:rs-text-primary transition-colors duration-300 font-body">Teachers</a>
+                <a href="{% url 'contact' %}" class="rs-text-primary font-semibold border-b-2 rs-border-primary font-body">Contact</a>
+            </div>
+            <div class="flex items-center gap-4">
+                <a href="{% url 'booking' %}" class="rs-btn-primary hidden md:inline-block px-6 py-2.5 rounded-lg font-medium hover:scale-95 transition-transform duration-200 shadow-sm">
+                    Book a Class
+                </a>
+                <button type="button" id="mobile-menu-button-page" class="p-2 rs-text-primary md:hidden">
+                    <i class="fas fa-bars"></i>
                 </button>
-            </form>
-
-            <div class="text-center mt-8 text-gray-700 animate-fade-in-up" style="animation-delay: 0.5s;">
-                <p class="text-lg font-semibold mb-4">You can also reach us directly:</p>
-                <p class="mt-2 text-lg"><i class="fas fa-envelope mr-2 text-amber-500"></i> Email: <a href="mailto:support@yogakailasa.com" class="text-blue-600 hover:underline">support@yogakailasa.com</a></p>
-                <p class="mt-2 text-lg"><i class="fas fa-phone-alt mr-2 text-amber-500"></i> Phone: +1 (123) 456-7890</p>
-                
-                {# Optional: Social Media Links #}
-                <div class="flex justify-center space-x-6 mt-6">
-                    <a href="#" class="text-gray-600 hover:text-amber-500 transition duration-300 transform hover:scale-110"><i class="fab fa-facebook-f text-2xl"></i></a>
-                    <a href="#" class="text-gray-600 hover:text-amber-500 transition duration-300 transform hover:scale-110"><i class="fab fa-instagram text-2xl"></i></a>
-                    <a href="#" class="text-gray-600 hover:text-amber-500 transition duration-300 transform hover:scale-110"><i class="fab fa-twitter text-2xl"></i></a>
-                    <a href="#" class="text-gray-600 hover:text-amber-500 transition duration-300 transform hover:scale-110"><i class="fab fa-youtube text-2xl"></i></a>
-                </div>
-
-                {# Optional: Embedded Map #}
-                <div class="mt-10 rounded-lg overflow-hidden shadow-md border border-gray-200">
-                    <h4 class="text-xl font-semibold text-gray-800 mb-4">Find Us on the Map</h4>
-                    <div class="relative" style="padding-bottom: 75%; height: 0; overflow: hidden;">
-                        <iframe
-                            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3455.518178825838!2d78.31871231508826!3d30.08698188188566!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x390916a2b8e0e6ff%3A0x7d7b7e8d7e8d7e8d!2sRishikesh%2C%20Uttarakhand%2C%20India!5e0!3m2!1sen!2sus!4v1678901234567!5m2!1sen!2sus"
-                            width="600"
-                            height="450"
-                            style="border:0;"
-                            allowfullscreen=""
-                            loading="lazy"
-                            referrerpolicy="no-referrer-when-downgrade"
-                            class="absolute top-0 left-0 w-full h-full"
-                        ></iframe>
-                    </div>
-                    <p class="text-gray-500 text-sm mt-4">Visit us at 123 Yoga Street, Rishikesh, India.</p>
-                </div>
             </div>
         </div>
+    </nav>
+
+    {# Mobile Menu Overlay #}
+    <div id="mobile-menu-overlay-page" class="fixed inset-0 bg-black/50 z-40 hidden" style="transition: opacity 0.3s ease-out, visibility 0.3s ease-out; opacity: 0; visibility: hidden;"></div>
+
+    {# Mobile Menu Sidebar #}
+    <div id="mobile-menu-page" class="fixed top-0 right-0 w-64 h-full bg-white shadow-lg z-50 p-6 pb-20 transform translate-x-full md:hidden overflow-y-auto" style="transition: transform 0.3s ease-out;">
+        <div class="flex justify-end mb-6">
+            <button id="close-mobile-menu-page" class="text-[#534434] text-2xl focus:outline-none">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <nav class="flex flex-col space-y-4">
+            <a href="{% url 'home' %}" class="text-[#534434] hover:text-[#855300] font-medium text-lg">Home</a>
+            <a href="{% url 'courses' %}" class="text-[#534434] hover:text-[#855300] font-medium text-lg">Courses</a>
+            <a href="{% url 'poses' %}" class="text-[#534434] hover:text-[#855300] font-medium text-lg">Poses</a>
+            <a href="{% url 'breathing' %}" class="text-[#534434] hover:text-[#855300] font-medium text-lg">Breathing</a>
+            <a href="{% url 'consultant_list' %}" class="text-[#534434] hover:text-[#855300] font-medium text-lg">Consultants</a>
+            <a href="{% url 'blog_list' %}" class="text-[#534434] hover:text-[#855300] font-medium text-lg">Blog</a>
+            <a href="{% url 'booking' %}" class="text-[#534434] hover:text-[#855300] font-medium text-lg">Booking</a>
+            <a href="{% url 'contact' %}" class="text-[#855300] font-bold text-lg">Contact</a>
+            <a href="{% url 'about' %}" class="text-[#534434] hover:text-[#855300] font-medium text-lg">About</a>
+            {% if user.is_authenticated %}
+                <div class="border-t border-[#d8c3ad]/30 pt-4 mt-4">
+                    <a href="{% url 'dashboard' %}" class="block px-2 py-1 text-[#534434] hover:bg-[#fdf2e7] rounded-md"><i class="fas fa-tachometer-alt mr-2 text-[#855300]"></i> Dashboard</a>
+                    <a href="{% url 'profile_edit' %}" class="block px-2 py-1 text-[#534434] hover:bg-[#fdf2e7] rounded-md"><i class="fas fa-user mr-2 text-[#855300]"></i> My Profile</a>
+                    <button type="button" class="logout-btn w-full text-left py-2 text-white bg-[#a73a00] hover:bg-[#855300] font-bold text-lg flex items-center justify-center rounded">
+                        <i class="fas fa-sign-out-alt mr-2"></i> Logout
+                    </button>
+                </div>
+            {% else %}
+                <div class="border-t border-[#d8c3ad]/30 pt-4 mt-4">
+                    <a href="{% url 'login' %}" class="block text-[#534434] hover:text-[#855300] font-medium text-lg">Login</a>
+                    <a href="{% url 'register' %}" class="block rs-btn-primary px-5 py-2 rounded-lg shadow-md transition duration-300 text-center mt-3">Sign Up</a>
+                </div>
+            {% endif %}
+        </nav>
     </div>
-</section>
+
+    <main class="pt-32 pb-24 px-6 md:px-12 max-w-7xl mx-auto overflow-hidden">
+        {# Hero Section: Sanctuary Support #}
+        <header class="relative mb-24 text-center max-w-3xl mx-auto">
+            <div class="mb-4 rs-text-secondary uppercase tracking-[0.3em] text-xs font-semibold">Contact Us</div>
+            <h1 class="text-5xl md:text-7xl rs-headline rs-text-primary leading-tight mb-8">Begin the Conversation</h1>
+            <p class="text-lg rs-text-on-surface-variant leading-relaxed font-light">
+                Whether you're seeking guidance on your practice or have questions about our upcoming retreats, we are here to support your journey back to yourself.
+            </p>
+        </header>
+
+        {# Main Content Area: Bento-inspired Asymmetric Layout #}
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-8 items-start">
+            {# Left Side: Mindful Form #}
+            <section class="lg:col-span-7 rs-bg-surface-container-low p-8 md:p-12 rounded-xl">
+                <div class="mb-10">
+                    <h2 class="text-3xl rs-text-on-surface mb-2 rs-headline">Send a Message</h2>
+                    <p class="rs-text-on-surface-variant font-light">Our sanctuary team typically responds within one breath—or 24 hours.</p>
+                </div>
+                <form method="post" action="{% url 'contact' %}" class="space-y-8">
+                    {% csrf_token %}
+                    
+                    {% if form.non_field_errors %}
+                    <div class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg" role="alert">
+                        {% for error in form.non_field_errors %}
+                        <p>{{ error }}</p>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                        <div class="relative group">
+                            <label class="block text-xs font-semibold uppercase tracking-wider rs-text-outline mb-2 ml-1" for="{{ form.name.id_for_label }}">{{ form.name.label }}</label>
+                            <input type="text" name="{{ form.name.html_name }}" id="{{ form.name.id_for_label }}"
+                                   class="w-full rs-input-field py-3 px-1 rs-text-on-surface placeholder:rs-text-outline-variant/60 font-body"
+                                   placeholder="Your name"
+                                   value="{{ form.name.value|default_if_none:'' }}"
+                                   {% if form.name.field.required %}required{% endif %}>
+                            {% if form.name.errors %}
+                            <p class="text-red-500 text-xs mt-1">{{ form.name.errors.0 }}</p>
+                            {% endif %}
+                        </div>
+                        <div class="relative group">
+                            <label class="block text-xs font-semibold uppercase tracking-wider rs-text-outline mb-2 ml-1" for="{{ form.email.id_for_label }}">{{ form.email.label }}</label>
+                            <input type="email" name="{{ form.email.html_name }}" id="{{ form.email.id_for_label }}"
+                                   class="w-full rs-input-field py-3 px-1 rs-text-on-surface placeholder:rs-text-outline-variant/60 font-body"
+                                   placeholder="hello@yourjourney.com"
+                                   value="{{ form.email.value|default_if_none:'' }}"
+                                   {% if form.email.field.required %}required{% endif %}>
+                            {% if form.email.errors %}
+                            <p class="text-red-500 text-xs mt-1">{{ form.email.errors.0 }}</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="relative group">
+                        <label class="block text-xs font-semibold uppercase tracking-wider rs-text-outline mb-2 ml-1" for="{{ form.subject.id_for_label }}">{{ form.subject.label }}</label>
+                        <input type="text" name="{{ form.subject.html_name }}" id="{{ form.subject.id_for_label }}"
+                               class="w-full rs-input-field py-3 px-1 rs-text-on-surface placeholder:rs-text-outline-variant/60 font-body"
+                               placeholder="Subject of your message"
+                               value="{{ form.subject.value|default_if_none:'' }}"
+                               {% if form.subject.field.required %}required{% endif %}>
+                        {% if form.subject.errors %}
+                        <p class="text-red-500 text-xs mt-1">{{ form.subject.errors.0 }}</p>
+                        {% endif %}
+                    </div>
+                    <div class="relative group">
+                        <label class="block text-xs font-semibold uppercase tracking-wider rs-text-outline mb-2 ml-1" for="{{ form.message.id_for_label }}">{{ form.message.label }}</label>
+                        <textarea name="{{ form.message.html_name }}" id="{{ form.message.id_for_label }}"
+                                  class="w-full rs-input-field py-3 px-1 rs-text-on-surface placeholder:rs-text-outline-variant/60 font-body resize-none"
+                                  placeholder="How can we assist your practice today?"
+                                  rows="4"
+                                  {% if form.message.field.required %}required{% endif %}>{{ form.message.value|default_if_none:'' }}</textarea>
+                        {% if form.message.errors %}
+                        <p class="text-red-500 text-xs mt-1">{{ form.message.errors.0 }}</p>
+                        {% endif %}
+                    </div>
+                    <div class="pt-4">
+                        <button type="submit" class="rs-btn-primary inline-flex items-center gap-3 px-10 py-4 rounded-lg font-semibold hover:shadow-xl hover:-translate-y-0.5 transition-all duration-300">
+                            Send Reflection
+                            <i class="fas fa-paper-plane"></i>
+                        </button>
+                    </div>
+                </form>
+            </section>
+
+            {# Right Side: Guided Support & Map #}
+            <aside class="lg:col-span-5 space-y-8">
+                {# Contact Cards #}
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-1 gap-6">
+                    {# Email Support #}
+                    <div class="rs-contact-card p-8 rounded-xl group">
+                        <div class="w-12 h-12 rs-bg-primary/10 rounded-full flex items-center justify-center mb-6 rs-text-primary rs-contact-icon">
+                            <i class="fas fa-envelope text-xl"></i>
+                        </div>
+                        <h3 class="text-xl mb-2 rs-headline">Connect via Email</h3>
+                        <p class="rs-text-on-surface-variant font-light mb-4">For detailed inquiries and retreat bookings.</p>
+                        <a href="mailto:support@yogakailasa.com" class="rs-text-secondary font-semibold hover:underline decoration-secondary/30 transition-all">support@yogakailasa.com</a>
+                    </div>
+                    {# Call the Studio #}
+                    <div class="rs-contact-card p-8 rounded-xl group">
+                        <div class="w-12 h-12 rs-bg-primary/10 rounded-full flex items-center justify-center mb-6 rs-text-primary rs-contact-icon">
+                            <i class="fas fa-phone text-xl"></i>
+                        </div>
+                        <h3 class="text-xl mb-2 rs-headline">Voice Assistance</h3>
+                        <p class="rs-text-on-surface-variant font-light mb-4">Available Mon-Fri, 8am — 6pm for immediate help.</p>
+                        <a href="tel:+11234567890" class="rs-text-secondary font-semibold hover:underline decoration-secondary/30 transition-all">+1 (123) 456-7890</a>
+                    </div>
+                </div>
+
+                {# Studio Location / Minimal Map #}
+                <div class="relative overflow-hidden rounded-xl h-[400px] shadow-sm">
+                    <img src="https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=800&h=600&fit=crop" alt="Studio Map" class="absolute inset-0 w-full h-full object-cover grayscale opacity-40">
+                    <div class="absolute inset-0 bg-gradient-to-t from-[#ebe1d6] via-transparent to-transparent"></div>
+                    <div class="absolute bottom-0 left-0 p-8 w-full">
+                        <div class="rs-overlay-glass p-6 rounded-lg rs-border-outline-variant border">
+                            <div class="flex items-start gap-4">
+                                <i class="fas fa-map-marker-alt rs-text-primary mt-1"></i>
+                                <div>
+                                    <h4 class="font-bold rs-text-on-surface rs-headline">The Hill Sanctuary</h4>
+                                    <p class="text-sm rs-text-on-surface-variant leading-relaxed">
+                                        108 Serenity Path, Zen Ridge<br/>
+                                        Rishikesh, India
+                                    </p>
+                                    <a href="https://maps.google.com" target="_blank" class="inline-block mt-4 text-xs font-bold uppercase tracking-widest rs-text-primary border-b rs-border-primary pb-1 hover:border-primary transition-all">Get Directions</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </aside>
+        </div>
+
+        {# Social Media Connection #}
+        <section class="mt-24 text-center border-t rs-border-outline-variant pt-24">
+            <h2 class="text-4xl mb-12 rs-headline">Flow with us online</h2>
+            <div class="flex flex-wrap justify-center gap-12">
+                <a href="#" class="flex flex-col items-center gap-4 group">
+                    <div class="w-16 h-16 rounded-full border rs-border-outline-variant flex items-center justify-center rs-social-icon">
+                        <i class="fab fa-instagram text-on-surface-variant group-hover:text-on-primary transition-colors text-xl"></i>
+                    </div>
+                    <span class="text-xs font-semibold tracking-widest uppercase rs-text-outline">Instagram</span>
+                </a>
+                <a href="#" class="flex flex-col items-center gap-4 group">
+                    <div class="w-16 h-16 rounded-full border rs-border-outline-variant flex items-center justify-center rs-social-icon">
+                        <i class="fab fa-youtube text-on-surface-variant group-hover:text-on-primary transition-colors text-xl"></i>
+                    </div>
+                    <span class="text-xs font-semibold tracking-widest uppercase rs-text-outline">YouTube</span>
+                </a>
+                <a href="#" class="flex flex-col items-center gap-4 group">
+                    <div class="w-16 h-16 rounded-full border rs-border-outline-variant flex items-center justify-center rs-social-icon">
+                        <i class="fab fa-facebook-f text-on-surface-variant group-hover:text-on-primary transition-colors text-xl"></i>
+                    </div>
+                    <span class="text-xs font-semibold tracking-widest uppercase rs-text-outline">Facebook</span>
+                </a>
+            </div>
+        </section>
+    </main>
+
+    {# Footer #}
+    <footer class="w-full pt-20 pb-10 rs-bg-surface-container-high flex flex-col items-center gap-8 px-6 text-center">
+        <div class="rs-headline rs-text-primary text-2xl tracking-tight">Yoga Kailasa</div>
+        <div class="flex flex-wrap justify-center gap-8 font-['Manrope'] text-sm tracking-wide">
+            <a href="{% url 'privacy_policy' %}" class="rs-text-on-surface/70 hover:rs-text-secondary transition-all">Privacy Policy</a>
+            <a href="{% url 'terms_of_service' %}" class="rs-text-on-surface/70 hover:rs-text-secondary transition-all">Terms of Service</a>
+            <a href="{% url 'contact' %}" class="rs-text-on-surface/70 hover:rs-text-secondary transition-all">Studio Guidelines</a>
+            <a href="#" class="rs-text-on-surface/70 hover:rs-text-secondary transition-all underline decoration-[#855300]/30">Instagram</a>
+        </div>
+        <p class="rs-text-on-surface/70 font-['Manrope'] text-sm opacity-80 mt-4">
+            &copy; {% now "Y" %} Yoga Kailasa. Breathing through every transition.
+        </p>
+    </footer>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+{{ block.super }}
 {% endblock %}

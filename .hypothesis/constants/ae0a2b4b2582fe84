@@ -1,0 +1,4 @@
+# file: C:\Users\Orunmila1\Documents\Projects\yoga_kailasa_project\yoga_app\migrations\0032_booking_user_fk.py
+# hypothesis_version: 6.151.12
+
+['-booked_at', 'Booking', 'Bookings', 'booking', 'bookings', 'idx_booking_user', 'ordering', 'user', 'verbose_name', 'verbose_name_plural', 'yoga_app']

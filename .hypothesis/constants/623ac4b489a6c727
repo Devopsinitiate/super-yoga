@@ -1,0 +1,4 @@
+# file: C:\Users\Orunmila1\Documents\Projects\yoga_kailasa_project\yoga_app\services\blog_service.py
+# hypothesis_version: 6.151.12
+
+['-published_date', '-shared_tags_count', 'author', 'category', 'comments__user', 'created_at', 'id', 'likes', 'name', 'tags', 'username']

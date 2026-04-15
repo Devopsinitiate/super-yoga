@@ -1,0 +1,4 @@
+# file: C:\Users\Orunmila1\Documents\Projects\yoga_kailasa_project\yoga_app\migrations\0030_blogpost_featured_image_webp_and_more.py
+# hypothesis_version: 6.151.12
+
+[255, 'blogpost', 'featured_image_webp', 'profile_picture_webp', 'userprofile', 'yoga_app']

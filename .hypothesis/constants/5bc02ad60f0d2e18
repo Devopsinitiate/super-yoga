@@ -1,0 +1,4 @@
+# file: C:\Users\Orunmila1\Documents\Projects\yoga_kailasa_project\yoga_app\migrations\0013_breathingtechnique_created_at_and_more.py
+# hypothesis_version: 6.151.12
+
+[2025, 768095, 'breathingtechnique', 'course', 'coursereview', 'created_at', 'discussionpost', 'discussiontopic', 'lesson', 'liked_posts', 'liked_topics', 'likes', 'module', 'start_date', 'updated_at', 'yoga_app', 'yogapose']
