@@ -42,12 +42,14 @@ class ContentSecurityPolicyMiddleware:
         extra_script = f" {self._extra_script}" if self._extra_script else ''
         extra_frame = f" {self._extra_frame}" if self._extra_frame else ''
 
-        # In debug mode allow unsafe-inline for easier development
-        unsafe_inline = " 'unsafe-inline'" if self._debug else ''
+        # Allow unsafe-inline for scripts — the project uses many inline onclick
+        # handlers and <script> blocks that would require nonce-based CSP otherwise.
+        # A full nonce/hash refactor is tracked as a future enhancement.
+        script_unsafe_inline = " 'unsafe-inline'"
 
         directives = [
             "default-src 'self'",
-            f"script-src 'self' https://js.paystack.co https://cdnjs.cloudflare.com https://www.youtube.com https://s.ytimg.com{unsafe_inline}{extra_script}",
+            f"script-src 'self' https://js.paystack.co https://cdnjs.cloudflare.com https://www.youtube.com https://s.ytimg.com{script_unsafe_inline}{extra_script}",
             f"style-src 'self' https://fonts.googleapis.com https://cdnjs.cloudflare.com https://paystack.com 'unsafe-inline'",
             "font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com data:",
             f"frame-src 'self' https://www.youtube.com https://youtube.com https://www.youtube-nocookie.com https://js.paystack.co https://checkout.paystack.com{extra_frame}",
