@@ -27,10 +27,20 @@ from yoga_app.services import EnrollmentService
 logger = logging.getLogger(__name__)
 
 
+import logging
+logger = logging.getLogger(__name__)
+
+
 def send_verification_email(user, request):
     token = default_token_generator.make_token(user)
     uid = urlsafe_base64_encode(force_bytes(user.pk))
     verification_url = f"{request.scheme}://{request.get_host()}/verify-email/{uid}/{token}/"
+
+    # Always log the URL — essential when SMTP is unavailable (e.g. PythonAnywhere free tier)
+    logger.info(
+        "VERIFICATION LINK for %s (%s): %s",
+        user.username, user.email, verification_url
+    )
 
     subject = "Verify Your Email - Yoga Kailasa"
     message = f"""
@@ -64,14 +74,25 @@ The Yoga Kailasa Team
 </html>
 """
 
-    send_mail(
-        subject=subject,
-        message=message,
-        from_email=settings.DEFAULT_FROM_EMAIL,
-        recipient_list=[user.email],
-        html_message=html_message,
-        fail_silently=False,
-    )
+    email_delivered = True
+    try:
+        send_mail(
+            subject=subject,
+            message=message,
+            from_email=settings.DEFAULT_FROM_EMAIL,
+            recipient_list=[user.email],
+            html_message=html_message,
+            fail_silently=False,
+        )
+    except Exception:
+        email_delivered = False
+        logger.warning(
+            "SMTP unavailable — could not send verification email to %s. "
+            "The verification link has been logged above.",
+            user.email,
+        )
+
+    return verification_url if not email_delivered else None
 
 
 @method_decorator(ratelimit(key='ip', rate='5/m', block=True), name='dispatch')
@@ -119,7 +140,9 @@ def register_view(request):
             user = form.save(commit=False)
             user.is_active = False
             user.save()
-            send_verification_email(user, request)
+            url = send_verification_email(user, request)
+            if url:
+                request.session['pending_verification_url'] = url
             messages.success(request, f"Account created! Please check your email ({user.email}) to verify your account before logging in.")
             return redirect('verify_email_pending', user_id=user.pk)
         else:
@@ -161,11 +184,14 @@ def verify_email_pending_view(request, user_id):
         return redirect('login')
 
     if request.method == 'POST':
-        send_verification_email(user, request)
+        url = send_verification_email(user, request)
+        if url:
+            request.session['pending_verification_url'] = url
         messages.success(request, f"Verification email sent to {user.email}.")
         return redirect('verify_email_pending', user_id=user.pk)
 
-    context = {'user': user}
+    verification_url = request.session.pop('pending_verification_url', None)
+    context = {'user': user, 'verification_url': verification_url}
     return render(request, 'yoga_app/registration/verify_email_pending.html', context)
 
 

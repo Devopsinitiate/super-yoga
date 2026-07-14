@@ -252,8 +252,8 @@
                 <div class="md:col-span-8 group cursor-pointer rs-animate-in">
                     <a href="{% url 'breathing_technique_detail' technique.id %}" class="block">
                         <div class="relative overflow-hidden rs-surface-container-low rounded-xl aspect-[16/9] rs-technique-card">
-                            {% if technique.image_url %}
-                            <img src="{{ technique.image_url }}" alt="{{ technique.name }}" class="absolute inset-0 w-full h-full object-cover mix-blend-multiply opacity-80 rs-technique-image">
+                            {% if technique.display_image %}
+                            <img src="{{ technique.display_image }}" alt="{{ technique.name }}" class="absolute inset-0 w-full h-full object-cover mix-blend-multiply opacity-80 rs-technique-image">
                             {% else %}
                             <div class="absolute inset-0 rs-surface-container flex items-center justify-center">
                                 <i class="fas fa-lungs text-8xl rs-primary/10 rs-breathing-circle"></i>
@@ -281,9 +281,9 @@
                     <a href="{% url 'breathing_technique_detail' technique.id %}" class="block h-full">
                         <div class="h-full rs-surface-container-low rounded-xl p-8 rs-technique-card flex flex-col justify-between">
                             <div>
-                                {% if technique.image_url %}
+                                {% if technique.display_image %}
                                 <div class="mb-6 overflow-hidden rounded-lg aspect-square">
-                                    <img src="{{ technique.image_url }}" alt="{{ technique.name }}" class="w-full h-full object-cover rs-technique-image">
+                                    <img src="{{ technique.display_image }}" alt="{{ technique.name }}" class="w-full h-full object-cover rs-technique-image">
                                 </div>
                                 {% else %}
                                 <div class="mb-6 overflow-hidden rounded-lg aspect-square rs-surface-container flex items-center justify-center">
@@ -322,8 +322,8 @@
                                     </button>
                                 </div>
                                 <div class="hidden md:block relative h-full">
-                                    {% if technique.image_url %}
-                                    <img src="{{ technique.image_url }}" alt="{{ technique.name }}" class="absolute inset-0 w-full h-full object-cover rs-technique-image">
+                                    {% if technique.display_image %}
+                                    <img src="{{ technique.display_image }}" alt="{{ technique.name }}" class="absolute inset-0 w-full h-full object-cover rs-technique-image">
                                     {% else %}
                                     <div class="absolute inset-0 rs-surface-container flex items-center justify-center">
                                         <i class="fas fa-lungs text-8xl rs-primary/10"></i>

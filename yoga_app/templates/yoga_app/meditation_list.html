@@ -98,8 +98,8 @@
                 {% for med in meditations %}
                 <a href="{% url 'meditation_detail' med.id %}" class="med-card block rounded-2xl overflow-hidden" style="background:#fdf2e7;">
                     <div class="aspect-[16/9] overflow-hidden relative" style="background:#f1e7db;">
-                        {% if med.image_url %}
-                        <img src="{{ med.image_url }}" alt="{{ med.title }}" class="med-img w-full h-full object-cover">
+                        {% if med.display_image %}
+                        <img src="{{ med.display_image }}" alt="{{ med.title }}" class="med-img w-full h-full object-cover">
                         {% else %}
                         <div class="w-full h-full flex items-center justify-center">
                             <i class="fas fa-om text-5xl" style="color:#d8c3ad;"></i>

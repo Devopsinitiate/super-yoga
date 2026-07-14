@@ -116,7 +116,7 @@ class CourseDetailSerializer(CourseSerializer):
 class YogaPoseSerializer(serializers.ModelSerializer):
     class Meta:
         model = YogaPose
-        fields = ['id', 'name', 'sanskrit_name', 'difficulty', 'description', 'instructions', 'image_url', 'video_url', 'created_at', 'updated_at']
+        fields = ['id', 'name', 'sanskrit_name', 'difficulty', 'description', 'instructions', 'benefits', 'contraindications', 'image_url', 'video_url', 'created_at', 'updated_at']
 
 
 class BreathingTechniqueSerializer(serializers.ModelSerializer):

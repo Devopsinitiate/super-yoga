@@ -323,8 +323,8 @@
                 {% for course in courses %}
                 <div class="group flex flex-col rs-animate-in" style="animation-delay: {{ forloop.counter|multiply:0.1 }}s;">
                     <div class="relative aspect-[16/10] overflow-hidden rounded-xl rs-surface-container mb-6">
-                        {% if course.image_url %}
-                        <img src="{{ course.image_url }}" alt="{{ course.title }}" class="w-full h-full object-cover rs-course-image transition-transform duration-700 group-hover:scale-105">
+                        {% if course.display_image %}
+                        <img src="{{ course.display_image }}" alt="{{ course.title }}" class="w-full h-full object-cover rs-course-image transition-transform duration-700 group-hover:scale-105">
                         {% else %}
                         <div class="w-full h-full rs-surface-container flex items-center justify-center rs-course-image">
                             <i class="fas fa-spa text-6xl text-[#855300]/20"></i>

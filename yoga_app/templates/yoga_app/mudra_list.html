@@ -93,8 +93,8 @@
                 {% for mudra in mudras %}
                 <a href="{% url 'mudra_detail' mudra.id %}" class="mudra-card block rounded-2xl overflow-hidden" style="background:#fdf2e7;">
                     <div class="aspect-[4/3] overflow-hidden relative" style="background:#f1e7db;">
-                        {% if mudra.image_url %}
-                        <img src="{{ mudra.image_url }}" alt="{{ mudra.name }}" class="mudra-img w-full h-full object-cover">
+                        {% if mudra.display_image %}
+                        <img src="{{ mudra.display_image }}" alt="{{ mudra.name }}" class="mudra-img w-full h-full object-cover">
                         {% else %}
                         <div class="w-full h-full flex items-center justify-center">
                             <i class="fas fa-hand-paper text-6xl" style="color:#d8c3ad;"></i>

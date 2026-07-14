@@ -34,7 +34,7 @@
     {% endif %}
 {% endblock %}
 
-{% block og_image %}{% if course.image_url %}{{ course.image_url }}{% else %}{% static 'yoga_app/images/default_course_og_image.jpg' %}{% endif %}{% endblock %}
+{% block og_image %}{% if course.display_image %}{{ course.display_image }}{% else %}{% static 'yoga_app/images/default_course_og_image.jpg' %}{% endif %}{% endblock %}
 
 {% block extra_css %}
 <link href="https://fonts.googleapis.com/css2?family=Noto+Serif:ital,wght@0,400;0,600;0,700;1,600&family=Manrope:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -263,8 +263,8 @@
                 </div>
                 {% else %}
                 <div class="relative group aspect-video rs-surface-container-high rounded-xl overflow-hidden mb-10 shadow-sm flex items-center justify-center">
-                    {% if course.image_url %}
-                    <img src="{{ course.image_url }}" alt="{{ course.title }}" class="w-full h-full object-cover">
+                    {% if course.display_image %}
+                    <img src="{{ course.display_image }}" alt="{{ course.title }}" class="w-full h-full object-cover">
                     {% else %}
                     <div class="w-full h-full rs-surface-container flex items-center justify-center">
                         <i class="fas fa-spa text-6xl rs-primary/20"></i>

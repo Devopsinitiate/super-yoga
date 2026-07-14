@@ -30,8 +30,8 @@ urlpatterns = [
     path('payments/webhook/paystack', views.paystack_webhook_view),  # no-slash variant for Paystack
 
     path('register/', views.register_view, name='register'),
-    path('verify-email/<uidb64>/<token>/', views.verify_email_view, name='verify_email'),
     path('verify-email/pending/<int:user_id>/', views.verify_email_pending_view, name='verify_email_pending'),
+    path('verify-email/<uidb64>/<token>/', views.verify_email_view, name='verify_email'),
     path('resend-verification/', views.resend_verification_view, name='resend_verification'),
     path('login/', CustomLoginView.as_view(template_name='yoga_app/registration/login.html', authentication_form=UserLoginForm), name='login'),
     path('logout/', CustomLogoutView.as_view(next_page='home'), name='logout'),

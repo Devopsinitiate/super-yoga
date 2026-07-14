@@ -9,7 +9,7 @@
 {# NEW: Dynamic Open Graph Tags for Social Sharing #}
 {% block og_title %}{{ topic.title }} - Discussion - {{ course.title }}{% endblock %}
 {% block og_description %}Discussion topic: "{{ topic.title }}" in the "{{ course.title }}" course forum. Posted by {{ topic.user.username }}. {{ topic.content|striptags|truncatechars:200 }}{% endblock %}
-{% block og_image %}{% if course.image_url %}{{ course.image_url }}{% else %}{% static 'yoga_app/images/default_discussion_og_image.jpg' %}{% endif %}{% endblock %}
+{% block og_image %}{% if course.display_image %}{{ course.display_image }}{% else %}{% static 'yoga_app/images/default_discussion_og_image.jpg' %}{% endif %}{% endblock %}
 
 
 {% block content %}

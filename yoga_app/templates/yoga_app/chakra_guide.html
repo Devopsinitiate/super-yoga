@@ -56,13 +56,13 @@
                         <a href="?chakra={{ chakra.key }}"
                            class="chakra-tab flex items-center gap-4 px-5 py-4 {% if selected_chakra.key == chakra.key %}active{% endif %}"
                            style="--chakra-color:{{ chakra.color_hex }};">
-                            {% if chakra.image_url %}
-                            <div class="w-8 h-8 rounded-full overflow-hidden flex-shrink-0 border-2" style="border-color:{{ chakra.color_hex }};">
-                                <img src="{{ chakra.image_url }}" alt="{{ chakra.name }}" class="w-full h-full object-cover">
-                            </div>
-                            {% else %}
-                            <div class="chakra-dot" style="background:{{ chakra.color_hex }};"></div>
-                            {% endif %}
+                            {% if chakra.display_image %}
+                             <div class="w-8 h-8 rounded-full overflow-hidden flex-shrink-0 border-2" style="border-color:{{ chakra.color_hex }};">
+                                 <img src="{{ chakra.display_image }}" alt="{{ chakra.name }}" class="w-full h-full object-cover">
+                             </div>
+                             {% else %}
+                             <div class="chakra-dot" style="background:{{ chakra.color_hex }};"></div>
+                             {% endif %}
                             <div>
                                 <p class="font-bold text-sm" style="color:#1f1b14;">{{ chakra.name }}</p>
                                 <p class="text-xs italic" style="color:#867461;">{{ chakra.sanskrit_name }}</p>
@@ -81,10 +81,10 @@
                         {# Chakra header band #}
                         <div class="p-8" style="background:{{ selected_chakra.color_hex }}15;">
                             <div class="flex items-center gap-6 mb-4">
-                                {% if selected_chakra.image_url %}
-                                <div class="w-20 h-20 rounded-full overflow-hidden flex-shrink-0 border-4" style="border-color:{{ selected_chakra.color_hex }};">
-                                    <img src="{{ selected_chakra.image_url }}" alt="{{ selected_chakra.name }} chakra symbol" class="w-full h-full object-cover">
-                                </div>
+                                {% if selected_chakra.display_image %}
+                                 <div class="w-20 h-20 rounded-full overflow-hidden flex-shrink-0 border-4" style="border-color:{{ selected_chakra.color_hex }};">
+                                     <img src="{{ selected_chakra.display_image }}" alt="{{ selected_chakra.name }} chakra symbol" class="w-full h-full object-cover">
+                                 </div>
                                 {% else %}
                                 <div class="w-16 h-16 rounded-full flex items-center justify-center text-white text-2xl font-bold rs-headline flex-shrink-0" style="background:{{ selected_chakra.color_hex }};">
                                     {{ selected_chakra.number }}

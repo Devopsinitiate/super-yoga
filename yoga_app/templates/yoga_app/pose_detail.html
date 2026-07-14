@@ -8,7 +8,7 @@
 
 {% block og_title %}{{ pose.name }} - Yoga Kailasa{% endblock %}
 {% block og_description %}Learn the {{ pose.name }} {% if pose.sanskrit_name %}({{ pose.sanskrit_name }}){% endif %} yoga pose. Detailed instructions, benefits, and video demonstration for mastering this asana.{% endblock %}
-{% block og_image %}{% if pose.image_url %}{{ pose.image_url }}{% else %}{% static 'yoga_app/images/default_pose_og_image.jpg' %}{% endif %}{% endblock %}
+{% block og_image %}{% if pose.display_image %}{{ pose.display_image }}{% else %}{% static 'yoga_app/images/default_pose_og_image.jpg' %}{% endif %}{% endblock %}
 
 {% block extra_css %}
 <link href="https://fonts.googleapis.com/css2?family=Noto+Serif:ital,wght@0,400;0,700;1,400&family=Manrope:wght@300;400;600;800&display=swap" rel="stylesheet">
@@ -135,8 +135,8 @@
         </div>
 
         {# Radiant Feature Section (Hero) #}
-        <section class="relative grid grid-cols-1 lg:grid-cols-12 gap-8 mb-24 items-end">
-            <div class="lg:col-span-7 relative z-10">
+        <section class="grid grid-cols-1 lg:grid-cols-12 gap-8 mb-24 items-start">
+            <div class="lg:col-span-7 order-2 lg:order-1">
                 <div class="mb-4 rs-secondary font-semibold tracking-[0.2em] uppercase text-xs">Asana Sanctuary</div>
                 <h1 class="rs-headline text-6xl md:text-8xl leading-none rs-on-surface mb-4">{{ pose.name }}</h1>
                 {% if pose.sanskrit_name %}
@@ -149,12 +149,13 @@
                     {% endif %}
                 </div>
             </div>
-            <div class="lg:col-span-5 lg:absolute lg:right-0 lg:top-0 lg:h-full lg:w-1/2 -z-10 lg:-mr-6">
-                <div class="aspect-[4/5] rounded-xl overflow-hidden shadow-2xl">
-                    {% if pose.image_url %}
-                    <img src="{{ pose.image_url }}" alt="{{ pose.name }}" class="w-full h-full object-cover">
+            <div class="lg:col-span-5 order-1 lg:order-2">
+                <div class="rounded-2xl overflow-hidden shadow-2xl rs-surface-container">
+                    {% if pose.display_image %}
+                    <img src="{{ pose.display_image }}" alt="{{ pose.name }}"
+                         class="w-full h-auto max-h-[75vh] object-contain block">
                     {% else %}
-                    <div class="w-full h-full rs-surface-container flex items-center justify-center">
+                    <div class="aspect-[4/5] rs-surface-container flex items-center justify-center">
                         <i class="fas fa-spa text-8xl rs-primary/10"></i>
                     </div>
                     {% endif %}
@@ -196,28 +197,23 @@
                 </div>
                 {% endif %}
                 
+                {% if pose.benefits %}
                 <div class="pt-8 border-t border-[#d8c3ad]/30">
                     <h4 class="text-xs uppercase tracking-[0.2em] font-bold rs-primary mb-4">Key Benefits</h4>
-                    <ul class="space-y-3 text-sm rs-on-surface-variant">
-                        <li class="flex items-center gap-2">
-                            <i class="fas fa-check-circle text-secondary text-sm"></i>
-                            Improves Balance & Focus
-                        </li>
-                        <li class="flex items-center gap-2">
-                            <i class="fas fa-check-circle text-secondary text-sm"></i>
-                            Strengthens Core Muscles
-                        </li>
-                        <li class="flex items-center gap-2">
-                            <i class="fas fa-check-circle text-secondary text-sm"></i>
-                            Enhances Flexibility
-                        </li>
-                    </ul>
+                    <div class="rs-lesson-content text-sm rs-on-surface-variant">
+                        {{ pose.benefits|safe }}
+                    </div>
                 </div>
+                {% endif %}
                 
+                {% if pose.contraindications %}
                 <div class="pt-8 border-t border-[#d8c3ad]/30">
                     <h4 class="text-xs uppercase tracking-[0.2em] font-bold rs-primary mb-4">Contraindications</h4>
-                    <p class="text-sm italic rs-on-surface-variant">Practice with caution if you have recent injuries. Use props or modifications as needed.</p>
+                    <div class="rs-lesson-content text-sm rs-on-surface-variant italic">
+                        {{ pose.contraindications|safe }}
+                    </div>
                 </div>
+                {% endif %}
                 
                 <div class="pt-8">
                     <a href="{% url 'poses' %}" class="block w-full rs-btn-primary py-4 rounded-lg font-bold text-center">
@@ -250,8 +246,8 @@
                 {% for related_pose in related_poses|default:pose_list|slice:":3" %}
                 {% if forloop.counter <= 3 %}
                 <a href="{% url 'pose_detail' related_pose.id %}" class="rs-related-pose group relative aspect-square rounded-xl overflow-hidden rs-surface-container cursor-pointer">
-                    {% if related_pose.image_url %}
-                    <img src="{{ related_pose.image_url }}" alt="{{ related_pose.name }}" class="w-full h-full object-cover rs-related-pose-img">
+                    {% if related_pose.display_image %}
+                    <img src="{{ related_pose.display_image }}" alt="{{ related_pose.name }}" class="w-full h-full object-cover rs-related-pose-img">
                     {% else %}
                     <div class="w-full h-full rs-surface-container-high flex items-center justify-center">
                         <i class="fas fa-spa text-6xl rs-primary/10"></i>

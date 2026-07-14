@@ -115,14 +115,18 @@ class YogaPoseAdmin(admin.ModelAdmin):
     search_fields = ('name', 'sanskrit_name', 'description')
     fieldsets = (
         (None, {
-            'fields': ('name', 'sanskrit_name', 'difficulty', 'image_url', 'video_url'),
+            'fields': ('name', 'sanskrit_name', 'difficulty'),
+        }),
+        ('Images & Media', {
+            'fields': ('image', 'image_url', 'video_url'),
+            'description': 'Upload an image file OR provide an image URL. The uploaded file takes priority.',
         }),
         ('Content', {
             'fields': ('description', 'instructions'),
         }),
         ('Timestamps', {
             'fields': ('created_at', 'updated_at'),
-            'classes': ('collapse',), # Collapsible section
+            'classes': ('collapse',),
         }),
     )
     readonly_fields = ('created_at', 'updated_at')
@@ -157,7 +161,11 @@ class CourseAdmin(admin.ModelAdmin):
             'fields': ('title', 'instructor_name', 'price', 'is_popular', 'duration', 'image_url', 'start_date'),
         }),
         ('Content', {
-            'fields': ('description', 'overview_content', 'includes'),
+            'fields': ('description', 'instructions'),
+        }),
+        ('Details', {
+            'fields': ('benefits', 'contraindications'),
+            'description': 'Pose-specific benefits and contraindications. Leave blank to omit from the detail page.',
         }),
         ('Timestamps', {
             'fields': ('created_at', 'updated_at'),

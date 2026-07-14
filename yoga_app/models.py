@@ -138,6 +138,8 @@ class YogaPose(models.Model):
     image_url = models.URLField(max_length=500, blank=True, null=True, help_text="URL for an image representing the pose (e.g., Unsplash link, placeholder).")
     image = models.ImageField(upload_to='poses/', blank=True, null=True, help_text="Uploaded image for the pose (takes priority over image_url when set).")
     video_url = models.URLField(max_length=500, blank=True, null=True, help_text="Embed URL for a video demonstration (e.g., YouTube embed link)")
+    benefits = CKEditor5Field(blank=True, null=True, help_text="Key benefits of this pose.")
+    contraindications = CKEditor5Field(blank=True, null=True, help_text="Contraindications and precautions for this pose.")
     created_at = models.DateTimeField(auto_now_add=True,)
     updated_at = models.DateTimeField(auto_now=True,)
 
@@ -157,6 +159,13 @@ class YogaPose(models.Model):
         if self.image:
             return self.image.url
         return self.image_url or ''
+
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+        if self.image:
+            optimized_path = optimize_image(self.image.path)
+            self.image.name = os.path.relpath(optimized_path, settings.MEDIA_ROOT)
+            super().save(update_fields=['image'])
 
 # Model for Breathing Techniques (Pranayama)
 class BreathingTechnique(models.Model):
@@ -188,6 +197,13 @@ class BreathingTechnique(models.Model):
         if self.image:
             return self.image.url
         return self.image_url or ''
+
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+        if self.image:
+            optimized_path = optimize_image(self.image.path)
+            self.image.name = os.path.relpath(optimized_path, settings.MEDIA_ROOT)
+            super().save(update_fields=['image'])
 
 # Model for Yoga Courses
 class Course(models.Model):
@@ -231,6 +247,10 @@ class Course(models.Model):
     def save(self, *args, **kwargs):
         self.is_free = (self.price == 0.00)
         super().save(*args, **kwargs)
+        if self.image:
+            optimized_path = optimize_image(self.image.path)
+            self.image.name = os.path.relpath(optimized_path, settings.MEDIA_ROOT)
+            super().save(update_fields=['image'])
     
     @cached_property
     def lessons(self):
@@ -427,6 +447,13 @@ class Consultant(models.Model):
         if self.profile_picture:
             return self.profile_picture.url
         return self.profile_picture_url or ''
+
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+        if self.profile_picture:
+            optimized_path = optimize_image(self.profile_picture.path)
+            self.profile_picture.name = os.path.relpath(optimized_path, settings.MEDIA_ROOT)
+            super().save(update_fields=['profile_picture'])
 
 # Testimonial Model (UPDATED: Added is_approved field)
 class Testimonial(models.Model):
@@ -806,6 +833,13 @@ class Mudra(models.Model):
             return self.image.url
         return self.image_url or ''
 
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+        if self.image:
+            optimized_path = optimize_image(self.image.path)
+            self.image.name = os.path.relpath(optimized_path, settings.MEDIA_ROOT)
+            super().save(update_fields=['image'])
+
 
 # ─── Meditation ───────────────────────────────────────────────────────────────
 
@@ -861,6 +895,13 @@ class Meditation(models.Model):
             return self.image.url
         return self.image_url or ''
 
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+        if self.image:
+            optimized_path = optimize_image(self.image.path)
+            self.image.name = os.path.relpath(optimized_path, settings.MEDIA_ROOT)
+            super().save(update_fields=['image'])
+
 
 # ─── Chakra ───────────────────────────────────────────────────────────────────
 
@@ -908,6 +949,13 @@ class Chakra(models.Model):
         if self.image:
             return self.image.url
         return self.image_url or ''
+
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+        if self.image:
+            optimized_path = optimize_image(self.image.path)
+            self.image.name = os.path.relpath(optimized_path, settings.MEDIA_ROOT)
+            super().save(update_fields=['image'])
 
 
 # ─── Daily Practice Journal ───────────────────────────────────────────────────
@@ -1005,6 +1053,13 @@ class KriyaSession(models.Model):
         if self.image:
             return self.image.url
         return self.image_url or ''
+
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+        if self.image:
+            optimized_path = optimize_image(self.image.path)
+            self.image.name = os.path.relpath(optimized_path, settings.MEDIA_ROOT)
+            super().save(update_fields=['image'])
 
     @property
     def step_count(self):

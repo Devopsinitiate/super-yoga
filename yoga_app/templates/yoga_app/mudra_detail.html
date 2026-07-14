@@ -47,8 +47,8 @@
                     <p class="text-lg leading-relaxed" style="color:#534434;">{{ mudra.description }}</p>
                 </div>
                 <div class="aspect-square rounded-2xl overflow-hidden" style="background:#f1e7db;">
-                    {% if mudra.image_url %}
-                    <img src="{{ mudra.image_url }}" alt="{{ mudra.name }}" class="w-full h-full object-cover">
+                    {% if mudra.display_image %}
+                    <img src="{{ mudra.display_image }}" alt="{{ mudra.name }}" class="w-full h-full object-cover">
                     {% else %}
                     <div class="w-full h-full flex items-center justify-center">
                         <i class="fas fa-hand-paper text-8xl" style="color:#d8c3ad;"></i>

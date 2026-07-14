@@ -15,6 +15,23 @@ def is_postgres():
     return connection.vendor == 'postgresql' and _POSTGRES_SEARCH_AVAILABLE
 
 
+def _model_has_search_vector(model):
+    """Returns True only if the model actually has search_vector as a DB column."""
+    try:
+        model._meta.get_field('search_vector')
+        return True
+    except Exception:
+        return False
+
+def _model_has_search_vector(model):
+    try:
+        model._meta.get_field('search_vector')
+        return True
+    except Exception:
+        return False
+
+
+
 class SearchService:
     @staticmethod
     def global_search(query='', category_filter='', pose_difficulty_filter='', course_price_filter=''):
@@ -23,7 +40,7 @@ class SearchService:
         courses = Course.objects.none()
 
         if query:
-            if is_postgres():
+            if is_postgres() and _model_has_search_vector(YogaPose):
                 search_query = SearchQuery(query, search_type='websearch')
                 
                 if not category_filter or category_filter == 'poses':

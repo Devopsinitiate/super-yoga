@@ -47,9 +47,9 @@
             </div>
 
             {# Image #}
-            {% if meditation.image_url %}
+            {% if meditation.display_image %}
             <div class="aspect-[16/7] rounded-2xl overflow-hidden mb-10" style="background:#f1e7db;">
-                <img src="{{ meditation.image_url }}" alt="{{ meditation.title }}" class="w-full h-full object-cover">
+                <img src="{{ meditation.display_image }}" alt="{{ meditation.title }}" class="w-full h-full object-cover">
             </div>
             {% endif %}
 

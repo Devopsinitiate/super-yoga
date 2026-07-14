@@ -218,8 +218,8 @@
                     {% for pose in yoga_poses %}
                     <a href="{% url 'pose_detail' pose.id %}" class="group rs-bg-surface-container-low rounded-xl overflow-hidden rs-search-card block">
                         <div class="aspect-[4/5] relative overflow-hidden">
-                            {% if pose.image_url %}
-                            <img src="{{ pose.image_url }}" alt="{{ pose.name }}" class="w-full h-full object-cover rs-search-image">
+                            {% if pose.display_image %}
+                            <img src="{{ pose.display_image }}" alt="{{ pose.name }}" class="w-full h-full object-cover rs-search-image">
                             {% else %}
                             <div class="w-full h-full rs-bg-surface-container flex items-center justify-center">
                                 <i class="fas fa-spa text-6xl rs-text-primary/20"></i>
@@ -253,8 +253,8 @@
                     {% for technique in breathing_techniques %}
                     <a href="{% url 'breathing_technique_detail' technique.id %}" class="group flex flex-col md:flex-row rs-bg-surface-container-low rounded-xl overflow-hidden rs-search-card">
                         <div class="md:w-1/2 aspect-square md:aspect-auto overflow-hidden">
-                            {% if technique.image_url %}
-                            <img src="{{ technique.image_url }}" alt="{{ technique.name }}" class="w-full h-full object-cover rs-search-image">
+                            {% if technique.display_image %}
+                            <img src="{{ technique.display_image }}" alt="{{ technique.name }}" class="w-full h-full object-cover rs-search-image">
                             {% else %}
                             <div class="w-full h-full rs-bg-surface-container flex items-center justify-center">
                                 <i class="fas fa-wind text-6xl rs-text-primary/20"></i>
@@ -286,8 +286,8 @@
                     {% for course in courses %}
                     <a href="{% url 'course_detail' course.id %}" class="group rs-bg-surface-container-low rounded-xl overflow-hidden rs-search-card block">
                         <div class="aspect-[4/5] relative overflow-hidden">
-                            {% if course.image_url %}
-                            <img src="{{ course.image_url }}" alt="{{ course.title }}" class="w-full h-full object-cover rs-search-image">
+                            {% if course.display_image %}
+                            <img src="{{ course.display_image }}" alt="{{ course.title }}" class="w-full h-full object-cover rs-search-image">
                             {% else %}
                             <div class="w-full h-full rs-bg-surface-container flex items-center justify-center">
                                 <i class="fas fa-book-open text-6xl rs-text-primary/20"></i>

@@ -293,9 +293,9 @@
                 {# Large Focus Card #}
                 <div class="group cursor-pointer lg:col-span-2">
                     <a href="{% url 'pose_detail' pose.id %}" class="block">
-                        <div class="relative rounded-xl overflow-hidden aspect-[16/9] mb-6 rs-surface-container-low">
-                            {% if pose.image_url %}
-                            <img src="{{ pose.image_url }}" alt="{{ pose.name }}" class="w-full h-full object-cover rs-pose-image">
+                        <div class="relative rounded-xl overflow-hidden aspect-[4/5] mb-6 rs-surface-container-low">
+                            {% if pose.display_image %}
+                            <img src="{{ pose.display_image }}" alt="{{ pose.name }}" class="w-full h-full object-contain rs-pose-image">
                             {% else %}
                             <div class="w-full h-full rs-surface-container flex items-center justify-center">
                                 <i class="fas fa-spa text-8xl rs-primary/10"></i>
@@ -324,8 +324,8 @@
                 <div class="group cursor-pointer">
                     <a href="{% url 'pose_detail' pose.id %}" class="block">
                         <div class="relative rounded-xl overflow-hidden aspect-[4/5] mb-6 rs-surface-container-low">
-                            {% if pose.image_url %}
-                            <img src="{{ pose.image_url }}" alt="{{ pose.name }}" class="w-full h-full object-cover rs-pose-image">
+                            {% if pose.display_image %}
+                            <img src="{{ pose.display_image }}" alt="{{ pose.name }}" class="w-full h-full object-contain rs-pose-image">
                             {% else %}
                             <div class="w-full h-full rs-surface-container flex items-center justify-center">
                                 <i class="fas fa-spa text-6xl rs-primary/20"></i>

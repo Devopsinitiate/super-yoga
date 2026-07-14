@@ -214,8 +214,8 @@
                 <a href="{% url 'pose_detail' pose.id %}" class="block">
                     <div class="rs-surface-container-low rounded-xl p-4 rs-pose-card">
                         <div class="aspect-[3/4] rounded-lg overflow-hidden mb-4">
-                            {% if pose.image_url %}
-                            <img src="{{ pose.image_url }}" alt="{{ pose.name }}" class="w-full h-full object-cover rs-pose-image">
+                            {% if pose.display_image %}
+                            <img src="{{ pose.display_image }}" alt="{{ pose.name }}" class="w-full h-full object-cover rs-pose-image">
                             {% else %}
                             <div class="w-full h-full rs-surface-container flex items-center justify-center rs-pose-image">
                                 <i class="fas fa-spa text-6xl rs-primary/20"></i>
@@ -259,8 +259,8 @@
                 <div class="md:col-span-8 rs-surface-container-low rounded-2xl overflow-hidden group rs-course-card">
                     <div class="grid md:grid-cols-2 h-full">
                         <div class="relative overflow-hidden h-64 md:h-full">
-                            {% if course.image_url %}
-                            <img src="{{ course.image_url }}" alt="{{ course.title }}" class="w-full h-full object-cover rs-course-image transition-transform duration-700 group-hover:scale-105">
+                            {% if course.display_image %}
+                            <img src="{{ course.display_image }}" alt="{{ course.title }}" class="w-full h-full object-cover rs-course-image transition-transform duration-700 group-hover:scale-105">
                             {% else %}
                             <div class="w-full h-full rs-surface-container flex items-center justify-center">
                                 <i class="fas fa-spa text-6xl rs-primary/20"></i>

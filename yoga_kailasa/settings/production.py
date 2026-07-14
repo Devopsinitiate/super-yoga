@@ -14,10 +14,20 @@ STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 # ── Email ─────────────────────────────────────────────────────────────────────
 
-EMAIL_BACKEND = os.environ.get(
-    'EMAIL_BACKEND',
-    'django.core.mail.backends.smtp.EmailBackend'
-)
+if os.environ.get('EMAIL_HOST_USER'):
+    EMAIL_BACKEND = os.environ.get(
+        'EMAIL_BACKEND',
+        'django.core.mail.backends.smtp.EmailBackend'
+    )
+else:
+    EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+    import logging
+    logging.warning(
+        "EMAIL_HOST_USER not configured — falling back to console email backend. "
+        "Emails will be printed to the server log instead of delivered. "
+        "Set EMAIL_HOST_USER and EMAIL_HOST_PASSWORD in your PythonAnywhere "
+        "environment variables to enable email delivery."
+    )
 
 # ── Cache — Redis if reachable, else LocMemCache ──────────────────────────────
 

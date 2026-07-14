@@ -7,7 +7,7 @@
 
 {% block og_title %}{{ course.title }} - Yoga Kailasa{% endblock %}
 {% block og_description %}{{ course.description|striptags|truncatechars:200 }}{% endblock %}
-{% block og_image %}{% if course.image_url %}{{ course.image_url }}{% else %}{% static 'yoga_app/images/hero_image.jpg' %}{% endif %}{% endblock %}
+{% block og_image %}{% if course.display_image %}{{ course.display_image }}{% else %}{% static 'yoga_app/images/hero_image.jpg' %}{% endif %}{% endblock %}
 
 {% block extra_css %}
 <link href="https://fonts.googleapis.com/css2?family=Noto+Serif:ital,wght@0,400;0,700;1,400&family=Manrope:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -155,8 +155,8 @@
         {# Hero Section #}
         <section class="relative min-h-[600px] flex items-center overflow-hidden rs-surface">
             <div class="absolute inset-0 z-0">
-                {% if course.image_url %}
-                <img src="{{ course.image_url }}" alt="{{ course.title }}" class="w-full h-full object-cover opacity-80 mix-blend-multiply saturate-50">
+                {% if course.display_image %}
+                <img src="{{ course.display_image }}" alt="{{ course.title }}" class="w-full h-full object-cover opacity-80 mix-blend-multiply saturate-50">
                 {% else %}
                 <div class="w-full h-full rs-surface-container flex items-center justify-center">
                     <i class="fas fa-spa text-9xl rs-primary/10"></i>
@@ -175,9 +175,9 @@
                         {{ course.title }}<br/><span class="italic font-normal">{{ course.instructor_name }}</span>
                     </h1>
                     <div class="flex items-center gap-4 mb-8">
-                        {% if course.image_url %}
+                        {% if course.display_image %}
                         <div class="w-12 h-12 rounded-full overflow-hidden border-2 border-[#f59e0b]">
-                            <img src="{{ course.image_url }}" alt="{{ course.instructor_name }}" class="w-full h-full object-cover">
+                            <img src="{{ course.display_image }}" alt="{{ course.instructor_name }}" class="w-full h-full object-cover">
                         </div>
                         {% else %}
                         <div class="w-12 h-12 rounded-full rs-primary-container/20 flex items-center justify-center border-2 border-[#f59e0b]">
