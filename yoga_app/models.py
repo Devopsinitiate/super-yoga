@@ -157,7 +157,10 @@ class YogaPose(models.Model):
     def display_image(self):
         """Returns uploaded image URL if set, otherwise falls back to image_url."""
         if self.image:
-            return self.image.url
+            try:
+                return self.image.url
+            except Exception:
+                return self.image_url or ''
         return self.image_url or ''
 
     def save(self, *args, **kwargs):

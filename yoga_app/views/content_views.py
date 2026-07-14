@@ -65,7 +65,11 @@ def pose_detail_view(request, pose_id):
         'related_poses': related_poses,
         'pose_list': YogaPose.objects.exclude(id=pose_id)[:3],
     }
-    return render(request, 'yoga_app/pose_detail.html', context)
+    try:
+        return render(request, 'yoga_app/pose_detail.html', context)
+    except Exception as e:
+        logger.exception("Error rendering pose_detail for pose_id=%s", pose_id)
+        raise
 
 
 @cache_page(60 * 8)  # 8 minutes ≈ 5 × φ
