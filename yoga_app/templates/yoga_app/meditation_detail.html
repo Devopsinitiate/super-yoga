@@ -3,6 +3,7 @@
 {% load app_filters %}
 {% load app_filters %}
 
+{% block base_header %}{% endblock %}
 {% block title %}{{ meditation.title }} — Meditation | Yoga Kailasa{% endblock %}
 {% block meta_description %}{{ meditation.description|truncatechars:160 }}{% endblock %}
 
@@ -26,7 +27,12 @@
     <nav class="fixed top-0 w-full z-50 rs-glass shadow-sm">
         <div class="flex justify-between items-center px-6 md:px-10 py-4 max-w-7xl mx-auto">
             <a href="{% url 'home' %}" class="rs-headline text-xl font-bold" style="color:#855300;">Yoga Kailasa</a>
-            <a href="{% url 'meditations' %}" class="text-sm font-medium" style="color:#534434;">← Back to Meditations</a>
+            <div class="flex items-center gap-4">
+                <button type="button" onclick="window.toggleBaseMobileMenu()" class="md:hidden text-[#534434] text-2xl focus:outline-none">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <a href="{% url 'meditations' %}" class="text-sm font-medium" style="color:#534434;">← Back to Meditations</a>
+            </div>
         </div>
     </nav>
 

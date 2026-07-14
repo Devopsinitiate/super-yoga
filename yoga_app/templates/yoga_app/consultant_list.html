@@ -1,6 +1,7 @@
 {% extends 'yoga_app/base.html' %}
 {% load static %}
 
+{% block base_header %}{% endblock %}
 {% block title %}Teacher Sanctuary - Yoga Kailasa{% endblock %}
 
 {% block meta_description %}Meet our experienced yoga and wellness consultants. Book a personalized session to deepen your practice and address specific needs.{% endblock %}
@@ -130,6 +131,9 @@
                 <a href="{% url 'booking' %}" class="rs-on-surface/60 font-medium hover:rs-primary transition-colors">Retreats</a>
             </nav>
             <div class="flex items-center gap-6">
+                <button type="button" onclick="window.toggleBaseMobileMenu()" class="md:hidden text-[#534434] text-2xl focus:outline-none">
+                    <i class="fas fa-bars"></i>
+                </button>
                 <a href="{% url 'all_notifications' %}" class="rs-primary hover:bg-[#f1e7db]/50 p-2 rounded-xl transition-all">
                     <i class="fas fa-bell"></i>
                 </a>

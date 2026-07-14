@@ -2,6 +2,7 @@
 {% load static %}
 {% load app_filters %}
 
+{% block base_header %}{% endblock %}
 {% block title %}Sacred Postures - Yoga Kailasa{% endblock %}
 
 {% block meta_description %}Explore a wide range of yoga asanas and poses at Yoga Kailasa. Filter by difficulty and search for specific poses to enhance your practice.{% endblock %}
@@ -101,8 +102,7 @@
         color: #ffffff;
     }
     
-    /* Hide base.html elements */
-    .pose-list-page > header,
+    /* Hide base.html back-to-top (page has its own header) */
     .pose-list-page > #backToTopBtn {
         display: none !important;
     }

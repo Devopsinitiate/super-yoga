@@ -1,6 +1,7 @@
 {% extends 'yoga_app/base.html' %}
 {% load static %}
 
+{% block base_header %}{% endblock %}
 {% block title %}About Us - Yoga Kailasa{% endblock %}
 
 {% block meta_description %}Learn about Yoga Kailasa's mission, vision, and philosophy. Discover our commitment to authentic yoga, mindfulness, and holistic well-being.{% endblock %}
@@ -124,9 +125,14 @@
                 <a href="{% url 'consultant_list' %}" class="rs-text-on-surface/70 hover:rs-text-primary transition-colors rs-headline">Teachers</a>
                 <a href="{% url 'booking' %}" class="rs-text-on-surface/70 hover:rs-text-primary transition-colors rs-headline">Retreats</a>
             </div>
-            <a href="{% url 'booking' %}" class="rs-btn-primary px-8 py-3 rounded-lg font-medium hover:opacity-80 transition-all scale-95 active:scale-100">
-                Book a Mat
-            </a>
+            <div class="flex items-center gap-4">
+                <button type="button" onclick="window.toggleBaseMobileMenu()" class="md:hidden text-[#534434] text-2xl focus:outline-none">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <a href="{% url 'booking' %}" class="rs-btn-primary px-8 py-3 rounded-lg font-medium hover:opacity-80 transition-all scale-95 active:scale-100">
+                    Book a Mat
+                </a>
+            </div>
         </div>
     </nav>
 

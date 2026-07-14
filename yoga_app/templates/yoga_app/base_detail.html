@@ -7,7 +7,7 @@
   so each detail page can render its own fixed nav without conflicts.
 
   Usage:
-    {% extends 'yoga_app/base_detail.html' %}
+    Extend this template to use the detail layout.
 
   Blocks available:
     detail_nav    — Override to provide a custom fixed navigation bar
@@ -21,16 +21,10 @@
     Default content padding-top is 5rem (80px) to clear the nav.
 #}
 
+{% block base_header %}{% endblock %}
+
 {% block extra_css %}
 <style>
-  /* Hide base.html global chrome — detail pages manage their own nav */
-  body > header,
-  body > #mobile-menu,
-  body > #mobile-menu-overlay,
-  body > #backToTopBtn {
-    display: none !important;
-  }
-
   /* Default font stack — override via detail_fonts block */
   body { font-family: 'Manrope', sans-serif; }
 </style>

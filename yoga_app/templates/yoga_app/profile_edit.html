@@ -1,6 +1,7 @@
 {% extends 'yoga_app/base.html' %}
 {% load static %}
 
+{% block base_header %}{% endblock %}
 {% block title %}Sanctuary Profile Management - Yoga Kailasa{% endblock %}
 
 {% block meta_description %}Manage your Yoga Kailasa user profile. Update your email address, change your password, upload a profile picture, or update your bio securely.{% endblock %}
@@ -173,6 +174,9 @@
                 <a href="{% url 'booking' %}" class="rs-text-on-surface-variant/70 font-medium hover:rs-text-primary transition-colors duration-300">Retreats</a>
             </nav>
             <div class="flex items-center gap-4">
+                <button type="button" onclick="window.toggleBaseMobileMenu()" class="md:hidden text-[#855300] text-2xl focus:outline-none">
+                    <i class="fas fa-bars"></i>
+                </button>
                 <a href="{% url 'all_notifications' %}" class="rs-text-primary scale-95 active:duration-150">
                     <i class="fas fa-bell"></i>
                 </a>

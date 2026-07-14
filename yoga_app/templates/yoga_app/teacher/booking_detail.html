@@ -1,6 +1,7 @@
 {% extends 'yoga_app/base.html' %}
 {% load static %}
 
+{% block base_header %}{% endblock %}
 {% block title %}Booking #{{ booking.id }} — Yoga Kailasa{% endblock %}
 
 {% block extra_css %}
@@ -27,7 +28,12 @@
                 <a href="{% url 'home' %}" class="rs-headline text-xl font-bold" style="color:#855300;">Yoga Kailasa</a>
                 <span class="text-xs uppercase tracking-widest font-semibold px-3 py-1 rounded-full" style="background:#f1e7db;color:#534434;">Staff Portal</span>
             </div>
-            <a href="{% url 'teacher_dashboard' %}" class="text-sm font-medium" style="color:#534434;">← All Bookings</a>
+            <div class="flex items-center gap-4">
+                <button type="button" onclick="window.toggleBaseMobileMenu()" class="md:hidden text-[#534434] text-2xl focus:outline-none">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <a href="{% url 'teacher_dashboard' %}" class="text-sm font-medium" style="color:#534434;">← All Bookings</a>
+            </div>
         </div>
     </nav>
 

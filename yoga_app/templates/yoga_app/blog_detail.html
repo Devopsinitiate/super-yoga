@@ -2,6 +2,7 @@
 {% load static %}
 {% load app_filters %}
 
+{% block base_header %}{% endblock %}
 {% block title %}{{ post.title }} - Yoga Kailasa Journal{% endblock %}
 
 {% block meta_description %}{{ post.excerpt|striptags|truncatechars:160 }}{% endblock %}
@@ -188,6 +189,9 @@
                 <a href="{% url 'blog_list' %}" class="rs-headline tracking-tight leading-relaxed rs-primary border-b-2 border-[#855300]/50 pb-1">Journal</a>
             </div>
             <div class="flex items-center space-x-4">
+                <button type="button" onclick="window.toggleBaseMobileMenu()" class="md:hidden text-[#534434] text-2xl focus:outline-none">
+                    <i class="fas fa-bars"></i>
+                </button>
                 {% if user.is_authenticated %}
                 <a href="{% url 'profile_edit' %}" class="rs-primary scale-95 active:opacity-80 transition-transform">
                     <i class="fas fa-user-circle text-xl"></i>

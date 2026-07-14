@@ -1,6 +1,7 @@
 {% extends 'yoga_app/base.html' %}
 {% load static %}
 
+{% block base_header %}{% endblock %}
 {% block title %}Your Radiant Updates - Yoga Kailasa{% endblock %}
 
 {% block extra_css %}
@@ -99,6 +100,9 @@
                 <a href="{% url 'blog_list' %}" class="rs-text-on-surface-variant/70 hover:rs-text-secondary transition-colors duration-300">Community</a>
             </nav>
             <div class="flex items-center space-x-6">
+                <button type="button" onclick="window.toggleBaseMobileMenu()" class="md:hidden text-[#534434] text-2xl focus:outline-none">
+                    <i class="fas fa-bars"></i>
+                </button>
                 <a href="{% url 'all_notifications' %}" class="rs-text-primary cursor-pointer hover:scale-95 duration-200">
                     <i class="fas fa-bell"></i>
                 </a>

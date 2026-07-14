@@ -205,8 +205,9 @@
     {# Toast Container #}
     <div id="toast-container"></div>
 
-    {# Header #}
-    <header class="rs-glass shadow-sm py-4 sticky top-0 z-40" role="banner">
+    {# Header - wrapped in block so pages with custom navs can hide it #}
+    {% block base_header %}
+    <header id="base-header" class="rs-glass shadow-sm py-4 sticky top-0 z-40" role="banner">
         <div class="container mx-auto px-4 flex justify-between items-center">
             {# Logo #}
             <a href="{% url 'home' %}" class="flex items-center space-x-2">
@@ -376,6 +377,7 @@
             </div>
         </div>
     </header>
+    {% endblock %}
 
     {# Mobile Menu Overlay #}
     <div id="mobile-menu-overlay" class="mobile-menu-overlay fixed inset-0 bg-black/50 z-40 hidden" style="transition: opacity 0.3s ease-out, visibility 0.3s ease-out; opacity: 0; visibility: hidden;"></div>
@@ -546,10 +548,12 @@
                     btn.addEventListener('click', function(e) { e.preventDefault(); e.stopPropagation(); toggleMobileMenu(); });
                 });
                 overlay.addEventListener('click', function(e) { e.preventDefault(); e.stopPropagation(); toggleMobileMenu(); });
+
+                return toggleMobileMenu;
             }
 
             // Setup for base.html mobile menu
-            setupMobileMenu('#mobile-menu-button', '#close-mobile-menu', 'mobile-menu', 'mobile-menu-overlay');
+            window.toggleBaseMobileMenu = setupMobileMenu('#mobile-menu-button', '#close-mobile-menu', 'mobile-menu', 'mobile-menu-overlay');
 
             // Mobile accordion sections
             function toggleMobileSection(id) {

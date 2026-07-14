@@ -2,6 +2,7 @@
 {% load static %}
 {% load app_filters %}
 
+{% block base_header %}{% endblock %}
 {% block title %}{{ mudra.name }} — Sacred Mudras | Yoga Kailasa{% endblock %}
 {% block meta_description %}{{ mudra.description|truncatechars:160 }}{% endblock %}
 
@@ -26,7 +27,12 @@
     <nav class="fixed top-0 w-full z-50 rs-glass shadow-sm">
         <div class="flex justify-between items-center px-6 md:px-10 py-4 max-w-7xl mx-auto">
             <a href="{% url 'home' %}" class="rs-headline text-xl font-bold" style="color:#855300;">Yoga Kailasa</a>
-            <a href="{% url 'mudras' %}" class="text-sm font-medium" style="color:#534434;">← Back to Mudras</a>
+            <div class="flex items-center gap-4">
+                <button type="button" onclick="window.toggleBaseMobileMenu()" class="md:hidden text-[#534434] text-2xl focus:outline-none">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <a href="{% url 'mudras' %}" class="text-sm font-medium" style="color:#534434;">← Back to Mudras</a>
+            </div>
         </div>
     </nav>
 

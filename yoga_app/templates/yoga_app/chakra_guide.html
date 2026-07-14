@@ -1,6 +1,7 @@
 {% extends 'yoga_app/base.html' %}
 {% load static %}
 
+{% block base_header %}{% endblock %}
 {% block title %}Chakra Guide — The Seven Energy Centres | Yoga Kailasa{% endblock %}
 {% block meta_description %}Explore the seven chakras — their colours, elements, mantras, and associated yoga poses, mudras, and breathing techniques.{% endblock %}
 
@@ -31,6 +32,9 @@
                 <a href="{% url 'mudras' %}" class="hover:underline">Mudras</a>
                 <a href="{% url 'meditations' %}" class="hover:underline">Meditation</a>
             </div>
+            <button type="button" onclick="window.toggleBaseMobileMenu()" class="md:hidden text-[#534434] text-2xl focus:outline-none">
+                <i class="fas fa-bars"></i>
+            </button>
         </div>
     </nav>
 

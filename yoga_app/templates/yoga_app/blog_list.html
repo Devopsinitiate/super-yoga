@@ -2,6 +2,7 @@
 {% load static %}
 {% load app_filters %}
 
+{% block base_header %}{% endblock %}
 {% block title %}Journal - Yoga Kailasa{% endblock %}
 
 {% block meta_description %}Explore articles and insights on yoga, meditation, wellness, and healthy living from the Yoga Kailasa blog. Find tips, guides, and inspiration.{% endblock %}
@@ -136,6 +137,9 @@
                 <a href="{% url 'consultant_list' %}" class="rs-on-surface-variant/70 hover:rs-primary transition-colors duration-300">Teachers</a>
             </div>
             <div class="flex items-center gap-6">
+                <button type="button" onclick="window.toggleBaseMobileMenu()" class="md:hidden text-[#534434] text-2xl focus:outline-none">
+                    <i class="fas fa-bars"></i>
+                </button>
                 <a href="{% url 'global_search' %}" class="rs-primary text-2xl hover:opacity-80 transition-all">
                     <i class="fas fa-search"></i>
                 </a>

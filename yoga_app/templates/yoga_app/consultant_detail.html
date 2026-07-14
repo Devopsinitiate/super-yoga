@@ -1,6 +1,7 @@
 {% extends 'yoga_app/base.html' %}
 {% load static %}
 
+{% block base_header %}{% endblock %}
 {% block title %}{{ consultant.name }} - Yoga Kailasa{% endblock %}
 
 {% block meta_description %}Learn more about {{ consultant.name }}, our expert in {{ consultant.specialty }}. View their bio and contact information for personalized sessions.{% endblock %}
@@ -123,6 +124,9 @@
             <a href="{% url 'blog_list' %}" class="rs-text-on-surface-variant/60 font-medium hover:rs-text-primary transition-colors duration-300">Schedule</a>
         </div>
         <div class="flex items-center gap-6">
+            <button type="button" onclick="window.toggleBaseMobileMenu()" class="md:hidden text-[#534434] text-2xl focus:outline-none mr-2">
+                <i class="fas fa-bars"></i>
+            </button>
             <div class="flex gap-4 items-center">
                 <a href="{% url 'all_notifications' %}" class="rs-text-on-surface-variant cursor-pointer hover:rs-text-primary transition-colors">
                     <i class="fas fa-bell"></i>

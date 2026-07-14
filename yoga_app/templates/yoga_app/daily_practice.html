@@ -1,6 +1,7 @@
 {% extends 'yoga_app/base.html' %}
 {% load static %}
 
+{% block base_header %}{% endblock %}
 {% block title %}Daily Practice Journal — Yoga Kailasa{% endblock %}
 {% block meta_description %}Log your daily yoga practice — track poses, breathing, mudras, meditation, mood, and personal reflections.{% endblock %}
 
@@ -34,7 +35,12 @@
     <nav class="fixed top-0 w-full z-50 rs-glass shadow-sm">
         <div class="flex justify-between items-center px-6 md:px-10 py-4 max-w-7xl mx-auto">
             <a href="{% url 'home' %}" class="rs-headline text-xl font-bold" style="color:#855300;">Yoga Kailasa</a>
-            <a href="{% url 'dashboard' %}" class="text-sm font-medium" style="color:#534434;">← Dashboard</a>
+            <div class="flex items-center gap-4">
+                <button type="button" onclick="window.toggleBaseMobileMenu()" class="md:hidden text-[#534434] text-2xl focus:outline-none">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <a href="{% url 'dashboard' %}" class="text-sm font-medium" style="color:#534434;">← Dashboard</a>
+            </div>
         </div>
     </nav>
 

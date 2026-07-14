@@ -1,6 +1,7 @@
 {% extends 'yoga_app/base.html' %}
 {% load static %}
 
+{% block base_header %}{% endblock %}
 {% block title %}Sanctuary Booking - Yoga Kailasa{% endblock %}
 
 {% block meta_description %}Schedule a personalized yoga or wellness consultation with our expert team. Book your session easily online.{% endblock %}
@@ -117,6 +118,9 @@
                 <a href="{% url 'consultant_list' %}" class="rs-text-stone-600 font-medium hover:rs-text-primary transition-all duration-300">Teachers</a>
             </div>
             <div class="flex items-center space-x-6">
+                <button type="button" onclick="window.toggleBaseMobileMenu()" class="md:hidden text-[#534434] text-2xl focus:outline-none">
+                    <i class="fas fa-bars"></i>
+                </button>
                 <a href="{% url 'booking' %}" class="rs-btn-primary px-6 py-2.5 rounded-lg font-medium text-sm hover:scale-[1.02] active:scale-[0.98] transition-all">Book a Mat</a>
                 {% if user.is_authenticated %}
                 {% if user_profile.profile_picture %}

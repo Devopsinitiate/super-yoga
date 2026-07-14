@@ -2,6 +2,7 @@
 {% load static %}
 {% load app_filters %}
 
+{% block base_header %}{% endblock %}
 {% block title %}{{ pose.name }} - Yoga Kailasa{% endblock %}
 
 {% block meta_description %}Learn the {{ pose.name }} {% if pose.sanskrit_name %}({{ pose.sanskrit_name }}){% endif %} yoga pose. Detailed instructions, benefits, and video demonstration for mastering this asana.{% endblock %}
@@ -114,6 +115,9 @@
                 <a href="{% url 'booking' %}" class="rs-primary/60 hover:rs-primary transition-colors duration-300">Retreats</a>
             </div>
             <div class="flex items-center gap-4">
+                <button type="button" onclick="window.toggleBaseMobileMenu()" class="md:hidden text-[#534434] text-2xl focus:outline-none">
+                    <i class="fas fa-bars"></i>
+                </button>
                 {% if user.is_authenticated %}
                 <a href="{% url 'profile_edit' %}" class="rs-on-surface-variant hover:rs-primary transition-colors">
                     <i class="fas fa-user-circle text-xl"></i>

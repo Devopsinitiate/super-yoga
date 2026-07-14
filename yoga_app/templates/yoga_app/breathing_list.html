@@ -2,6 +2,7 @@
 {% load static %}
 {% load app_filters %}
 
+{% block base_header %}{% endblock %}
 {% block title %}Breathing Techniques - Yoga Kailasa{% endblock %}
 
 {% block meta_description %}Explore a wide range of pranayama and breathing techniques at Yoga Kailasa to calm your mind, reduce stress, and energize your body.{% endblock %}
@@ -98,8 +99,7 @@
         50% { transform: scale(1.08); }
     }
     
-    /* Hide base.html elements */
-    .breathing-page > header,
+    /* Hide base.html back-to-top (page has its own header) */
     .breathing-page > #backToTopBtn {
         display: none !important;
     }

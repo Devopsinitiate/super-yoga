@@ -1,6 +1,7 @@
 {% extends 'yoga_app/base.html' %}
 {% load static %}
 
+{% block base_header %}{% endblock %}
 {% block title %}Terms of Service — Yoga Kailasa{% endblock %}
 {% block meta_description %}Read the terms and conditions governing your use of the Yoga Kailasa platform and courses.{% endblock %}
 
@@ -28,7 +29,12 @@
     <nav class="fixed top-0 w-full z-50 shadow-sm" style="background:rgba(255,248,243,0.9);backdrop-filter:blur(20px);">
         <div class="flex justify-between items-center px-6 md:px-10 py-4 max-w-4xl mx-auto">
             <a href="{% url 'home' %}" class="rs-headline text-xl font-bold" style="color:#855300;">Yoga Kailasa</a>
-            <a href="{% url 'home' %}" class="text-sm font-medium" style="color:#534434;">← Back to Home</a>
+            <div class="flex items-center gap-4">
+                <button type="button" onclick="window.toggleBaseMobileMenu()" class="md:hidden text-[#534434] text-2xl focus:outline-none">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <a href="{% url 'home' %}" class="text-sm font-medium" style="color:#534434;">← Back to Home</a>
+            </div>
         </div>
     </nav>
 

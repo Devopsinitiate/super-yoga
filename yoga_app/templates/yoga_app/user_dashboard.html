@@ -1,6 +1,7 @@
 {% extends 'yoga_app/base.html' %}
 {% load static %}
 
+{% block base_header %}{% endblock %}
 {% block title %}Dashboard - {{ user.username }} - Yoga Kailasa{% endblock %}
 
 {% block meta_description %}Welcome to your Yoga Kailasa dashboard, {{ user.username }}. Track your course progress, view recent notifications, manage payments, and continue your learning journey.{% endblock %}
@@ -152,6 +153,9 @@
                 </div>
             </div>
             <div class="flex items-center gap-4">
+                <button type="button" onclick="window.toggleBaseMobileMenu()" class="md:hidden text-[#855300] text-2xl focus:outline-none">
+                    <i class="fas fa-bars"></i>
+                </button>
                 <a href="{% url 'all_notifications' %}" class="relative text-[#855300] hover:text-[#a73a00] transition-colors duration-300">
                     <i class="fas fa-bell text-xl"></i>
                     {% if unread_notifications_count > 0 %}
