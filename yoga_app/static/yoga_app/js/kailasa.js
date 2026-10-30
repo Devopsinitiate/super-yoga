@@ -120,9 +120,66 @@ function initNotificationPagination() {
   });
 }
 
+/* ─── Delegated data-action dispatcher ──────────────────────────────────────── */
+/* Replaces inline onclick="" handlers so the site can run without CSP
+   'unsafe-inline' for scripts. Templates use:
+     <button data-action="toggle-mobile-menu">
+     <button data-action="toggle-mobile-section" data-target="mobile-practice">
+     <button data-action="toggle-module" data-target="module-3">
+     <button data-action="scroll-to" data-target="curriculum-section">
+     <button data-action="toggle-aside">
+     <button data-action="toggle-password">
+     <button data-action="pick-profile-picture" data-target="id_profile_picture">
+     <div data-action="toggle-class-active">
+     <button data-action="alert-message" data-message="...">
+ */
+function initDataActions() {
+  document.addEventListener('click', function (e) {
+    const el = e.target.closest('[data-action]');
+    if (!el) return;
+
+    const actions = {
+      'toggle-mobile-menu': () => window.toggleBaseMobileMenu && window.toggleBaseMobileMenu(),
+      'toggle-mobile-section': () => window.toggleMobileSection && window.toggleMobileSection(el.dataset.target),
+      'toggle-module': () => window.toggleModule && window.toggleModule(el.dataset.target),
+      'scroll-to': () => document.getElementById(el.dataset.target)?.scrollIntoView({ behavior: 'smooth' }),
+      'toggle-aside': () => {
+        const aside = document.querySelector('aside');
+        if (aside) ['hidden', 'fixed', 'z-50'].forEach(cls => aside.classList.toggle(cls));
+      },
+      'toggle-password': () => window.togglePasswordVisibility && window.togglePasswordVisibility(),
+      'pick-profile-picture': () => document.getElementById(el.dataset.target)?.click(),
+      'toggle-class-active': () => el.classList.toggle('active'),
+      'alert-message': () => alert(el.dataset.message || ''),
+      'load-video-embed': () => {
+        const slot = el.closest('.rs-embed-slot');
+        if (!slot || slot.dataset.loaded === 'true') return;
+        const embed = slot.dataset.embed || el.dataset.embed;
+        if (!embed) return;
+        const iframe = document.createElement('iframe');
+        iframe.src = embed + (embed.includes('?') ? '&' : '?') + 'autoplay=1';
+        iframe.title = slot.getAttribute('aria-label') || 'Highlighted session video';
+        iframe.className = 'absolute inset-0 w-full h-full';
+        iframe.setAttribute('allow', 'autoplay; encrypted-media; picture-in-picture; fullscreen');
+        iframe.setAttribute('allowfullscreen', '');
+        slot.style.background = '#000';
+        slot.textContent = '';
+        slot.appendChild(iframe);
+        slot.dataset.loaded = 'true';
+      },
+    };
+    const handler = actions[el.dataset.action];
+    if (handler) {
+      e.preventDefault();
+      handler();
+    }
+  });
+}
+
 /* ─── Init ───────────────────────────────────────────────────────────────────── */
 document.addEventListener('DOMContentLoaded', function () {
   initLikeButtons();
   initCommentForms();
   initNotificationPagination();
+  initDataActions();
 });

@@ -1,9 +1,6 @@
 from django.shortcuts import render, redirect
-from django.contrib import messages
-from django.views.decorators.cache import cache_page
-from django.views.decorators.vary import vary_on_cookie
 from yoga_app.forms import ContactMessageForm
-from yoga_app.models import YogaPose, BreathingTechnique, Course, Consultant, Testimonial
+from yoga_app.models import YogaPose, BreathingTechnique, Course, Consultant, Testimonial, HighlightSession
 
 
 def _build_home_context(request):
@@ -13,20 +10,15 @@ def _build_home_context(request):
         'courses': Course.objects.order_by('-is_popular', 'price'),
         'consultants': Consultant.objects.all().order_by('name'),
         'testimonials': Testimonial.objects.filter(is_approved=True).order_by('-submitted_at')[:3],
+        'highlight_sessions': HighlightSession.objects.filter(is_active=True)[:6],
         'contact_form': ContactMessageForm(),
     }
 
 
 def home_view(request):
-    # If there are flash messages pending, skip cache so they display immediately
-    if list(messages.get_messages(request)):
-        return render(request, 'yoga_app/index.html', _build_home_context(request))
-    return _cached_home_view(request)
-
-
-@vary_on_cookie
-@cache_page(60 * 5)
-def _cached_home_view(request):
+    # Always render fresh: full-page caching would embed a stale CSP nonce in
+    # cached HTML, breaking inline scripts on cache hits, and would also freeze
+    # the randomized pose selection.
     return render(request, 'yoga_app/index.html', _build_home_context(request))
 
 

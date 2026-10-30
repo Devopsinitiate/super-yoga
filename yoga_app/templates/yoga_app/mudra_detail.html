@@ -28,7 +28,7 @@
         <div class="flex justify-between items-center px-6 md:px-10 py-4 max-w-7xl mx-auto">
             <a href="{% url 'home' %}" class="rs-headline text-xl font-bold" style="color:#855300;">Yoga Kailasa</a>
             <div class="flex items-center gap-4">
-                <button type="button" onclick="window.toggleBaseMobileMenu()" class="md:hidden text-[#534434] text-2xl focus:outline-none">
+                <button type="button" data-action="toggle-mobile-menu" class="md:hidden text-[#534434] text-2xl focus:outline-none">
                     <i class="fas fa-bars"></i>
                 </button>
                 <a href="{% url 'mudras' %}" class="text-sm font-medium" style="color:#534434;">← Back to Mudras</a>
@@ -121,7 +121,7 @@
                             referrerpolicy="strict-origin-when-cross-origin"></iframe>
                 </div>
             </div>
-            <script>
+            <script nonce="{{ request.csp_nonce }}">
             (function() {
                 var iframe = document.getElementById('video-iframe');
                 var fallback = document.getElementById('video-fallback');

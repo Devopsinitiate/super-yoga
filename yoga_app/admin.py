@@ -12,6 +12,7 @@ from .models import (
     Tag,
     Mudra, Meditation, Chakra, DailyPractice,
     KriyaSession, KriyaStep,
+    HighlightSession,
 )
 
 # --- Inline Classes for Course Management ---
@@ -158,14 +159,10 @@ class CourseAdmin(admin.ModelAdmin):
     inlines = [ModuleInline] # Add ModuleInline here
     fieldsets = (
         (None, {
-            'fields': ('title', 'instructor_name', 'price', 'is_popular', 'duration', 'image_url', 'start_date'),
+            'fields': ('title', 'instructor_name', 'price', 'is_popular', 'duration', 'image', 'image_url', 'start_date'),
         }),
         ('Content', {
-            'fields': ('description', 'instructions'),
-        }),
-        ('Details', {
-            'fields': ('benefits', 'contraindications'),
-            'description': 'Pose-specific benefits and contraindications. Leave blank to omit from the detail page.',
+            'fields': ('description', 'overview_content', 'includes'),
         }),
         ('Timestamps', {
             'fields': ('created_at', 'updated_at'),
@@ -312,6 +309,20 @@ class TestimonialAdmin(admin.ModelAdmin):
     def mark_unapproved(self, request, queryset):
         queryset.update(is_approved=False)
     mark_unapproved.short_description = "Mark selected testimonials as unapproved"
+
+
+@admin.register(HighlightSession)
+class HighlightSessionAdmin(admin.ModelAdmin):
+    """Homepage video highlights — yoga classes and therapy sessions."""
+    list_display = ('title', 'session_type', 'order', 'is_active', 'created_at')
+    list_filter = ('session_type', 'is_active')
+    list_editable = ('order', 'is_active')  # reorder/hide directly from the list
+    search_fields = ('title', 'description', 'instructor_label')
+    fieldsets = (
+        (None, {'fields': ('title', 'session_type', 'description')}),
+        ('Video', {'fields': ('video_url', 'thumbnail')}),
+        ('Display', {'fields': ('instructor_label', 'duration_label', 'order', 'is_active')}),
+    )
 
 @admin.register(Booking)
 class BookingAdmin(admin.ModelAdmin):

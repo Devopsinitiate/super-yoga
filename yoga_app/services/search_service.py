@@ -1,35 +1,7 @@
 from django.db.models import Q, Avg, Count
-from django.db import connection
 from django.utils import timezone
 from datetime import timedelta
 from yoga_app.models import YogaPose, BreathingTechnique, Course, BlogPost
-
-try:
-    from django.contrib.postgres.search import SearchVector, SearchQuery, SearchRank
-    _POSTGRES_SEARCH_AVAILABLE = True
-except ImportError:
-    _POSTGRES_SEARCH_AVAILABLE = False
-
-
-def is_postgres():
-    return connection.vendor == 'postgresql' and _POSTGRES_SEARCH_AVAILABLE
-
-
-def _model_has_search_vector(model):
-    """Returns True only if the model actually has search_vector as a DB column."""
-    try:
-        model._meta.get_field('search_vector')
-        return True
-    except Exception:
-        return False
-
-def _model_has_search_vector(model):
-    try:
-        model._meta.get_field('search_vector')
-        return True
-    except Exception:
-        return False
-
 
 
 class SearchService:
@@ -40,45 +12,20 @@ class SearchService:
         courses = Course.objects.none()
 
         if query:
-            if is_postgres() and _model_has_search_vector(YogaPose):
-                search_query = SearchQuery(query, search_type='websearch')
-                
-                if not category_filter or category_filter == 'poses':
-                    yoga_poses = YogaPose.objects.filter(
-                        search_vector=search_query
-                    ).annotate(
-                        rank=SearchRank('search_vector', search_query)
-                    ).order_by('-rank')
+            if not category_filter or category_filter == 'poses':
+                yoga_poses = YogaPose.objects.filter(
+                    Q(name__icontains=query) | Q(sanskrit_name__icontains=query) | Q(description__icontains=query)
+                ).distinct()
 
-                if not category_filter or category_filter == 'breathing':
-                    breathing_techniques = BreathingTechnique.objects.filter(
-                        search_vector=search_query
-                    ).annotate(
-                        rank=SearchRank('search_vector', search_query)
-                    ).order_by('-rank')
+            if not category_filter or category_filter == 'breathing':
+                breathing_techniques = BreathingTechnique.objects.filter(
+                    Q(name__icontains=query) | Q(sanskrit_name__icontains=query) | Q(description__icontains=query)
+                ).distinct()
 
-                if not category_filter or category_filter == 'courses':
-                    courses = Course.objects.filter(
-                        search_vector=search_query
-                    ).annotate(
-                        rank=SearchRank('search_vector', search_query)
-                    ).order_by('-rank', '-is_popular')
-            else:
-                # Fallback for SQLite
-                if not category_filter or category_filter == 'poses':
-                    yoga_poses = YogaPose.objects.filter(
-                        Q(name__icontains=query) | Q(sanskrit_name__icontains=query) | Q(description__icontains=query)
-                    ).distinct()
-
-                if not category_filter or category_filter == 'breathing':
-                    breathing_techniques = BreathingTechnique.objects.filter(
-                        Q(name__icontains=query) | Q(sanskrit_name__icontains=query) | Q(description__icontains=query)
-                    ).distinct()
-
-                if not category_filter or category_filter == 'courses':
-                    courses = Course.objects.filter(
-                        Q(title__icontains=query) | Q(instructor_name__icontains=query) | Q(description__icontains=query)
-                    ).distinct()
+            if not category_filter or category_filter == 'courses':
+                courses = Course.objects.filter(
+                    Q(title__icontains=query) | Q(instructor_name__icontains=query) | Q(description__icontains=query)
+                ).distinct()
         else:
             if not category_filter or category_filter == 'poses':
                 yoga_poses = YogaPose.objects.all()
@@ -109,120 +56,56 @@ class SearchService:
 
         suggestions = []
 
-        if is_postgres():
-            search_query = SearchQuery(query + ':*', search_type='raw')
+        poses = YogaPose.objects.filter(
+            Q(name__icontains=query) | Q(sanskrit_name__icontains=query)
+        ).values('id', 'name')[:limit]
 
-            poses = YogaPose.objects.filter(
-                search_vector=search_query
-            ).annotate(
-                rank=SearchRank('search_vector', search_query)
-            ).values('id', 'name')[:limit]
+        for pose in poses:
+            suggestions.append({
+                'type': 'pose',
+                'title': pose['name'],
+                'url': f"/poses/{pose['id']}/"
+            })
 
-            for pose in poses:
-                suggestions.append({
-                    'type': 'pose',
-                    'title': pose['name'],
-                    'url': f"/poses/{pose['id']}/"
-                })
+        techniques = BreathingTechnique.objects.filter(
+            Q(name__icontains=query) | Q(sanskrit_name__icontains=query)
+        ).values('id', 'name')[:limit]
 
-            techniques = BreathingTechnique.objects.filter(
-                search_vector=search_query
-            ).annotate(
-                rank=SearchRank('search_vector', search_query)
-            ).values('id', 'name')[:limit]
+        for tech in techniques:
+            suggestions.append({
+                'type': 'breathing',
+                'title': tech['name'],
+                'url': f"/breathing/{tech['id']}/"
+            })
 
-            for tech in techniques:
-                suggestions.append({
-                    'type': 'breathing',
-                    'title': tech['name'],
-                    'url': f"/breathing/{tech['id']}/"
-                })
+        courses = Course.objects.filter(
+            Q(title__icontains=query) | Q(instructor_name__icontains=query)
+        ).values('id', 'title')[:limit]
 
-            courses = Course.objects.filter(
-                search_vector=search_query
-            ).annotate(
-                rank=SearchRank('search_vector', search_query)
-            ).values('id', 'title')[:limit]
+        for course in courses:
+            suggestions.append({
+                'type': 'course',
+                'title': course['title'],
+                'url': f"/courses/{course['id']}/"
+            })
 
-            for course in courses:
-                suggestions.append({
-                    'type': 'course',
-                    'title': course['title'],
-                    'url': f"/courses/{course['id']}/"
-                })
+        blog_posts = BlogPost.objects.filter(
+            Q(title__icontains=query) | Q(excerpt__icontains=query),
+            is_published=True
+        ).values('slug', 'title')[:limit]
 
-            blog_posts = BlogPost.objects.annotate(
-                rank=SearchRank(
-                    SearchVector('title', weight='A') + SearchVector('excerpt', weight='B'),
-                    search_query
-                )
-            ).filter(rank__gt=0.1, is_published=True).values('slug', 'title')[:limit]
-
-            for blog_post in blog_posts:
-                suggestions.append({
-                    'type': 'blog_post',
-                    'title': blog_post['title'],
-                    'url': f"/blog/{blog_post['slug']}/"
-                })
-        else:
-            # Fallback for SQLite
-            poses = YogaPose.objects.filter(
-                Q(name__icontains=query) | Q(sanskrit_name__icontains=query)
-            ).values('id', 'name')[:limit]
-
-            for pose in poses:
-                suggestions.append({
-                    'type': 'pose',
-                    'title': pose['name'],
-                    'url': f"/poses/{pose['id']}/"
-                })
-
-            techniques = BreathingTechnique.objects.filter(
-                Q(name__icontains=query) | Q(sanskrit_name__icontains=query)
-            ).values('id', 'name')[:limit]
-
-            for tech in techniques:
-                suggestions.append({
-                    'type': 'breathing',
-                    'title': tech['name'],
-                    'url': f"/breathing/{tech['id']}/"
-                })
-
-            courses = Course.objects.filter(
-                Q(title__icontains=query) | Q(instructor_name__icontains=query)
-            ).values('id', 'title')[:limit]
-
-            for course in courses:
-                suggestions.append({
-                    'type': 'course',
-                    'title': course['title'],
-                    'url': f"/courses/{course['id']}/"
-                })
-
-            blog_posts = BlogPost.objects.filter(
-                Q(title__icontains=query) | Q(excerpt__icontains=query),
-                is_published=True
-            ).values('slug', 'title')[:limit]
-
-            for blog_post in blog_posts:
-                suggestions.append({
-                    'type': 'blog_post',
-                    'title': blog_post['title'],
-                    'url': f"/blog/{blog_post['slug']}/"
-                })
+        for blog_post in blog_posts:
+            suggestions.append({
+                'type': 'blog_post',
+                'title': blog_post['title'],
+                'url': f"/blog/{blog_post['slug']}/"
+            })
 
         return suggestions
 
     @staticmethod
     def filter_courses(courses_list, query='', price_filter='', instructor_filter='', duration_filter='', min_rating_filter='', sort_by='popular_desc'):
-        if query and is_postgres():
-            search_query = SearchQuery(query, search_type='websearch')
-            courses_list = courses_list.filter(
-                search_vector=search_query
-            ).annotate(
-                rank=SearchRank('search_vector', search_query)
-            ).order_by('-rank')
-        elif query:
+        if query:
             courses_list = courses_list.filter(
                 Q(title__icontains=query) |
                 Q(instructor_name__icontains=query) |
@@ -300,18 +183,7 @@ class SearchService:
             elif date_range == 'past_year':
                 posts = posts.filter(published_date__gte=today - timedelta(days=365))
 
-        if query and is_postgres():
-            search_query = SearchQuery(query, search_type='websearch')
-            posts = posts.annotate(
-                rank=SearchRank(
-                    SearchVector('title', weight='A') +
-                    SearchVector('content', weight='B') +
-                    SearchVector('excerpt', weight='C') +
-                    SearchVector('author__username', weight='D'),
-                    search_query
-                )
-            ).filter(rank__gt=0.1).order_by('-rank')
-        elif query:
+        if query:
             posts = posts.filter(
                 Q(title__icontains=query) |
                 Q(content__icontains=query) |

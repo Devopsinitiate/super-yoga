@@ -105,7 +105,7 @@
 {% endblock %}
 
 {% block content %}
-<script>document.body.classList.add('booking-active');</script>
+<script nonce="{{ request.csp_nonce }}">document.body.classList.add('booking-active');</script>
 <div class="booking-page">
     {# Top Navigation Shell #}
     <nav class="fixed top-0 w-full z-50 rs-glass shadow-[0_8px_30px_rgb(0,0,0,0.04)] h-20">
@@ -118,7 +118,7 @@
                 <a href="{% url 'consultant_list' %}" class="rs-text-stone-600 font-medium hover:rs-text-primary transition-all duration-300">Teachers</a>
             </div>
             <div class="flex items-center space-x-6">
-                <button type="button" onclick="window.toggleBaseMobileMenu()" class="md:hidden text-[#534434] text-2xl focus:outline-none">
+                <button type="button" data-action="toggle-mobile-menu" class="md:hidden text-[#534434] text-2xl focus:outline-none">
                     <i class="fas fa-bars"></i>
                 </button>
                 <a href="{% url 'booking' %}" class="rs-btn-primary px-6 py-2.5 rounded-lg font-medium text-sm hover:scale-[1.02] active:scale-[0.98] transition-all">Book a Mat</a>

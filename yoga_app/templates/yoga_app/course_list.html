@@ -476,7 +476,7 @@
 
 {% block extra_js %}
 {{ block.super }}
-<script>
+<script nonce="{{ request.csp_nonce }}">
 document.addEventListener('DOMContentLoaded', function() {
     const mobileFilterToggle = document.getElementById('mobileFilterToggle');
     const mobileFilters = document.getElementById('mobileFilters');

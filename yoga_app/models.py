@@ -3,12 +3,13 @@ from __future__ import annotations
 
 import logging
 import os
+import re
 from functools import cached_property
 
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.core.validators import MinValueValidator, MaxValueValidator
-from django.db import models, connection
+from django.db import models
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.utils import timezone
@@ -17,25 +18,6 @@ from django_ckeditor_5.fields import CKEditor5Field
 from yoga_app.utils.image_optimize import optimize_image
 
 logger = logging.getLogger(__name__)
-
-
-def _is_postgres():
-    """Returns True if the current database backend is PostgreSQL."""
-    try:
-        return connection.vendor == 'postgresql'
-    except Exception:
-        return False
-
-
-# Conditional PostgreSQL-only imports
-try:
-    from django.contrib.postgres.indexes import GinIndex
-    from django.contrib.postgres.search import SearchVectorField
-    _POSTGRES_AVAILABLE = True
-except ImportError:
-    _POSTGRES_AVAILABLE = False
-    GinIndex = None
-    SearchVectorField = None
 
 
 # User Profile Model to extend Django's built-in User model
@@ -474,6 +456,104 @@ class Testimonial(models.Model):
 
     def __str__(self):
         return f"Testimonial by {self.author_name} - {self.rating} stars"
+
+# Model for homepage "Highlighted Sessions" video carousel
+class HighlightSession(models.Model):
+    """
+    A highlighted video session shown on the homepage — e.g. a recorded yoga
+    class or a massage therapy session.
+
+    video_url accepts a link from YouTube, Vimeo, Instagram, Facebook or
+    TikTok; `embed_url` converts it into the platform's iframe embed URL.
+    """
+    SESSION_TYPE_CHOICES = [
+        ('yoga_class', 'Yoga Class'),
+        ('massage_therapy', 'Massage Therapy'),
+        ('meditation', 'Meditation Session'),
+        ('breathwork', 'Breathwork Session'),
+    ]
+
+    title = models.CharField(max_length=200, help_text="Session title shown on the homepage card.")
+    session_type = models.CharField(
+        max_length=30, choices=SESSION_TYPE_CHOICES, default='yoga_class',
+        help_text="Kind of session, used for the badge and icon on the card.",
+    )
+    description = models.TextField(blank=True, help_text="Short description shown under the title.")
+    video_url = models.URLField(max_length=500, help_text="Full link to the video (YouTube, Vimeo, Instagram, Facebook or TikTok).")
+    thumbnail = models.ImageField(upload_to='highlight_sessions/', blank=True, null=True, help_text="Optional custom thumbnail. YouTube thumbnails are used automatically when omitted.")
+    instructor_label = models.CharField(max_length=100, blank=True, help_text="Who leads the session (e.g. 'with Swami Dev').")
+    duration_label = models.CharField(max_length=50, blank=True, help_text="Shown length (e.g. '45 min').")
+    order = models.PositiveIntegerField(default=0, help_text="Display order on the homepage (lower first).")
+    is_active = models.BooleanField(default=True, help_text="Whether this session is shown on the homepage.")
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        verbose_name = "Highlight Session"
+        verbose_name_plural = "Highlight Sessions"
+        ordering = ['order', '-created_at']
+
+    def __str__(self):
+        return self.title
+
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+        if self.thumbnail:
+            optimized_path = optimize_image(self.thumbnail.path)
+            self.thumbnail.name = os.path.relpath(optimized_path, settings.MEDIA_ROOT)
+            super().save(update_fields=['thumbnail'])
+
+    @staticmethod
+    def _youtube_id(url: str) -> str:
+        patterns = [
+            r'youtu\.be/([\w-]{6,})',
+            r'youtube\.com/watch\?v=([\w-]{6,})',
+            r'youtube\.com/embed/([\w-]{6,})',
+            r'youtube\.com/shorts/([\w-]{6,})',
+            r'youtube\.com/live/([\w-]{6,})',
+        ]
+        for pattern in patterns:
+            match = re.search(pattern, url, re.IGNORECASE)
+            if match:
+                return match.group(1)
+        return ''
+
+    @property
+    def embed_url(self) -> str:
+        """Conversion of video_url into an iframe-ready embed URL ('' if unsupported)."""
+        url = self.video_url.strip()
+        if not url:
+            return ''
+
+        youtube_id = self._youtube_id(url)
+        if youtube_id:
+            return f'https://www.youtube-nocookie.com/embed/{youtube_id}'
+
+        match = re.search(r'vimeo\.com/(\d+)', url)
+        if match:
+            return f'https://player.vimeo.com/video/{match.group(1)}'
+
+        match = re.search(r'instagram\.com/(?:p|reel|tv)/([\w-]+)', url)
+        if match:
+            return f'https://www.instagram.com/p/{match.group(1)}/embed'
+
+        match = re.search(r'tiktok\.com/@[\w.]+/video/(\d+)', url)
+        if match:
+            return f'https://www.tiktok.com/embed/v2/{match.group(1)}'
+
+        if 'facebook.com' in url and '/videos/' in url:
+            return f'https://www.facebook.com/plugins/video.php?href={url}'
+        return ''
+
+    @property
+    def thumbnail_url(self) -> str:
+        """Uploaded thumbnail, else YouTube's auto thumbnail, else ''."""
+        if self.thumbnail:
+            return self.thumbnail.url
+        youtube_id = self._youtube_id(self.video_url)
+        if youtube_id:
+            return f'https://i.ytimg.com/vi/{youtube_id}/hqdefault.jpg'
+        return ''
 
 # Model for Booking Private Sessions
 class Booking(models.Model):

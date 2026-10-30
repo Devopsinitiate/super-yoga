@@ -37,6 +37,7 @@ FROM python:3.13-slim AS runtime
 
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
+    DJANGO_ENV=production \
     PORT=8000
 
 WORKDIR /app

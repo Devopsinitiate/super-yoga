@@ -158,7 +158,7 @@
 
 {% block extra_js %}
 {{ block.super }}
-<script>
+<script nonce="{{ request.csp_nonce }}">
     document.addEventListener('DOMContentLoaded', function() {
         // Star rating for the feedback form on the dedicated feedback page
         const feedbackStarContainer = document.getElementById('feedback-star-container');

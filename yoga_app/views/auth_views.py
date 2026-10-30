@@ -173,6 +173,7 @@ def verify_email_view(request, uidb64, token):
         return redirect('home')
 
 
+@ratelimit(key='ip', rate='10/h', block=True)
 def verify_email_pending_view(request, user_id):
     try:
         user = User.objects.get(pk=user_id)
@@ -196,6 +197,7 @@ def verify_email_pending_view(request, user_id):
 
 
 @login_required
+@ratelimit(key='user', rate='10/h', block=True)
 def resend_verification_view(request):
     if request.user.is_active:
         messages.info(request, "Your email is already verified.")

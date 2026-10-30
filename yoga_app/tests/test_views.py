@@ -276,7 +276,8 @@ class TestPaymentFlow:
 
 @pytest.mark.view
 class TestCeleryTasks:
-    @patch('yoga_app.tasks.send_mail')
+    # tasks.py imports send_mail inside the function body, so patch at the source module
+    @patch('django.core.mail.send_mail')
     def test_send_newsletter_email(self, mock_send_mail):
         send_newsletter_email('Subject', 'Body', ['to@example.com'])
         mock_send_mail.assert_called_once()

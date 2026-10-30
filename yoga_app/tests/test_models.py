@@ -55,8 +55,8 @@ class TestCourse:
 
     def test_course_lessons_property(self, course, module, lesson):
         lessons = course.lessons
-        assert lessons.count() == 1
-        assert lessons.first() == lesson
+        assert len(lessons) == 1
+        assert lessons[0] == lesson
 
     def test_course_str(self, course):
         assert str(course) == course.title

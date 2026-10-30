@@ -182,7 +182,7 @@
                 </nav>
             </div>
             <div class="flex items-center gap-4">
-                <button type="button" onclick="window.toggleBaseMobileMenu()" class="md:hidden text-[#534434] text-2xl focus:outline-none">
+                <button type="button" data-action="toggle-mobile-menu" class="md:hidden text-[#534434] text-2xl focus:outline-none">
                     <i class="fas fa-bars"></i>
                 </button>
                 <a href="{% url 'dashboard' %}" class="rs-on-surface-variant hover:rs-primary transition-colors duration-300">
@@ -513,7 +513,7 @@
             <i class="fas fa-home"></i>
             <span class="text-[10px] font-bold uppercase">Home</span>
         </a>
-        <button onclick="document.querySelector('aside').classList.toggle('hidden'); document.querySelector('aside').classList.toggle('fixed'); document.querySelector('aside').classList.toggle('z-50');" class="flex flex-col items-center gap-1 rs-primary">
+        <button data-action="toggle-aside" class="flex flex-col items-center gap-1 rs-primary">
             <i class="fas fa-list"></i>
             <span class="text-[10px] font-bold uppercase">Lessons</span>
         </button>

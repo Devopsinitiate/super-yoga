@@ -133,7 +133,7 @@
                 </nav>
             </div>
             <div class="flex items-center gap-4">
-                <button type="button" onclick="window.toggleBaseMobileMenu()" class="md:hidden text-[#534434] text-2xl focus:outline-none">
+                <button type="button" data-action="toggle-mobile-menu" class="md:hidden text-[#534434] text-2xl focus:outline-none">
                     <i class="fas fa-bars"></i>
                 </button>
                 {% if user.is_authenticated %}
@@ -221,7 +221,7 @@
                             Sign In to Enroll
                         </a>
                         {% endif %}
-                        <button onclick="document.getElementById('curriculum-section').scrollIntoView({behavior: 'smooth'})" class="rs-btn-secondary px-8 py-4 rounded-md font-semibold text-lg">
+                        <button data-action="scroll-to" data-target="curriculum-section" class="rs-btn-secondary px-8 py-4 rounded-md font-semibold text-lg">
                             View Syllabus
                         </button>
                     </div>
@@ -269,7 +269,7 @@
                         <div class="space-y-4">
                             {% for module in course.modules.all %}
                             <div class="group rs-surface-container-lowest rounded-xl overflow-hidden transition-all duration-300">
-                                <button class="w-full flex items-center justify-between p-6 text-left hover:bg-[#fdf2e7] transition-colors rs-accordion-trigger" onclick="toggleModule('module-{{ module.id }}')">
+                                <button class="w-full flex items-center justify-between p-6 text-left hover:bg-[#fdf2e7] transition-colors rs-accordion-trigger" data-action="toggle-module" data-target="module-{{ module.id }}">
                                     <div class="flex items-center gap-6">
                                         <span class="rs-outline text-2xl rs-headline">{{ module.order|stringformat:"02d" }}</span>
                                         <div>
@@ -581,7 +581,7 @@
 
 {% block extra_js %}
 {{ block.super }}
-<script>
+<script nonce="{{ request.csp_nonce }}">
     document.addEventListener('DOMContentLoaded', function() {
         /* Module Toggle Functionality */
         window.toggleModule = function(moduleId) {

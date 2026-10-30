@@ -174,7 +174,7 @@
                 <a href="{% url 'booking' %}" class="rs-text-on-surface-variant/70 font-medium hover:rs-text-primary transition-colors duration-300">Retreats</a>
             </nav>
             <div class="flex items-center gap-4">
-                <button type="button" onclick="window.toggleBaseMobileMenu()" class="md:hidden text-[#855300] text-2xl focus:outline-none">
+                <button type="button" data-action="toggle-mobile-menu" class="md:hidden text-[#855300] text-2xl focus:outline-none">
                     <i class="fas fa-bars"></i>
                 </button>
                 <a href="{% url 'all_notifications' %}" class="rs-text-primary scale-95 active:duration-150">
@@ -253,7 +253,7 @@
                             </div>
                             {% endif %}
                         </div>
-                        <button type="button" onclick="document.getElementById('id_profile_picture').click()" class="absolute bottom-2 right-2 rs-bg-primary-container rs-text-on-primary-container p-2 rounded-full shadow-lg hover:scale-105 transition-transform">
+                        <button type="button" data-action="pick-profile-picture" data-target="id_profile_picture" class="absolute bottom-2 right-2 rs-bg-primary-container rs-text-on-primary-container p-2 rounded-full shadow-lg hover:scale-105 transition-transform">
                             <i class="fas fa-edit text-sm"></i>
                         </button>
                     </div>
@@ -418,11 +418,11 @@
                         <div class="space-y-6">
                             <label class="flex items-center justify-between cursor-pointer group">
                                 <span class="rs-text-on-surface font-medium">Class Reminders & Updates</span>
-                                <div class="rs-toggle {% if user_profile.receive_email_notifications %}active{% endif %}" onclick="this.classList.toggle('active')"></div>
+                                <div class="rs-toggle {% if user_profile.receive_email_notifications %}active{% endif %}" data-action="toggle-class-active"></div>
                             </label>
                             <label class="flex items-center justify-between cursor-pointer group">
                                 <span class="rs-text-on-surface font-medium">Weekly Meditative Insights</span>
-                                <div class="rs-toggle {% if user_profile.receive_app_notifications %}active{% endif %}" onclick="this.classList.toggle('active')"></div>
+                                <div class="rs-toggle {% if user_profile.receive_app_notifications %}active{% endif %}" data-action="toggle-class-active"></div>
                             </label>
                         </div>
                     </div>
@@ -477,7 +477,7 @@
 
 {% block extra_js %}
 {{ block.super }}
-<script>
+<script nonce="{{ request.csp_nonce }}">
 document.addEventListener('DOMContentLoaded', function() {
     /* Custom Delete Confirmation Modal Logic */
     const openModalBtn = document.getElementById('open-delete-modal');

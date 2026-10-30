@@ -240,6 +240,63 @@
     </section>
     {% endif %}
 
+    {# Highlighted Video Sessions (yoga classes / massage therapy) #}
+    {% if highlight_sessions %}
+    <section id="highlight-sessions" class="py-32 px-6 md:px-12 rs-surface">
+        <div class="max-w-7xl mx-auto">
+            <div class="text-center mb-16">
+                <span class="px-4 py-1.5 rs-primary/10 rs-primary text-xs font-bold uppercase tracking-widest rounded-full">In Focus</span>
+                <h2 class="rs-headline text-5xl font-bold rs-primary mb-4 leading-tight mt-6">Sessions In Motion</h2>
+                <p class="rs-on-surface-variant text-lg max-w-2xl mx-auto">
+                    Recorded highlights from our yoga classes and therapy sessions — watch, feel, then book your mat.
+                </p>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                {% for session in highlight_sessions %}
+                <article class="rs-surface-container-lowest rounded-2xl overflow-hidden shadow-sm rs-card flex flex-col">
+                    {# 16:9 embed slot — lazy thumbnail, iframe swaps in on click #}
+                    <div class="relative w-full rs-embed-slot" data-action="load-video-embed" data-embed="{{ session.embed_url }}" style="aspect-ratio: 16 / 9; cursor: pointer;" tabindex="0" role="button" aria-label="Play {{ session.title }}">
+                        {% if session.thumbnail_url %}
+                        <img src="{{ session.thumbnail_url }}" alt="{{ session.title }}" loading="lazy" class="absolute inset-0 w-full h-full object-cover">
+                        <div class="absolute inset-0 flex items-center justify-center bg-black/20 hover:bg-black/10 transition-colors">
+                            <span class="w-14 h-14 rounded-full rs-btn-primary flex items-center justify-center text-lg pl-1 shadow-lg">
+                                <i class="fas fa-play"></i>
+                            </span>
+                        </div>
+                        {% elif session.embed_url %}
+                        <iframe src="{{ session.embed_url }}" title="{{ session.title }}" loading="lazy"
+                                class="absolute inset-0 w-full h-full"
+                                allow="autoplay; encrypted-media; picture-in-picture; fullscreen" allowfullscreen></iframe>
+                        {% else %}
+                        <div class="absolute inset-0 rs-surface-container flex items-center justify-center">
+                            <i class="fas fa-video text-4xl rs-primary/30"></i>
+                        </div>
+                        {% endif %}
+                    </div>
+                    <div class="p-6 flex flex-col flex-grow">
+                        <div class="flex items-center justify-between mb-3">
+                            <span class="px-3 py-1 bg-[#fdf2e7] rs-primary text-xs font-bold uppercase tracking-widest rounded-full">
+                                {% if session.session_type == 'yoga_class' %}<i class="fas fa-spa mr-1"></i> Yoga Class
+                                {% elif session.session_type == 'massage_therapy' %}<i class="fas fa-hand-holding-heart mr-1"></i> Massage Therapy
+                                {% elif session.session_type == 'meditation' %}<i class="fas fa-om mr-1"></i> Meditation
+                                {% else %}<i class="fas fa-wind mr-1"></i> Breathwork{% endif %}
+                            </span>
+                            {% if session.duration_label %}<span class="rs-on-surface-variant text-xs">{{ session.duration_label }}</span>{% endif %}
+                        </div>
+                        <h3 class="rs-headline text-xl font-bold rs-primary mb-2">{{ session.title }}</h3>
+                        {% if session.description %}<p class="rs-on-surface-variant text-sm leading-relaxed mb-3">{{ session.description|truncatechars:140 }}</p>{% endif %}
+                        <div class="mt-auto flex items-center gap-2 border-t border-[#d8c3ad]/30 pt-4 text-sm">
+                            {% if session.instructor_label %}<i class="fas fa-user rs-secondary"></i><span class="rs-on-surface-variant">{{ session.instructor_label }}</span>{% endif %}
+                            <a href="{{ session.video_url }}" target="_blank" rel="noopener" class="ml-auto rs-primary font-semibold hover:opacity-70 transition-opacity">Open video <i class="fas fa-arrow-up-right-from-square ml-1 text-xs"></i></a>
+                        </div>
+                    </div>
+                </article>
+                {% endfor %}
+            </div>
+        </div>
+    </section>
+    {% endif %}
+
     {# Popular Courses (Bento Grid) #}
     {% if courses %}
     <section class="py-32 px-6 md:px-12 rs-surface-container">

@@ -35,6 +35,11 @@ class StandardPagination(PageNumberPagination):
     max_page_size = 100
 
 
+class BookingRateThrottle(AnonRateThrottle):
+    """Throttle public booking/contact submissions to prevent form spam."""
+    scope = 'booking'
+
+
 class CourseViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Course.objects.prefetch_related('reviews', 'modules__lessons').order_by('-is_popular', 'price')
     serializer_class = CourseSerializer
@@ -254,9 +259,17 @@ class BookingViewSet(viewsets.ModelViewSet):
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
 
     def get_permissions(self):
-        if self.action in ('create', 'update', 'partial_update', 'destroy'):
-            return [permissions.IsAuthenticated()]
-        return [permissions.AllowAny()]
+        # Anyone can submit a booking (mirrors the public booking page);
+        # only admins can list/read/modify existing bookings
+        if self.action == 'create':
+            return [permissions.AllowAny()]
+        return [permissions.IsAdminUser()]
+
+    def get_throttles(self):
+        if self.action == 'create':
+            self.throttle_scope = 'booking'
+            return [BookingRateThrottle()]
+        return super().get_throttles()
 
 
 class ContactMessageViewSet(viewsets.ModelViewSet):
@@ -268,3 +281,9 @@ class ContactMessageViewSet(viewsets.ModelViewSet):
         if self.action == 'create':
             return [permissions.AllowAny()]
         return [permissions.IsAdminUser()]
+
+    def get_throttles(self):
+        if self.action == 'create':
+            self.throttle_scope = 'booking'
+            return [BookingRateThrottle()]
+        return super().get_throttles()

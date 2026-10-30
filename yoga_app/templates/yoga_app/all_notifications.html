@@ -100,7 +100,7 @@
                 <a href="{% url 'blog_list' %}" class="rs-text-on-surface-variant/70 hover:rs-text-secondary transition-colors duration-300">Community</a>
             </nav>
             <div class="flex items-center space-x-6">
-                <button type="button" onclick="window.toggleBaseMobileMenu()" class="md:hidden text-[#534434] text-2xl focus:outline-none">
+                <button type="button" data-action="toggle-mobile-menu" class="md:hidden text-[#534434] text-2xl focus:outline-none">
                     <i class="fas fa-bars"></i>
                 </button>
                 <a href="{% url 'all_notifications' %}" class="rs-text-primary cursor-pointer hover:scale-95 duration-200">
@@ -229,7 +229,7 @@
 {% endblock %}
 
 {% block extra_js %}
-<script>
+<script nonce="{{ request.csp_nonce }}">
 document.addEventListener('DOMContentLoaded', function() {
     const markAllBtn = document.getElementById('markAllReadBtn');
     if (markAllBtn) {

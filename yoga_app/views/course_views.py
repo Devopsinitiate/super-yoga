@@ -5,8 +5,7 @@ from django.contrib.auth.decorators import login_required
 from django.db.models import Avg, Count, Q
 from django.db import connection
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
-from django.views.decorators.cache import cache_page
-from django.views.decorators.vary import vary_on_cookie
+from yoga_app.views.content_views import _cached_items
 from yoga_app.models import Course, Module, Lesson, UserProfile, UserCourseCompletion, UserLessonCompletion, LessonComment
 from yoga_app.forms import CourseReviewForm, LessonCommentForm
 from yoga_app.services import EnrollmentService, ProgressService, ReviewService, SearchService
@@ -18,74 +17,79 @@ def is_postgres():
     return connection.vendor == 'postgresql'
 
 
-@vary_on_cookie
-@cache_page(60 * 5)  # 5 minutes, varies per session so enrolled state is correct
 def course_list_view(request):
-    courses_list = Course.objects.all().prefetch_related('reviews')
+    def build_queryset():
+        courses_list = Course.objects.all().prefetch_related('reviews')
 
-    query = request.GET.get('q')
-    price_filter = request.GET.get('price_filter')
-    instructor_filter = request.GET.get('instructor_filter')
-    duration_filter = request.GET.get('duration_filter')
-    min_rating_filter = request.GET.get('min_rating_filter')
-    sort_by = request.GET.get('sort_by', 'popular_desc')
+        query = request.GET.get('q')
+        price_filter = request.GET.get('price_filter')
+        instructor_filter = request.GET.get('instructor_filter')
+        duration_filter = request.GET.get('duration_filter')
+        min_rating_filter = request.GET.get('min_rating_filter')
+        sort_by = request.GET.get('sort_by', 'popular_desc')
 
-    if query:
-        if is_postgres():
-            from django.contrib.postgres.search import SearchVector, SearchQuery, SearchRank
-            search_query = SearchQuery(query, search_type='websearch')
-            courses_list = courses_list.annotate(
-                rank=SearchRank(
-                    SearchVector('title', weight='A') +
-                    SearchVector('instructor_name', weight='B') +
-                    SearchVector('description', weight='C'),
-                    search_query
-                )
-            ).filter(rank__gt=0.1).order_by('-rank')
+        if query:
+            if is_postgres():
+                from django.contrib.postgres.search import SearchVector, SearchQuery, SearchRank
+                search_query = SearchQuery(query, search_type='websearch')
+                courses_list = courses_list.annotate(
+                    rank=SearchRank(
+                        SearchVector('title', weight='A') +
+                        SearchVector('instructor_name', weight='B') +
+                        SearchVector('description', weight='C'),
+                        search_query
+                    )
+                ).filter(rank__gt=0.1).order_by('-rank')
+            else:
+                courses_list = courses_list.filter(
+                    Q(title__icontains=query) |
+                    Q(instructor_name__icontains=query) |
+                    Q(description__icontains=query)
+                ).distinct()
         else:
-            courses_list = courses_list.filter(
-                Q(title__icontains=query) | 
-                Q(instructor_name__icontains=query) | 
-                Q(description__icontains=query)
-            ).distinct()
-    else:
-        if sort_by == 'rating_desc':
-            courses_list = courses_list.annotate(avg_rating=Avg('reviews__rating'))
-
-        if sort_by == 'newest':
-            courses_list = courses_list.order_by('-created_at')
-        elif sort_by == 'price_asc':
-            courses_list = courses_list.order_by('price')
-        elif sort_by == 'price_desc':
-            courses_list = courses_list.order_by('-price')
-        elif sort_by == 'alpha_asc':
-            courses_list = courses_list.order_by('title')
-        elif sort_by == 'rating_desc':
-            courses_list = courses_list.order_by('-avg_rating')
-        else:
-            courses_list = courses_list.order_by('-is_popular', 'title')
-
-    if price_filter == 'free':
-        courses_list = courses_list.filter(price=0.00)
-    elif price_filter == 'paid':
-        courses_list = courses_list.exclude(price=0.00)
-
-    if instructor_filter:
-        courses_list = courses_list.filter(instructor_name__icontains=instructor_filter)
-
-    if duration_filter:
-        courses_list = courses_list.filter(duration__icontains=duration_filter)
-
-    if min_rating_filter:
-        try:
-            min_rating = float(min_rating_filter)
-            if 'avg_rating' not in courses_list.query.annotations:
+            if sort_by == 'rating_desc':
                 courses_list = courses_list.annotate(avg_rating=Avg('reviews__rating'))
-            courses_list = courses_list.filter(
-                Q(avg_rating__gte=min_rating) | Q(avg_rating__isnull=True)
-            )
-        except ValueError:
-            pass
+
+            if sort_by == 'newest':
+                courses_list = courses_list.order_by('-created_at')
+            elif sort_by == 'price_asc':
+                courses_list = courses_list.order_by('price')
+            elif sort_by == 'price_desc':
+                courses_list = courses_list.order_by('-price')
+            elif sort_by == 'alpha_asc':
+                courses_list = courses_list.order_by('title')
+            elif sort_by == 'rating_desc':
+                courses_list = courses_list.order_by('-avg_rating')
+            else:
+                courses_list = courses_list.order_by('-is_popular', 'title')
+
+        if price_filter == 'free':
+            courses_list = courses_list.filter(price=0.00)
+        elif price_filter == 'paid':
+            courses_list = courses_list.exclude(price=0.00)
+
+        if instructor_filter:
+            courses_list = courses_list.filter(instructor_name__icontains=instructor_filter)
+
+        if duration_filter:
+            courses_list = courses_list.filter(duration__icontains=duration_filter)
+
+        if min_rating_filter:
+            try:
+                min_rating = float(min_rating_filter)
+                if 'avg_rating' not in courses_list.query.annotations:
+                    courses_list = courses_list.annotate(avg_rating=Avg('reviews__rating'))
+                courses_list = courses_list.filter(
+                    Q(avg_rating__gte=min_rating) | Q(avg_rating__isnull=True)
+                )
+            except ValueError:
+                pass
+        return courses_list
+
+    # Data-level caching (per filter combination) — full-page cache_page would
+    # embed stale CSP nonces in cached HTML, breaking inline scripts on hits.
+    cache_key = f"course_list:{request.GET.urlencode()}"
+    courses_list = _cached_items(cache_key, build_queryset, 60 * 5)
 
     paginator = Paginator(courses_list, 9)
     page = request.GET.get('page')
@@ -111,12 +115,12 @@ def course_list_view(request):
 
     context = {
         'courses': courses,
-        'query': query,
-        'price_filter': price_filter,
-        'instructor_filter': instructor_filter,
-        'duration_filter': duration_filter,
-        'min_rating_filter': min_rating_filter,
-        'sort_by': sort_by,
+        'query': request.GET.get('q'),
+        'price_filter': request.GET.get('price_filter'),
+        'instructor_filter': request.GET.get('instructor_filter'),
+        'duration_filter': request.GET.get('duration_filter'),
+        'min_rating_filter': request.GET.get('min_rating_filter'),
+        'sort_by': request.GET.get('sort_by', 'popular_desc'),
         'all_instructors': all_instructors,
         'all_durations': all_durations,
         'enrolled_course_ids': enrolled_course_ids,

@@ -1,6 +1,7 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from django.db.models import Q
+from django_ratelimit.decorators import ratelimit
 from yoga_app.models import Consultant
 from yoga_app.forms import BookingForm
 from yoga_app.tasks import send_booking_confirmation_email
@@ -30,6 +31,7 @@ def consultant_detail_view(request, consultant_id):
     return render(request, 'yoga_app/consultant_detail.html', context)
 
 
+@ratelimit(key='ip', rate='10/h', block=True)
 def booking_view(request):
     if request.method == 'POST':
         form = BookingForm(request.POST)

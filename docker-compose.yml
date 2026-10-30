@@ -30,6 +30,7 @@ services:
     restart: unless-stopped
     env_file: .env
     environment:
+      DJANGO_ENV: production
       POSTGRES_HOST: db
       REDIS_URL: redis://redis:6379/0
     ports:
@@ -50,6 +51,7 @@ services:
     restart: unless-stopped
     env_file: .env
     environment:
+      DJANGO_ENV: production
       POSTGRES_HOST: db
       REDIS_URL: redis://redis:6379/0
     volumes:

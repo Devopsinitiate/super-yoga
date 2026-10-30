@@ -149,7 +149,7 @@
 
 {% block extra_js %}
 {{ block.super }} {# Keep inherited JS from base.html #}
-<script>
+<script nonce="{{ request.csp_nonce }}">
     document.addEventListener('DOMContentLoaded', function() {
         // Event listener for all like buttons (topics and posts)
         document.querySelectorAll('.like-button').forEach(button => {

@@ -189,7 +189,7 @@
                 <a href="{% url 'blog_list' %}" class="rs-headline tracking-tight leading-relaxed rs-primary border-b-2 border-[#855300]/50 pb-1">Journal</a>
             </div>
             <div class="flex items-center space-x-4">
-                <button type="button" onclick="window.toggleBaseMobileMenu()" class="md:hidden text-[#534434] text-2xl focus:outline-none">
+                <button type="button" data-action="toggle-mobile-menu" class="md:hidden text-[#534434] text-2xl focus:outline-none">
                     <i class="fas fa-bars"></i>
                 </button>
                 {% if user.is_authenticated %}
@@ -420,7 +420,7 @@
 
 {% block extra_js %}
 {{ block.super }}
-<script>
+<script nonce="{{ request.csp_nonce }}">
 document.addEventListener('DOMContentLoaded', function() {
     const likeButton = document.getElementById('likeButton');
     const likesCountSpan = document.getElementById('likesCount');

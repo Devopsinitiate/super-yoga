@@ -153,7 +153,7 @@
                                placeholder="••••••••"
                                {% if form.password.field.required %}required{% endif %}
                                autocomplete="current-password">
-                        <button type="button" class="absolute right-3 top-1/2 -translate-y-1/2 rs-text-outline hover:rs-text-primary transition-colors" onclick="togglePasswordVisibility()">
+                        <button type="button" class="absolute right-3 top-1/2 -translate-y-1/2 rs-text-outline hover:rs-text-primary transition-colors" data-action="toggle-password">
                             <i class="fas fa-eye" id="togglePasswordIcon"></i>
                         </button>
                     </div>
@@ -180,7 +180,7 @@
     </div>
 </div>
 
-<script>
+<script nonce="{{ request.csp_nonce }}">
 function togglePasswordVisibility() {
     const passwordInput = document.getElementById('{{ form.password.id_for_label }}');
     const toggleIcon = document.getElementById('togglePasswordIcon');

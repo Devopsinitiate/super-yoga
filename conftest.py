@@ -14,6 +14,15 @@ def enable_db_access_for_all_tests(db):
     pass
 
 
+@pytest.fixture(scope='session', autouse=True)
+def celery_eager_mode():
+    """Run Celery tasks inline during tests so no broker/worker is required."""
+    from yoga_kailasa.celery import app as celery_app
+    celery_app.conf.task_always_eager = True
+    celery_app.conf.task_eager_propagates = False
+    yield
+
+
 @pytest.fixture
 def user(django_user_model):
     return django_user_model.objects.create_user(
